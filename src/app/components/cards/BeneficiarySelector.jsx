@@ -1,4 +1,5 @@
-import { PropTypes, Component } from 'react';
+import PropTypes from 'prop-types';
+import { Component } from 'react';
 import Autocomplete from 'react-autocomplete';
 import shouldComponentUpdate from 'app/utils/shouldComponentUpdate';
 import { validate_account_name } from 'app/utils/ChainValidation';

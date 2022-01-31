@@ -1,4 +1,5 @@
-import { PropTypes, createElement, Component } from 'react';
+import PropTypes from 'prop-types';
+import { createElement, Component } from 'react';
 import { browserHistory } from 'react-router';
 import Icon from 'app/components/elements/Icon';
 import { findParent } from 'app/utils/DomUtils';
