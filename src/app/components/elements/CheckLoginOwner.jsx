@@ -12,7 +12,7 @@ class CheckLoginOwner extends React.Component {
         super();
         this.state = {};
     }
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         const { login_owner_pubkey } = nextProps;
         if (
             login_owner_pubkey &&

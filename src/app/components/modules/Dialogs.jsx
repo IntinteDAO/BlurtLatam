@@ -23,7 +23,7 @@ class Dialogs extends React.Component {
             this.props.hide(name);
         };
     }
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         const { active_dialogs, hide } = nextProps;
         active_dialogs.forEach((v, k) => {
             if (!this['hide_' + k]) this['hide_' + k] = () => hide(k);

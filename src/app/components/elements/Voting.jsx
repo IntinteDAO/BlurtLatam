@@ -204,13 +204,13 @@ class Voting extends React.Component {
         this.shouldComponentUpdate = shouldComponentUpdate(this, 'Voting');
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         const { username, active_votes } = this.props;
         this._checkMyVote(username, active_votes);
         this.getVotingManabar(username);
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         const { username, active_votes } = nextProps;
         this._checkMyVote(username, active_votes);
         this.getVotingManabar(username);

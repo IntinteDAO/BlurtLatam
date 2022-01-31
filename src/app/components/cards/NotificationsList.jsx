@@ -95,7 +95,7 @@ class NotificationsList extends React.Component {
         super();
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         const { username, getAccountNotifications } = this.props;
         if (username) {
             getAccountNotifications(username);
