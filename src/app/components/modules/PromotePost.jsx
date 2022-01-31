@@ -1,9 +1,6 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import ReactDOM from 'react-dom';
-import * as transactionActions from 'app/redux/TransactionReducer';
-import * as globalActions from 'app/redux/GlobalReducer';
 import LoadingIndicator from 'app/components/elements/LoadingIndicator';
 import {
     DEBT_TOKEN,
@@ -32,7 +29,8 @@ class PromotePost extends Component {
 
     componentDidMount() {
         setTimeout(() => {
-            ReactDOM.findDOMNode(this.refs.amount).focus();
+            this.amountRef.focus();
+            // ReactDOM.findDOMNode(this.refs.amount).focus();
         }, 300);
     }
 
@@ -101,7 +99,7 @@ class PromotePost extends Component {
                                         type="text"
                                         placeholder={tt('g.amount')}
                                         value={amount}
-                                        ref="amount"
+                                        ref={amount => this.amountRef = amount}
                                         autoComplete="off"
                                         disabled={loading}
                                         onChange={this.amountChange}

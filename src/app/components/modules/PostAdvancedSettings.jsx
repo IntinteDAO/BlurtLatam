@@ -1,6 +1,5 @@
 import { PropTypes, Component } from 'react';
 import * as React from 'react';
-import ReactDOM from 'react-dom';
 import reactForm from 'app/utils/ReactForm';
 import { SUBMIT_FORM_ID } from 'shared/constants';
 import tt from 'counterpart';
@@ -12,7 +11,7 @@ import * as userActions from 'app/redux/UserReducer';
 
 class PostAdvancedSettings extends Component {
     static propTypes = {
-        formId: React.PropTypes.string.isRequired,
+        formId: PropTypes.string.isRequired,
     };
 
     constructor(props) {
