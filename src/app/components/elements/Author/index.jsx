@@ -1,19 +1,15 @@
 /* eslint react/prop-types: 0 */
 import { Component } from 'react';
 import PropTypes from 'prop-types';
-import ReactDOM from 'react-dom';
 import shouldComponentUpdate from 'app/utils/shouldComponentUpdate';
 import Icon from 'app/components/elements/Icon';
 import { Link } from 'react-router';
-import { authorNameAndRep } from 'app/utils/ComponentFormatters';
-import AuthorDropdown from '../AuthorDropdown';
-// import Reputation from 'app/components/elements/Reputation';
 import normalizeProfile from 'app/utils/NormalizeProfile';
 import AffiliationMap from 'app/utils/AffiliationMap';
 import tt from 'counterpart';
 import Overlay from 'react-overlays/lib/Overlay';
 import { findDOMNode } from 'react-dom';
-
+import AuthorDropdown from '../AuthorDropdown';
 import Blacklist from '../Blacklist';
 
 const { string, bool, number } = PropTypes;
@@ -21,7 +17,7 @@ const { string, bool, number } = PropTypes;
 const closers = [];
 
 const fnCloseAll = () => {
-    var close;
+    let close;
     while ((close = closers.shift())) {
         close();
     }
@@ -53,11 +49,10 @@ class Author extends Component {
         if (!this.authorProfileLink) {
             return;
         }
-        const node = ReactDOM.findDOMNode(this.authorProfileLink);
-        if (node.addEventListener) {
-            node.addEventListener('click', this.toggle, false);
+        if (this.authorProfileLink.addEventListener) {
+            this.authorProfileLink.addEventListener('click', this.toggle, false);
         } else {
-            node.attachEvent('click', this.toggle, false);
+            this.authorProfileLink.attachEvent('click', this.toggle, false);
         }
     }
 
@@ -67,11 +62,10 @@ class Author extends Component {
         if (!this.authorProfileLink) {
             return;
         }
-        const node = ReactDOM.findDOMNode(this.authorProfileLink);
-        if (node.removeEventListener) {
-            node.removeEventListener('click', this.toggle);
+        if (this.authorProfileLink.removeEventListener) {
+            this.authorProfileLink.removeEventListener('click', this.toggle);
         } else {
-            node.detachEvent('click', this.toggle);
+            this.authorProfileLink.detachEvent('click', this.toggle);
         }
     }
 

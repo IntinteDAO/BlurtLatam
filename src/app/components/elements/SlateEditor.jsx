@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import Slate, { Editor, Mark, Raw, Html } from 'slate';
+import { Editor, Raw, Html } from 'slate';
 import Portal from 'react-portal';
 import position from 'selection-position';
 import Icon from 'app/components/elements/Icon';
@@ -13,9 +13,11 @@ import {
     getMarkdownType,
 } from 'app/utils/SlateEditor/Schema';
 
+import InsertBlockOnEnter from 'slate-insert-block-on-enter';
+import TrailingBlock from 'slate-trailing-block';
+
 const serializer = new Html({ rules: HtmlRules });
-export const serializeHtml = (state) =>
-    serializer
+export const serializeHtml = (state) => serializer
         .serialize(state, { render: false })
         .map((el) => ReactDOMServer.renderToStaticMarkup(el))
         .join('\n');
@@ -24,10 +26,7 @@ export const getDemoState = () => Raw.deserialize(demoState, { terse: true });
 
 const DEFAULT_NODE = 'paragraph';
 
-let plugins = [];
-
-import InsertBlockOnEnter from 'slate-insert-block-on-enter';
-import TrailingBlock from 'slate-trailing-block';
+const plugins = [];
 
 if (process.env.BROWSER) {
     //import InsertImages from 'slate-drop-or-paste-images'
@@ -62,15 +61,15 @@ export default class SlateEditor extends Component {
         this.state = { state: props.initialState };
     }
 
-    componentDidMount = () => {
+    componentDidMount() {
         this.updateMenu();
         this.updateSidebar();
-    };
+    }
 
-    componentDidUpdate = () => {
+    componentDidUpdate() {
         this.updateMenu();
         this.updateSidebar();
-    };
+    }
 
     // On backspace, if at the start of a non-paragraph, convert it back into a paragraph node.
     onBackspace = (e, state) => {
@@ -83,8 +82,7 @@ export default class SlateEditor extends Component {
 
         let transform = state.transform().setBlock('paragraph');
 
-        if (startBlock.type == 'list-item')
-            transform = transform
+        if (startBlock.type == 'list-item') transform = transform
                 .unwrapBlock('bulleted-list')
                 .unwrapBlock('numbered-list');
 
@@ -247,19 +245,17 @@ export default class SlateEditor extends Component {
         const { startBlock, startOffset, endOffset } = state;
 
         // On return, if at the end of a node type that should not be extended, create a new paragraph below it.
-        if (startOffset == 0 && startBlock.length == 0)
-            return this.onBackspace(e, state); //empty block
+        if (startOffset == 0 && startBlock.length == 0) return this.onBackspace(e, state); //empty block
         if (endOffset != startBlock.length) return; //not at end of block
 
         if (
-            startBlock.type != 'heading-one' &&
-            startBlock.type != 'heading-two' &&
-            startBlock.type != 'heading-three' &&
-            startBlock.type != 'heading-four' &&
-            startBlock.type != 'block-quote' &&
-            startBlock.type != 'code-block'
-        )
-            return;
+            startBlock.type != 'heading-one'
+            && startBlock.type != 'heading-two'
+            && startBlock.type != 'heading-three'
+            && startBlock.type != 'heading-four'
+            && startBlock.type != 'block-quote'
+            && startBlock.type != 'code-block'
+        ) return;
 
         e.preventDefault();
         return state.transform().splitBlock().setBlock('paragraph').apply();
@@ -323,9 +319,9 @@ export default class SlateEditor extends Component {
 
         // Allow soft returns for certain block types
         if (
-            startBlock.type == 'paragraph' ||
-            startBlock.type == 'code-block' ||
-            startBlock.type == 'block-quote'
+            startBlock.type == 'paragraph'
+            || startBlock.type == 'code-block'
+            || startBlock.type == 'block-quote'
         ) {
             let transform = state.transform();
             if (state.isExpanded) transform = transform.delete();
@@ -342,7 +338,7 @@ export default class SlateEditor extends Component {
     // If space was entered, check if it was a markdown sequence
     onSpace = (e, state) => {
         if (state.isExpanded) return;
-        let { selection } = state;
+        const { selection } = state;
         const { startText, startBlock, startOffset } = state;
         const chars = startBlock.text.slice(0, startOffset); //.replace(/\s*/g, '')
         const type = getMarkdownType(chars);
@@ -353,10 +349,8 @@ export default class SlateEditor extends Component {
 
         let transform = state.transform().setBlock(type);
 
-        if (type == 'list-item' && chars != '1.')
-            transform = transform.wrapBlock('bulleted-list');
-        if (type == 'list-item' && chars == '1.')
-            transform = transform.wrapBlock('numbered-list');
+        if (type == 'list-item' && chars != '1.') transform = transform.wrapBlock('bulleted-list');
+        if (type == 'list-item' && chars == '1.') transform = transform.wrapBlock('numbered-list');
 
         state = transform.extendToStartOf(startBlock).delete().apply();
 
@@ -368,9 +362,8 @@ export default class SlateEditor extends Component {
         const { state } = this.state;
         const { document } = state;
         return state.blocks.some(
-            (node) =>
-                node.type == type ||
-                !!document.getClosest(node, (parent) => parent.type == type)
+            (node) => node.type == type
+                || !!document.getClosest(node, (parent) => parent.type == type)
         );
     };
 
@@ -574,7 +567,7 @@ export default class SlateEditor extends Component {
         );
     };
 
-    render = () => {
+    render() {
         const { state } = this.state;
         return (
             <div>
@@ -583,5 +576,5 @@ export default class SlateEditor extends Component {
                 {this.renderEditor()}
             </div>
         );
-    };
+    }
 }
