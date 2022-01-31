@@ -4,12 +4,6 @@ import { connect } from 'react-redux';
 import { Sparklines, SparklinesLine } from 'react-sparklines';
 
 class Coin extends Component {
-    constructor(props) {
-        super(props);
-        this.onPointMouseMove = this.onPointMouseMove.bind(this);
-        this.onPointMouseOut = this.onPointMouseOut.bind(this);
-    }
-
     componentDidMount() {
         const node = ReactDOM.findDOMNode(this.refs.coin);
         node.querySelectorAll('circle').forEach((circle) => {
@@ -66,7 +60,7 @@ class Coin extends Component {
         );
     }
 
-    onPointMouseMove(e) {
+    onPointMouseMove = e => {
         const node = ReactDOM.findDOMNode(this.refs.coin);
         const caption = node.querySelector('.caption');
         const circle = e.currentTarget;
@@ -78,13 +72,13 @@ class Coin extends Component {
         const timepoint = point.get('timepoint');
         const time = new Date(timepoint).toLocaleString();
         caption.innerText = `$${priceUsd} ${time}`;
-    }
+    };
 
-    onPointMouseOut(e) {
+    onPointMouseOut = e => {
         const node = ReactDOM.findDOMNode(this.refs.coin);
         const caption = node.querySelector('.caption');
         caption.innerText = '';
-    }
+    };
 }
 
 class SteemMarket extends Component {

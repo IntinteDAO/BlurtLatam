@@ -43,7 +43,6 @@ class PostsIndex extends Component {
     constructor() {
         super();
         this.state = {};
-        this.loadMore = this.loadMore.bind(this);
         this.shouldComponentUpdate = shouldComponentUpdate(this, 'PostsIndex');
     }
 
@@ -63,7 +62,7 @@ class PostsIndex extends Component {
         return topic_discussions.get(order);
     }
 
-    loadMore(last_post) {
+    loadMore = last_post => {
         if (!last_post) return;
         let {
             accountname,
@@ -84,7 +83,8 @@ class PostsIndex extends Component {
             category,
             accountname,
         });
-    }
+    };
+
     onShowSpam = () => {
         this.setState({ showSpam: !this.state.showSpam });
     };

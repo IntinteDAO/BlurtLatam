@@ -18,7 +18,6 @@ function image2canvas(image, bgcolor) {
 export default class PdfDownload extends Component {
     constructor(props) {
         super(props);
-        this.downloadPdf = this.downloadPdf.bind(this);
         this.state = { loaded: false };
     }
 
@@ -35,11 +34,11 @@ export default class PdfDownload extends Component {
         );
     }
 
-    downloadPdf() {
+    downloadPdf = () => {
         const keys = this.generateKeys(this.props.name, this.props.password);
         const filename = this.props.name + '_steem_keys.pdf';
         this.renderPdf(keys, filename).save(filename);
-    }
+    };
 
     // Generate the canvas, which will be generated into a PDF
     async componentDidMount() {

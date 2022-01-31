@@ -46,8 +46,6 @@ class PostsList extends Component {
             showNegativeComments: false,
         };
         this.scrollListener = this.scrollListener.bind(this);
-        this.onBackButton = this.onBackButton.bind(this);
-        this.closeOnOutsideClick = this.closeOnOutsideClick.bind(this);
         this.shouldComponentUpdate = shouldComponentUpdate(this, 'PostsList');
     }
 
@@ -65,13 +63,13 @@ class PostsList extends Component {
         document.getElementsByTagName('body')[0].className = '';
     }
 
-    onBackButton(e) {
+    onBackButton = e => {
         if ('keyCode' in e && e.keyCode !== 27) return;
         window.removeEventListener('popstate', this.onBackButton);
         window.removeEventListener('keydown', this.onBackButton);
-    }
+    };
 
-    closeOnOutsideClick(e) {
+    closeOnOutsideClick = e => {
         const inside_post = findParent(e.target, 'PostsList__post_container');
         if (!inside_post) {
             const inside_top_bar = findParent(
@@ -88,7 +86,7 @@ class PostsList extends Component {
                 this.closePostModal();
             }
         }
-    }
+    };
 
     fetchIfNeeded() {
         this.scrollListener();

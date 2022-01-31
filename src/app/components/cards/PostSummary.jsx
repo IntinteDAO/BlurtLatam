@@ -38,7 +38,6 @@ class PostSummary extends Component {
     constructor() {
         super();
         this.state = { revealNsfw: false };
-        this.onRevealNsfw = this.onRevealNsfw.bind(this);
     }
 
     shouldComponentUpdate(props, state) {
@@ -53,10 +52,10 @@ class PostSummary extends Component {
         );
     }
 
-    onRevealNsfw(e) {
+    onRevealNsfw = e => {
         e.preventDefault();
         this.setState({ revealNsfw: true });
-    }
+    };
 
     render() {
         const { thumbSize, ignore } = this.props;

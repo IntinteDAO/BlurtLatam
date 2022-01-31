@@ -13,15 +13,14 @@ class Settings extends Component {
             errorMessage: '',
             successMessage: '',
         };
-        this.onNsfwPrefChange = this.onNsfwPrefChange.bind(this);
     }
 
-    onNsfwPrefChange(e) {
+    onNsfwPrefChange = e => {
         this.props.setUserPreferences({
             ...this.props.user_preferences,
             nsfwPref: e.currentTarget.value,
         });
-    }
+    };
 
     handleDefaultBlogPayoutChange = (event) => {
         this.props.setUserPreferences({

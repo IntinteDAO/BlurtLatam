@@ -28,10 +28,6 @@ class PromotePost extends Component {
             amountError: '',
             trxError: '',
         };
-        this.onSubmit = this.onSubmit.bind(this);
-        this.errorCallback = this.errorCallback.bind(this);
-        this.amountChange = this.amountChange.bind(this);
-        // this.assetChange = this.assetChange.bind(this);
     }
 
     componentDidMount() {
@@ -40,11 +36,11 @@ class PromotePost extends Component {
         }, 300);
     }
 
-    errorCallback(estr) {
+    errorCallback = estr => {
         this.setState({ trxError: estr, loading: false });
-    }
+    };
 
-    onSubmit(e) {
+    onSubmit = e => {
         e.preventDefault();
         const { author, permlink, onClose } = this.props;
         const { amount } = this.state;
@@ -59,13 +55,13 @@ class PromotePost extends Component {
             currentUser: this.props.currentUser,
             errorCallback: this.errorCallback,
         });
-    }
+    };
 
-    amountChange(e) {
+    amountChange = e => {
         const amount = e.target.value;
         // console.log('-- PromotePost.amountChange -->', amount);
         this.setState({ amount });
-    }
+    };
 
     // assetChange(e) {
     //     const asset = e.target.value;

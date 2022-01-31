@@ -122,7 +122,6 @@ class CommentImpl extends Component {
     constructor() {
         super();
         this.state = { collapsed: false, hide_body: false, highlight: false };
-        this.revealBody = this.revealBody.bind(this);
         this.shouldComponentUpdate = shouldComponentUpdate(this, 'Comment');
         this.onShowReply = () => {
             const { showReply } = this.state;
@@ -169,7 +168,6 @@ class CommentImpl extends Component {
                 this.props.bandwidth_kbytes_fee
             );
         };
-        this.toggleCollapsed = this.toggleCollapsed.bind(this);
     }
 
     UNSAFE_componentWillMount() {
@@ -208,13 +206,13 @@ class CommentImpl extends Component {
         }
     }
 
-    toggleCollapsed() {
+    toggleCollapsed = () => {
         this.setState({ collapsed: !this.state.collapsed });
-    }
+    };
 
-    revealBody() {
+    revealBody = () => {
         this.setState({ hide_body: false });
-    }
+    };
 
     initEditor(props) {
         if (this.state.PostReplyEditor) return;

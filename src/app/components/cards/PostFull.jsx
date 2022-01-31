@@ -96,10 +96,6 @@ class PostFull extends Component {
     constructor() {
         super();
         this.state = {};
-        this.fbShare = this.fbShare.bind(this);
-        this.twitterShare = this.twitterShare.bind(this);
-        this.redditShare = this.redditShare.bind(this);
-        this.linkedInShare = this.linkedInShare.bind(this);
         this.showExplorePost = this.showExplorePost.bind(this);
         this.onShowReply = () => {
             const {
@@ -159,7 +155,7 @@ class PostFull extends Component {
         );
     }
 
-    fbShare(e) {
+    fbShare = e => {
         const href = this.share_params.url;
         e.preventDefault();
         window.open(
@@ -168,9 +164,9 @@ class PostFull extends Component {
             'width=600, height=400, scrollbars=no'
         );
         serverApiRecordEvent('FbShare', this.share_params.link);
-    }
+    };
 
-    twitterShare(e) {
+    twitterShare = e => {
         serverApiRecordEvent('TwitterShare', this.share_params.link);
         e.preventDefault();
         const winWidth = 640;
@@ -195,9 +191,9 @@ class PostFull extends Component {
                 ',height=' +
                 winHeight
         );
-    }
+    };
 
-    redditShare(e) {
+    redditShare = e => {
         serverApiRecordEvent('RedditShare', this.share_params.link);
         e.preventDefault();
         const s = this.share_params;
@@ -207,9 +203,9 @@ class PostFull extends Component {
             '&url=' +
             encodeURIComponent(s.url);
         window.open('https://www.reddit.com/submit?' + q, 'Share');
-    }
+    };
 
-    linkedInShare(e) {
+    linkedInShare = e => {
         serverApiRecordEvent('LinkedInShare', this.share_params.link);
         e.preventDefault();
         const winWidth = 720;
@@ -235,7 +231,7 @@ class PostFull extends Component {
                 ',height=' +
                 winHeight
         );
-    }
+    };
 
     showPromotePost = () => {
         const post_content = this.props.cont.get(this.props.post);

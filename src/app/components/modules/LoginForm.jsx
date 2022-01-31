@@ -35,7 +35,6 @@ class LoginForm extends Component {
         super();
         const cryptoTestResult = runTests();
         let cryptographyFailure = false;
-        this.SignUp = this.SignUp.bind(this);
         if (cryptoTestResult !== undefined) {
             console.error(
                 'CreateAccount - cryptoTestResult: ',
@@ -114,12 +113,12 @@ class LoginForm extends Component {
         });
     }
 
-    SignUp() {
+    SignUp = () => {
         const onType =
             document.getElementsByClassName('OpAction')[0].textContent;
         serverApiRecordEvent('FreeMoneySignUp', onType);
         window.location.href = SIGNUP_URL;
-    }
+    };
 
     GetKeychain() {
         window.location.href = KEYCHAIN_URL;

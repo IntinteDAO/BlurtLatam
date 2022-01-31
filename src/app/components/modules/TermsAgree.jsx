@@ -15,11 +15,9 @@ class TermsAgree extends Component {
             tosChecked: false,
             privacyChecked: false,
         };
-        this.termsAgree = this.termsAgree.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this);
     }
 
-    handleInputChange(event) {
+    handleInputChange = event => {
         const target = event.target;
         const value =
             target.type === 'checkbox' ? target.checked : target.value;
@@ -28,12 +26,12 @@ class TermsAgree extends Component {
         this.setState({
             [name]: value,
         });
-    }
+    };
 
-    termsAgree(e) {
+    termsAgree = e => {
         // let user proceed
         this.props.acceptTerms(e);
-    }
+    };
 
     static propTypes = {
         username: PropTypes.string.isRequired,

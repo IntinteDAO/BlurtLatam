@@ -31,7 +31,6 @@ export default class Follow extends Component {
         super();
         this.state = {};
         this.initEvents(props);
-        this.followLoggedOut = this.followLoggedOut.bind(this);
         this.shouldComponentUpdate = shouldComponentUpdate(this, 'Follow');
     }
 
@@ -76,13 +75,13 @@ export default class Follow extends Component {
         };
     }
 
-    followLoggedOut(e) {
+    followLoggedOut = e => {
         // close author preview if present
         const author_preview = document.querySelector('.dropdown-pane.is-open');
         if (author_preview) author_preview.remove();
         // resume authenticate modal
         this.props.showLogin(e);
-    }
+    };
 
     render() {
         const { loading } = this.props;

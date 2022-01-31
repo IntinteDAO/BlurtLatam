@@ -14,7 +14,6 @@ export default class FoundationDropdown extends Component {
     constructor(props) {
         super(props);
         this.state = { show: props.show };
-        this.closeOnOutsideClick = this.closeOnOutsideClick.bind(this);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -49,14 +48,14 @@ export default class FoundationDropdown extends Component {
         );
     }
 
-    closeOnOutsideClick(e) {
+    closeOnOutsideClick = e => {
         const inside_dropdown = findParent(e.target, 'FoundationDropdown');
         // console.log('-- closeOnOutsideClick -->', e.target, inside_dropdown);
         if (!inside_dropdown) {
             this.setState({ show: false });
             if (this.props.onHide) this.props.onHide();
         }
-    }
+    };
 
     render() {
         if (!this.state.show) return null;
