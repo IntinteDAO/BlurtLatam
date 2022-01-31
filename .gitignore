@@ -37,7 +37,7 @@ build/
 node_modules/
 ./node_modules/
 ./tmp
-./dist
+# ./dist/*
 ./lib
 *.log
 yarn.lock
