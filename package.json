@@ -95,7 +95,7 @@
         "picturefill": "3.0.3",
         "postcss-preset-env": "^7.1.0",
         "qrious": "^4.0.2",
-        "react": "15.6.2",
+        "react": "^17.0.2",
         "react-ab-test": "1.7.0",
         "react-addons-pure-render-mixin": "^15.6.3",
         "react-adsense": "^0.1.0",
