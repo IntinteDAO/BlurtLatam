@@ -42,6 +42,15 @@ const remarkable = new Remarkable({ html: true, breaks: true });
 const RTE_DEFAULT = false;
 
 class ReplyEditor extends Component {
+    static defaultProps = {
+        // eslint-disable-next-line react/default-props-match-prop-types
+        isStory: false,
+        author: '',
+        parent_author: '',
+        parent_permlink: '',
+        type: 'submit_comment',
+    };
+
     static propTypes = {
         // html component attributes
         formId: PropTypes.string.isRequired, // unique form id for each editor
@@ -61,15 +70,6 @@ class ReplyEditor extends Component {
         defaultPayoutType: PropTypes.string,
         payoutType: PropTypes.string,
         summary: PropTypes.string,
-    };
-
-    static defaultProps = {
-        // eslint-disable-next-line react/default-props-match-prop-types
-        isStory: false,
-        author: '',
-        parent_author: '',
-        parent_permlink: '',
-        type: 'submit_comment',
     };
 
     constructor(props) {
@@ -178,74 +178,6 @@ class ReplyEditor extends Component {
         }
     }
 
-    initForm(props) {
-        const { isStory, type, fields } = props;
-        const isEdit = type === 'edit';
-        const maxKb = isStory ? 65 : 16;
-        const markdownRegex = /(?:\*[\w\s]*\*|#[\w\s]*#|_[\w\s]*_|~[\w\s]*~|]\s*\(|]\s*\[)/;
-        const htmlTagRegex = /<\/?[\w\s="/.':;#-/?]+>/gi;
-        reactForm({
-            fields,
-            instance: this,
-            name: 'replyForm',
-            initialValues: props.initialValues,
-            validation: (values) => ({
-                title:
-                    isStory
-                    && (!values.title || values.title.trim() === ''
-                        ? tt('g.required')
-                        : values.title.length > 255
-                            ? tt('reply_editor.shorten_title')
-                            : null),
-                category: isStory && validateCategory(values.category, !isEdit),
-                body: !values.body
-                    ? tt('g.required')
-                    : values.body.length > maxKb * 1024
-                        ? tt('reply_editor.exceeds_maximum_length', { maxKb })
-                        : null,
-                summary:
-                    isStory
-                    && (values.summary.length > 140
-                        ? tt('reply_editor.shorten_summary')
-                        : markdownRegex.test(values.summary)
-                            ? tt('reply_editor.markdown_not_supported')
-                            : htmlTagRegex.test(values.summary)
-                                ? tt('reply_editor.html_not_supported')
-                                : null),
-            }),
-        });
-    }
-
-    onTitleChange = (e) => {
-        const { value } = e.target;
-        // TODO block links in title (they do not make good permlinks)
-        const hasMarkdown = /(?:\*[\w\s]*\*|\#[\w\s]*\#|_[\w\s]*_|~[\w\s]*~|\]\s*\(|\]\s*\[)/.test(
-            value
-        );
-        this.setState({
-            titleWarn: hasMarkdown
-                ? tt('reply_editor.markdown_not_supported')
-                : '',
-        });
-        const { title } = this.state;
-        title.props.onChange(e);
-    };
-
-    onSummaryChange = (e) => {
-        const { value } = e.target;
-        // TODO block links in title (they do not make good permlinks)
-        const hasMarkdown = /(?:\*[\w\s]*\*|\#[\w\s]*\#|_[\w\s]*_|~[\w\s]*~|\]\s*\(|\]\s*\[)/.test(
-            value
-        );
-        this.setState({
-            summaryWarn: hasMarkdown
-                ? tt('reply_editor.markdown_not_supported')
-                : '',
-        });
-        const { summary } = this.state;
-        summary.props.onChange(e);
-    };
-
     onCancel = (e) => {
         if (e) e.preventDefault();
         const { formId, onCancel, defaultPayoutType } = this.props;
@@ -272,48 +204,6 @@ class ReplyEditor extends Component {
         const html = stateToHtml(rte_value);
         const { body } = this.state;
         if (body.value !== html) body.props.onChange(html);
-    };
-
-    toggleRte = (e) => {
-        e.preventDefault();
-        const state = { rte: !this.state.rte };
-        if (state.rte) {
-            const { body } = this.state;
-            state.rte_value = isHtmlTest(body.value)
-                ? stateFromHtml(this.props.richTextEditor, body.value)
-                : stateFromMarkdown(this.props.richTextEditor, body.value);
-        }
-        this.setState(state);
-        localStorage.setItem('replyEditorData-rte', !this.state.rte);
-    };
-
-    showDraftSaved() {
-        try {
-            // this.refs = React.createRef();
-            const { draft } = this.refs;
-            draft.className = 'ReplyEditor__draft';
-            // eslint-disable-next-line no-void
-            void draft.offsetWidth; // reset animation
-            draft.className = 'ReplyEditor__draft ReplyEditor__draft-saved';
-        } catch (err) {
-            // do nothing
-        }
-    }
-
-    showAdvancedSettings = (e) => {
-        e.preventDefault();
-        this.props.setPayoutType(this.props.formId, this.props.payoutType);
-        this.props.showAdvancedSettings(this.props.formId);
-    };
-
-    displayErrorMessage = (message) => {
-        this.setState({
-            progress: { error: message },
-        });
-
-        setTimeout(() => {
-            this.setState({ progress: {} });
-        }, 6000); // clear message
     };
 
     onDrop = (acceptedFiles, rejectedFiles) => {
@@ -373,12 +263,83 @@ class ReplyEditor extends Component {
         }
     };
 
-    uploadNextImage = () => {
-        if (imagesToUpload.length > 0) {
-            const nextImage = imagesToUpload.pop();
-            this.upload(nextImage);
-        }
+    onSummaryChange = (e) => {
+        const { value } = e.target;
+        // TODO block links in title (they do not make good permlinks)
+        const hasMarkdown = /(?:\*[\w\s]*\*|\#[\w\s]*\#|_[\w\s]*_|~[\w\s]*~|\]\s*\(|\]\s*\[)/.test(
+            value
+        );
+        this.setState({
+            summaryWarn: hasMarkdown
+                ? tt('reply_editor.markdown_not_supported')
+                : '',
+        });
+        const { summary } = this.state;
+        summary.props.onChange(e);
     };
+
+    onTitleChange = (e) => {
+        const { value } = e.target;
+        // TODO block links in title (they do not make good permlinks)
+        const hasMarkdown = /(?:\*[\w\s]*\*|\#[\w\s]*\#|_[\w\s]*_|~[\w\s]*~|\]\s*\(|\]\s*\[)/.test(
+            value
+        );
+        this.setState({
+            titleWarn: hasMarkdown
+                ? tt('reply_editor.markdown_not_supported')
+                : '',
+        });
+        const { title } = this.state;
+        title.props.onChange(e);
+    };
+
+    displayErrorMessage = (message) => {
+        this.setState({
+            progress: { error: message },
+        });
+
+        setTimeout(() => {
+            this.setState({ progress: {} });
+        }, 6000); // clear message
+    };
+
+    initForm(props) {
+        const { isStory, type, fields } = props;
+        const isEdit = type === 'edit';
+        const maxKb = isStory ? 65 : 16;
+        const markdownRegex = /(?:\*[\w\s]*\*|#[\w\s]*#|_[\w\s]*_|~[\w\s]*~|]\s*\(|]\s*\[)/;
+        const htmlTagRegex = /<\/?[\w\s="/.':;#-/?]+>/gi;
+        reactForm({
+            fields,
+            instance: this,
+            name: 'replyForm',
+            initialValues: props.initialValues,
+            validation: (values) => ({
+                title:
+                    isStory
+                    && (!values.title || values.title.trim() === ''
+                        ? tt('g.required')
+                        : values.title.length > 255
+                            ? tt('reply_editor.shorten_title')
+                            : null),
+                category: isStory && validateCategory(values.category, !isEdit),
+                body: !values.body
+                    ? tt('g.required')
+                    : values.body.length > maxKb * 1024
+                        ? tt('reply_editor.exceeds_maximum_length', { maxKb })
+                        : null,
+                summary:
+                    isStory
+                    && (values.summary.length > 140
+                        ? tt('reply_editor.shorten_summary')
+                        : markdownRegex.test(values.summary)
+                            ? tt('reply_editor.markdown_not_supported')
+                            : htmlTagRegex.test(values.summary)
+                                ? tt('reply_editor.html_not_supported')
+                                : null),
+            }),
+        });
+    }
 
     insertPlaceHolders = () => {
         let { imagesUploadCount } = this.state;
@@ -403,6 +364,38 @@ class ReplyEditor extends Component {
             + placeholder
             + body.value.substring(selectionStart, body.value.length)
         );
+    };
+
+    showAdvancedSettings = (e) => {
+        e.preventDefault();
+        this.props.setPayoutType(this.props.formId, this.props.payoutType);
+        this.props.showAdvancedSettings(this.props.formId);
+    };
+
+    showDraftSaved() {
+        try {
+            // this.refs = React.createRef();
+            const { draft } = this.refs;
+            draft.className = 'ReplyEditor__draft';
+            // eslint-disable-next-line no-void
+            void draft.offsetWidth; // reset animation
+            draft.className = 'ReplyEditor__draft ReplyEditor__draft-saved';
+        } catch (err) {
+            // do nothing
+        }
+    }
+
+    toggleRte = (e) => {
+        e.preventDefault();
+        const state = { rte: !this.state.rte };
+        if (state.rte) {
+            const { body } = this.state;
+            state.rte_value = isHtmlTest(body.value)
+                ? stateFromHtml(this.props.richTextEditor, body.value)
+                : stateFromMarkdown(this.props.richTextEditor, body.value);
+        }
+        this.setState(state);
+        localStorage.setItem('replyEditorData-rte', !this.state.rte);
     };
 
     upload = (image) => {
@@ -432,6 +425,13 @@ class ReplyEditor extends Component {
                 this.setState({ progress });
             }
         });
+    };
+
+    uploadNextImage = () => {
+        if (imagesToUpload.length > 0) {
+            const nextImage = imagesToUpload.pop();
+            this.upload(nextImage);
+        }
     };
 
     render() {

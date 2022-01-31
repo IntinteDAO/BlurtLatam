@@ -49,6 +49,10 @@ const VOTE_WEIGHT_DROPDOWN_THRESHOLD = 50; //if BP is more than 50, enable the s
 const MAX_WEIGHT = 10000;
 
 class Voting extends Component {
+    static defaultProps = {
+        showList: true,
+    };
+
     static propTypes = {
         // HTML properties
         post: PropTypes.string.isRequired,
@@ -68,10 +72,6 @@ class Voting extends Component {
         voting: PropTypes.bool,
         // price_per_blurt: PropTypes.number,
         // sbd_print_rate: PropTypes.number,
-    };
-
-    static defaultProps = {
-        showList: true,
     };
 
     constructor(props) {
@@ -222,19 +222,6 @@ class Voting extends Component {
         this.getVotingManabar(username);
     }
 
-    _checkMyVote(username, active_votes) {
-        if (username && active_votes) {
-            const vote = active_votes.find(
-                (el) => el.get('voter') === username
-            );
-            // weight warning, the API may send a string or a number (when zero)
-            if (vote)
-                this.setState({
-                    myVote: parseInt(vote.get('percent') || 0, 10),
-                });
-        }
-    }
-
     getVotingManabar(username) {
         if (username) {
             api.getAccounts([username], (err, response) => {
@@ -284,6 +271,19 @@ class Voting extends Component {
                     }
                 }
             });
+        }
+    }
+
+    _checkMyVote(username, active_votes) {
+        if (username && active_votes) {
+            const vote = active_votes.find(
+                (el) => el.get('voter') === username
+            );
+            // weight warning, the API may send a string or a number (when zero)
+            if (vote)
+                this.setState({
+                    myVote: parseInt(vote.get('percent') || 0, 10),
+                });
         }
     }
 

@@ -16,20 +16,11 @@ export default class HelpTip extends Component {
         };
     }
 
-    show = () => this.setVisibility(true);
-    hide = () => this.setVisibility(false);
-
     setVisibility = (visible) => {
         this.setState({
             visible,
         });
     };
-
-    handleTouch = () => {
-        this.show();
-        this.assignOutsideTouchHandler();
-    };
-
     assignOutsideTouchHandler = () => {
         const handler = (e) => {
             let currentNode = e.target;
@@ -44,6 +35,15 @@ export default class HelpTip extends Component {
         };
         document.addEventListener('touchstart', handler);
     };
+
+    handleTouch = () => {
+        this.show();
+        this.assignOutsideTouchHandler();
+    };
+
+    hide = () => this.setVisibility(false);
+
+    show = () => this.setVisibility(true);
 
     render() {
         const { props, state, show, hide, handleTouch } = this;

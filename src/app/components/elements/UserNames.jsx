@@ -13,12 +13,12 @@ function userLink(name) {
 }
 
 class UserNames extends Component {
+    static defaultProps = {
+        size: 2,
+    };
     static propTypes = {
         names: PropTypes.array,
         size: PropTypes.number,
-    };
-    static defaultProps = {
-        size: 2,
     };
 
     render() {

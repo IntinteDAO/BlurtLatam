@@ -28,16 +28,13 @@ export default class DropdownMenu extends Component {
         document.removeEventListener('click', this.hide);
     }
 
-    toggle = (e) => {
-        const { shown } = this.state;
-        if (shown) this.hide(e);
-        else this.show(e);
-    };
-
-    show = (e) => {
-        e.preventDefault();
-        this.setState({ shown: true });
-        document.addEventListener('click', this.hide);
+    getSelectedLabel = (items, selected) => {
+        const selectedEntry = items.find((i) => i.value === selected);
+        const selectedLabel =
+            selectedEntry && selectedEntry.label
+                ? selectedEntry.label
+                : selected;
+        return selectedLabel;
     };
 
     hide = (e) => {
@@ -61,13 +58,16 @@ export default class DropdownMenu extends Component {
         browserHistory.push(a.pathname + a.search);
     };
 
-    getSelectedLabel = (items, selected) => {
-        const selectedEntry = items.find((i) => i.value === selected);
-        const selectedLabel =
-            selectedEntry && selectedEntry.label
-                ? selectedEntry.label
-                : selected;
-        return selectedLabel;
+    show = (e) => {
+        e.preventDefault();
+        this.setState({ shown: true });
+        document.addEventListener('click', this.hide);
+    };
+
+    toggle = (e) => {
+        const { shown } = this.state;
+        if (shown) this.hide(e);
+        else this.show(e);
     };
 
     render() {

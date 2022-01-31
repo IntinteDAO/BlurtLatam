@@ -2,6 +2,30 @@ import { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 
 class BiddingAd extends Component {
+    constructor(props) {
+        super(props);
+        const { ad, enabled, type } = props;
+
+        this.ad = {};
+        this.type = type;
+        this.enabled = false;
+
+        if (ad) {
+            // console.info(
+            //     `Slot named '${props.slotName}' will render with given data:`,
+            //     ad
+            // );
+            this.enabled = enabled;
+            this.ad = ad.toJS();
+        } else {
+            // console.info(
+            //     `Slot named '${
+            //         props.slotName
+            //     }' will be disabled because we were unable to find the ad details.`
+            // );
+        }
+    }
+
     componentDidMount() {
         if (!this.ad.path || !this.enabled) return;
 
@@ -48,30 +72,6 @@ class BiddingAd extends Component {
                 },
             });
         });
-    }
-
-    constructor(props) {
-        super(props);
-        const { ad, enabled, type } = props;
-
-        this.ad = {};
-        this.type = type;
-        this.enabled = false;
-
-        if (ad) {
-            // console.info(
-            //     `Slot named '${props.slotName}' will render with given data:`,
-            //     ad
-            // );
-            this.enabled = enabled;
-            this.ad = ad.toJS();
-        } else {
-            // console.info(
-            //     `Slot named '${
-            //         props.slotName
-            //     }' will be disabled because we were unable to find the ad details.`
-            // );
-        }
     }
 
     render() {

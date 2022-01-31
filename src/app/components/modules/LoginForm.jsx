@@ -21,14 +21,14 @@ import { extractLoginData } from 'app/utils/UserUtil';
 import { browserHistory } from 'react-router';
 
 class LoginForm extends Component {
+    static defaultProps = {
+        afterLoginRedirectToWelcome: false,
+    };
+
     static propTypes = {
         // Steemit.
         loginError: PropTypes.string,
         onCancel: PropTypes.func,
-    };
-
-    static defaultProps = {
-        afterLoginRedirectToWelcome: false,
     };
 
     constructor(props) {
@@ -87,6 +87,17 @@ class LoginForm extends Component {
 
     shouldComponentUpdate = shouldComponentUpdate(this, 'LoginForm');
 
+    GetKeychain() {
+        window.location.href = KEYCHAIN_URL;
+    }
+
+    SignUp = () => {
+        const onType =
+            document.getElementsByClassName('OpAction')[0].textContent;
+        serverApiRecordEvent('FreeMoneySignUp', onType);
+        window.location.href = SIGNUP_URL;
+    };
+
     initForm(props) {
         reactForm({
             name: 'login',
@@ -113,27 +124,16 @@ class LoginForm extends Component {
         });
     }
 
-    SignUp = () => {
-        const onType =
-            document.getElementsByClassName('OpAction')[0].textContent;
-        serverApiRecordEvent('FreeMoneySignUp', onType);
-        window.location.href = SIGNUP_URL;
-    };
-
-    GetKeychain() {
-        window.location.href = KEYCHAIN_URL;
-    }
-
-    useKeychainToggle = () => {
-        const { useKeychain } = this.state;
-        useKeychain.props.onChange(!useKeychain.value);
-    };
-
     saveLoginToggle = () => {
         const { saveLogin } = this.state;
         saveLoginDefault = !saveLoginDefault;
         localStorage.setItem('saveLogin', saveLoginDefault ? 'yes' : 'no');
         saveLogin.props.onChange(saveLoginDefault); // change UI
+    };
+
+    useKeychainToggle = () => {
+        const { useKeychain } = this.state;
+        useKeychain.props.onChange(!useKeychain.value);
     };
 
     render() {

@@ -16,6 +16,15 @@ export default class FoundationDropdown extends Component {
         this.state = { show: props.show };
     }
 
+    UNSAFE_componentWillReceiveProps(newProps) {
+        if (
+            newProps.show !== this.props.show &&
+            newProps.show !== this.state.show
+        ) {
+            this.setState({ show: newProps.show });
+        }
+    }
+
     componentDidUpdate(prevProps, prevState) {
         const show = this.state.show;
         if (show !== prevState.show) {
@@ -29,15 +38,6 @@ export default class FoundationDropdown extends Component {
                     'mousedown',
                     this.closeOnOutsideClick
                 );
-        }
-    }
-
-    UNSAFE_componentWillReceiveProps(newProps) {
-        if (
-            newProps.show !== this.props.show &&
-            newProps.show !== this.state.show
-        ) {
-            this.setState({ show: newProps.show });
         }
     }
 

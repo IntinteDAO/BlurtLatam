@@ -166,45 +166,6 @@ class PostFull extends Component {
         serverApiRecordEvent('FbShare', this.share_params.link);
     };
 
-    twitterShare = e => {
-        serverApiRecordEvent('TwitterShare', this.share_params.link);
-        e.preventDefault();
-        const winWidth = 640;
-        const winHeight = 460;
-        const winTop = screen.height / 2 - winHeight / 2;
-        const winLeft = screen.width / 2 - winWidth / 2;
-        const s = this.share_params;
-        const q =
-            'text=' +
-            encodeURIComponent(s.title) +
-            '&url=' +
-            encodeURIComponent(s.url);
-        window.open(
-            'http://twitter.com/share?' + q,
-            'Share',
-            'top=' +
-                winTop +
-                ',left=' +
-                winLeft +
-                ',toolbar=0,status=0,width=' +
-                winWidth +
-                ',height=' +
-                winHeight
-        );
-    };
-
-    redditShare = e => {
-        serverApiRecordEvent('RedditShare', this.share_params.link);
-        e.preventDefault();
-        const s = this.share_params;
-        const q =
-            'title=' +
-            encodeURIComponent(s.title) +
-            '&url=' +
-            encodeURIComponent(s.url);
-        window.open('https://www.reddit.com/submit?' + q, 'Share');
-    };
-
     linkedInShare = e => {
         serverApiRecordEvent('LinkedInShare', this.share_params.link);
         e.preventDefault();
@@ -233,6 +194,24 @@ class PostFull extends Component {
         );
     };
 
+    redditShare = e => {
+        serverApiRecordEvent('RedditShare', this.share_params.link);
+        e.preventDefault();
+        const s = this.share_params;
+        const q =
+            'title=' +
+            encodeURIComponent(s.title) +
+            '&url=' +
+            encodeURIComponent(s.url);
+        window.open('https://www.reddit.com/submit?' + q, 'Share');
+    };
+
+    showExplorePost = () => {
+        const permlink = this.share_params.link;
+        const title = this.share_params.rawtitle;
+        this.props.showExplorePost(permlink, title);
+    };
+
     showPromotePost = () => {
         const post_content = this.props.cont.get(this.props.post);
         if (!post_content) return;
@@ -241,10 +220,31 @@ class PostFull extends Component {
         this.props.showPromotePost(author, permlink);
     };
 
-    showExplorePost = () => {
-        const permlink = this.share_params.link;
-        const title = this.share_params.rawtitle;
-        this.props.showExplorePost(permlink, title);
+    twitterShare = e => {
+        serverApiRecordEvent('TwitterShare', this.share_params.link);
+        e.preventDefault();
+        const winWidth = 640;
+        const winHeight = 460;
+        const winTop = screen.height / 2 - winHeight / 2;
+        const winLeft = screen.width / 2 - winWidth / 2;
+        const s = this.share_params;
+        const q =
+            'text=' +
+            encodeURIComponent(s.title) +
+            '&url=' +
+            encodeURIComponent(s.url);
+        window.open(
+            'http://twitter.com/share?' + q,
+            'Share',
+            'top=' +
+                winTop +
+                ',left=' +
+                winLeft +
+                ',toolbar=0,status=0,width=' +
+                winWidth +
+                ',height=' +
+                winHeight
+        );
     };
 
     render() {

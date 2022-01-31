@@ -24,6 +24,10 @@ import SortOrder from 'app/components/elements/SortOrder';
 import { RECOMMENDED_FOLLOW_ACCOUNT } from 'app/client_config';
 
 class PostsIndex extends Component {
+    static defaultProps = {
+        showSpam: false,
+    };
+
     static propTypes = {
         discussions: PropTypes.object,
         feed_posts: PropTypes.object,
@@ -34,10 +38,6 @@ class PostsIndex extends Component {
         username: PropTypes.string,
         blogmode: PropTypes.bool,
         categories: PropTypes.object,
-    };
-
-    static defaultProps = {
-        showSpam: false,
     };
 
     constructor() {
@@ -55,6 +55,10 @@ class PostsIndex extends Component {
             this.refs.list.fetchIfNeeded();
         }
     }
+
+    onShowSpam = () => {
+        this.setState({ showSpam: !this.state.showSpam });
+    };
 
     getPosts(order, category) {
         const topic_discussions = this.props.discussions.get(category || '');
@@ -85,9 +89,6 @@ class PostsIndex extends Component {
         });
     };
 
-    onShowSpam = () => {
-        this.setState({ showSpam: !this.state.showSpam });
-    };
     render() {
         let { category, order = constants.DEFAULT_SORT_ORDER } =
             this.props.routeParams;

@@ -24,21 +24,6 @@ class App extends Component {
         this.listenerActive = null;
     }
 
-    toggleBodyNightmode(nightmodeEnabled) {
-        if (nightmodeEnabled) {
-            document.body.classList.remove('theme-light');
-            document.body.classList.add('theme-dark');
-        } else {
-            document.body.classList.remove('theme-dark');
-            document.body.classList.add('theme-light');
-        }
-    }
-
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        const { nightmodeEnabled } = nextProps;
-        this.toggleBodyNightmode(nightmodeEnabled);
-    }
-
     UNSAFE_componentWillMount() {
         if (process.env.BROWSER) localStorage.removeItem('autopost'); // July 14 '16 compromise, renamed to autopost2
         this.props.loginUser();
@@ -46,6 +31,11 @@ class App extends Component {
 
     componentDidMount() {
         const { nightmodeEnabled } = this.props;
+        this.toggleBodyNightmode(nightmodeEnabled);
+    }
+
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        const { nightmodeEnabled } = nextProps;
         this.toggleBodyNightmode(nightmodeEnabled);
     }
 
@@ -70,6 +60,16 @@ class App extends Component {
     setShowBannerFalse = () => {
         this.setState({ showBanner: false });
     };
+
+    toggleBodyNightmode(nightmodeEnabled) {
+        if (nightmodeEnabled) {
+            document.body.classList.remove('theme-light');
+            document.body.classList.add('theme-dark');
+        } else {
+            document.body.classList.remove('theme-dark');
+            document.body.classList.add('theme-light');
+        }
+    }
 
     render() {
         const {

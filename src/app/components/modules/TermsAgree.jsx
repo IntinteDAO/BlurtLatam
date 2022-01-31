@@ -9,6 +9,11 @@ import HelpContent from 'app/components/elements/HelpContent';
 import * as userActions from 'app/redux/UserReducer';
 
 class TermsAgree extends Component {
+    static propTypes = {
+        username: PropTypes.string.isRequired,
+        acceptTerms: PropTypes.func.isRequired,
+    };
+
     constructor() {
         super();
         this.state = {
@@ -31,11 +36,6 @@ class TermsAgree extends Component {
     termsAgree = e => {
         // let user proceed
         this.props.acceptTerms(e);
-    };
-
-    static propTypes = {
-        username: PropTypes.string.isRequired,
-        acceptTerms: PropTypes.func.isRequired,
     };
 
     render() {

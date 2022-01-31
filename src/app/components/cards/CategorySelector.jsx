@@ -7,6 +7,11 @@ import tt from 'counterpart';
 import Tooltip from 'app/components/elements/Tooltip';
 
 class CategorySelector extends Component {
+    static defaultProps = {
+        autoComplete: 'on',
+        id: 'CategorySelectorId',
+        isEdit: false,
+    };
     static propTypes = {
         // HTML props
         id: PropTypes.string, // DOM id for active component (focusing, etc...)
@@ -21,11 +26,6 @@ class CategorySelector extends Component {
 
         // redux connect (overwrite in HTML)
         trending: PropTypes.object.isRequired, // Immutable.List
-    };
-    static defaultProps = {
-        autoComplete: 'on',
-        id: 'CategorySelectorId',
-        isEdit: false,
     };
     constructor() {
         super();

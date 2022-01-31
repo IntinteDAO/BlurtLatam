@@ -26,6 +26,26 @@ class Coin extends Component {
         node.removeEventListener('mouseout', this.onPointMouseOut);
     }
 
+    onPointMouseMove = e => {
+        const node = ReactDOM.findDOMNode(this.refs.coin);
+        const caption = node.querySelector('.caption');
+        const circle = e.currentTarget;
+        const circles = node.querySelectorAll('circle');
+        const index = Array.prototype.indexOf.call(circles, circle);
+        const points = this.props.coin.get('timepoints');
+        const point = points.get(index);
+        const priceUsd = parseFloat(point.get('price_usd')).toFixed(2);
+        const timepoint = point.get('timepoint');
+        const time = new Date(timepoint).toLocaleString();
+        caption.innerText = `$${priceUsd} ${time}`;
+    };
+
+    onPointMouseOut = e => {
+        const node = ReactDOM.findDOMNode(this.refs.coin);
+        const caption = node.querySelector('.caption');
+        caption.innerText = '';
+    };
+
     render() {
         const color = this.props.color;
         const coin = this.props.coin;
@@ -59,26 +79,6 @@ class Coin extends Component {
             </div>
         );
     }
-
-    onPointMouseMove = e => {
-        const node = ReactDOM.findDOMNode(this.refs.coin);
-        const caption = node.querySelector('.caption');
-        const circle = e.currentTarget;
-        const circles = node.querySelectorAll('circle');
-        const index = Array.prototype.indexOf.call(circles, circle);
-        const points = this.props.coin.get('timepoints');
-        const point = points.get(index);
-        const priceUsd = parseFloat(point.get('price_usd')).toFixed(2);
-        const timepoint = point.get('timepoint');
-        const time = new Date(timepoint).toLocaleString();
-        caption.innerText = `$${priceUsd} ${time}`;
-    };
-
-    onPointMouseOut = e => {
-        const node = ReactDOM.findDOMNode(this.refs.coin);
-        const caption = node.querySelector('.caption');
-        caption.innerText = '';
-    };
 }
 
 class SteemMarket extends Component {

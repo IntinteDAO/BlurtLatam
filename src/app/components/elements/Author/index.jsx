@@ -28,17 +28,18 @@ const fnCloseAll = () => {
 };
 
 class Author extends Component {
+    static defaultProps = {
+        follow: true,
+        mute: true,
+        showAffiliation: false,
+    };
+
     static propTypes = {
         author: string.isRequired,
         follow: bool,
         mute: bool,
         authorRepLog10: number,
         showAffiliation: bool,
-    };
-    static defaultProps = {
-        follow: true,
-        mute: true,
-        showAffiliation: false,
     };
 
     constructor(...args) {
@@ -60,6 +61,8 @@ class Author extends Component {
         }
     }
 
+    shouldComponentUpdate = shouldComponentUpdate(this, 'Author');
+
     componentWillUnmount() {
         if (!this.authorProfileLink) {
             return;
@@ -71,6 +74,12 @@ class Author extends Component {
             node.detachEvent('click', this.toggle);
         }
     }
+
+    close = () => {
+        this.setState({
+            show: false,
+        });
+    };
 
     toggle = (e) => {
         if (!(e.metaKey || e.ctrlKey)) {
@@ -85,13 +94,6 @@ class Author extends Component {
         }
     };
 
-    close = () => {
-        this.setState({
-            show: false,
-        });
-    };
-
-    shouldComponentUpdate = shouldComponentUpdate(this, 'Author');
     render() {
         const { author, follow, mute, authorRepLog10, showAffiliation } =
             this.props; // html

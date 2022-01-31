@@ -39,6 +39,17 @@ class CheckLoginOwner extends Component {
             }
         }
     }
+    onUnderstood = (e) => {
+        const understood = e.target.checked;
+        console.log('understood', understood);
+        this.setState({ understood });
+    };
+    getKey = (props = this.props) => {
+        const { previous_owner_authority } = props;
+        const username = previous_owner_authority.get('account');
+        const key = `${username}_previous_owner_authority_last_valid_time`;
+        return key;
+    };
     hide = () => {
         const { understood } = this.state;
         if (understood) {
@@ -47,20 +58,9 @@ class CheckLoginOwner extends Component {
         }
         this.setState({ last_valid_time: null, last_valid_date: null });
     };
-    getKey = (props = this.props) => {
-        const { previous_owner_authority } = props;
-        const username = previous_owner_authority.get('account');
-        const key = `${username}_previous_owner_authority_last_valid_time`;
-        return key;
-    };
     recover = () => {
         this.hide();
         browserHistory.push('/recover_account_step_1');
-    };
-    onUnderstood = (e) => {
-        const understood = e.target.checked;
-        console.log('understood', understood);
-        this.setState({ understood });
     };
     render() {
         const { last_valid_time, last_valid_date } = this.state;

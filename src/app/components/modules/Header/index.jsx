@@ -71,17 +71,6 @@ class Header extends Component {
         window.addEventListener('gptadshown', (e) => this.gptAdRendered(e));
     }
 
-    componentWillUnmount() {
-        if (
-            !this.props.gptEnabled ||
-            !process.env.BROWSER ||
-            !window.googletag ||
-            !window.googletag.pubads
-        ) {
-            return null;
-        }
-    }
-
     // Consider refactor.
     // I think 'last sort order' is something available through react-router-redux history.
     // Therefore no need to store it in the window global like this.
@@ -102,16 +91,27 @@ class Header extends Component {
         }
     }
 
-    headroomOnUnpin() {
-        this.setState({ showAd: false });
+    componentWillUnmount() {
+        if (
+            !this.props.gptEnabled ||
+            !process.env.BROWSER ||
+            !window.googletag ||
+            !window.googletag.pubads
+        ) {
+            return null;
+        }
+    }
+
+    gptAdRendered() {
+        this.setState({ showAd: true, gptAdRendered: true });
     }
 
     headroomOnUnfix() {
         this.setState({ showAd: true });
     }
 
-    gptAdRendered() {
-        this.setState({ showAd: true, gptAdRendered: true });
+    headroomOnUnpin() {
+        this.setState({ showAd: false });
     }
 
     hideAnnouncement() {

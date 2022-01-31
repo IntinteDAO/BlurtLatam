@@ -96,6 +96,10 @@ export function sortComments(cont, comments, sort_order) {
 }
 
 class CommentImpl extends Component {
+    static defaultProps = {
+        depth: 1,
+    };
+
     static propTypes = {
         // html props
         cont: PropTypes.object.isRequired,
@@ -114,9 +118,6 @@ class CommentImpl extends Component {
         rootComment: PropTypes.string,
         anchor_link: PropTypes.string.isRequired,
         deletePost: PropTypes.func.isRequired,
-    };
-    static defaultProps = {
-        depth: 1,
     };
 
     constructor() {
@@ -206,14 +207,6 @@ class CommentImpl extends Component {
         }
     }
 
-    toggleCollapsed = () => {
-        this.setState({ collapsed: !this.state.collapsed });
-    };
-
-    revealBody = () => {
-        this.setState({ hide_body: false });
-    };
-
     initEditor(props) {
         if (this.state.PostReplyEditor) return;
         const { cont } = this.props;
@@ -237,6 +230,14 @@ class CommentImpl extends Component {
         }
         this.setState({ PostReplyEditor, PostEditEditor });
     }
+
+    revealBody = () => {
+        this.setState({ hide_body: false });
+    };
+
+    toggleCollapsed = () => {
+        this.setState({ collapsed: !this.state.collapsed });
+    };
 
     render() {
         const { cont, content } = this.props;

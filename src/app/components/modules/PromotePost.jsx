@@ -36,10 +36,6 @@ class PromotePost extends Component {
         }, 300);
     }
 
-    errorCallback = estr => {
-        this.setState({ trxError: estr, loading: false });
-    };
-
     onSubmit = e => {
         e.preventDefault();
         const { author, permlink, onClose } = this.props;
@@ -61,6 +57,10 @@ class PromotePost extends Component {
         const amount = e.target.value;
         // console.log('-- PromotePost.amountChange -->', amount);
         this.setState({ amount });
+    };
+
+    errorCallback = estr => {
+        this.setState({ trxError: estr, loading: false });
     };
 
     // assetChange(e) {

@@ -30,6 +30,11 @@ export class Memo extends Component {
         };
     }
 
+    onRevealMemo = (e) => {
+        e.preventDefault();
+        this.setState({ revealMemo: true });
+    };
+
     decodeMemo(memo_private, text) {
         try {
             return memo.decode(memo_private, text);
@@ -38,11 +43,6 @@ export class Memo extends Component {
             return 'Invalid memo';
         }
     }
-
-    onRevealMemo = (e) => {
-        e.preventDefault();
-        this.setState({ revealMemo: true });
-    };
 
     render() {
         const { decodeMemo } = this;

@@ -22,33 +22,6 @@ class Settings extends Component {
         });
     };
 
-    handleDefaultBlogPayoutChange = (event) => {
-        this.props.setUserPreferences({
-            ...this.props.user_preferences,
-            defaultBlogPayout: event.target.value,
-        });
-    };
-
-    handleDefaultCommentPayoutChange = (event) => {
-        this.props.setUserPreferences({
-            ...this.props.user_preferences,
-            defaultCommentPayout: event.target.value,
-        });
-    };
-
-    handleDefaultCommentsSortOrderChange = (event) => {
-        this.props.setUserPreferences({
-            ...this.props.user_preferences,
-            defaultCommentsSortOrder: event.target.value,
-        });
-    };
-
-    handleLanguageChange = (event) => {
-        const locale = event.target.value;
-        const userPreferences = { ...this.props.user_preferences, locale };
-        this.props.setUserPreferences(userPreferences);
-    };
-
     getPreferredApiEndpoint = () => {
         let preferred_api_endpoint = $STM_Config.blurtd_connection_client;
 
@@ -87,6 +60,33 @@ class Settings extends Component {
             }
         }
         return entries;
+    };
+
+    handleDefaultBlogPayoutChange = (event) => {
+        this.props.setUserPreferences({
+            ...this.props.user_preferences,
+            defaultBlogPayout: event.target.value,
+        });
+    };
+
+    handleDefaultCommentPayoutChange = (event) => {
+        this.props.setUserPreferences({
+            ...this.props.user_preferences,
+            defaultCommentPayout: event.target.value,
+        });
+    };
+
+    handleDefaultCommentsSortOrderChange = (event) => {
+        this.props.setUserPreferences({
+            ...this.props.user_preferences,
+            defaultCommentsSortOrder: event.target.value,
+        });
+    };
+
+    handleLanguageChange = (event) => {
+        const locale = event.target.value;
+        const userPreferences = { ...this.props.user_preferences, locale };
+        this.props.setUserPreferences(userPreferences);
     };
     handlePreferredAPIEndpointChange = (event) => {
         if (typeof window !== 'undefined') {

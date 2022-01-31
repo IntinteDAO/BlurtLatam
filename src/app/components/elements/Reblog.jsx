@@ -36,6 +36,21 @@ export default class Reblog extends Component {
         }
     }
 
+    setReblogged(account) {
+        const { author, permlink } = this.props;
+        clearRebloggedCache();
+        let posts = getRebloggedList(account);
+        posts.push(author + '/' + permlink);
+        if (posts.length > 200) posts.shift(1);
+
+        localStorage.setItem('reblogged_' + account, JSON.stringify(posts));
+    }
+
+    isReblogged(account) {
+        const { author, permlink } = this.props;
+        return getRebloggedList(account).includes(author + '/' + permlink);
+    }
+
     reblog = (e) => {
         e.preventDefault();
         if (this.state.active) return;
@@ -64,21 +79,6 @@ export default class Reblog extends Component {
             }
         );
     };
-
-    isReblogged(account) {
-        const { author, permlink } = this.props;
-        return getRebloggedList(account).includes(author + '/' + permlink);
-    }
-
-    setReblogged(account) {
-        const { author, permlink } = this.props;
-        clearRebloggedCache();
-        let posts = getRebloggedList(account);
-        posts.push(author + '/' + permlink);
-        if (posts.length > 200) posts.shift(1);
-
-        localStorage.setItem('reblogged_' + account, JSON.stringify(posts));
-    }
 
     render() {
         if (this.props.author == this.props.account || this.props.parent_author)

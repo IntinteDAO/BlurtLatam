@@ -11,13 +11,13 @@ class UserList extends Component {
         this.state = { historyIndex: 0 };
     }
 
-    _setHistoryPagePrevious = () => {
-        const newIndex = this.state.historyIndex - PER_PAGE;
+    _setHistoryPageNext = () => {
+        const newIndex = this.state.historyIndex + PER_PAGE;
         this.setState({ historyIndex: Math.max(0, newIndex) });
     };
 
-    _setHistoryPageNext = () => {
-        const newIndex = this.state.historyIndex + PER_PAGE;
+    _setHistoryPagePrevious = () => {
+        const newIndex = this.state.historyIndex - PER_PAGE;
         this.setState({ historyIndex: Math.max(0, newIndex) });
     };
 

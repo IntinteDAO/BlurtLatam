@@ -62,10 +62,6 @@ export default class SlateEditor extends Component {
         this.state = { state: props.initialState };
     }
 
-    reset = () => {
-        this.setState({ state: this.props.initialState });
-    };
-
     componentDidMount = () => {
         this.updateMenu();
         this.updateSidebar();
@@ -76,53 +72,29 @@ export default class SlateEditor extends Component {
         this.updateSidebar();
     };
 
+    // On backspace, if at the start of a non-paragraph, convert it back into a paragraph node.
+    onBackspace = (e, state) => {
+        if (state.isExpanded) return;
+        if (state.startOffset != 0) return;
+        const { startBlock } = state;
+
+        if (startBlock.type == 'paragraph') return;
+        e.preventDefault();
+
+        let transform = state.transform().setBlock('paragraph');
+
+        if (startBlock.type == 'list-item')
+            transform = transform
+                .unwrapBlock('bulleted-list')
+                .unwrapBlock('numbered-list');
+
+        state = transform.apply();
+        return state;
+    };
+
     onChange = (state) => {
         //this.setState({ state })
         this.props.onChange(state);
-    };
-
-    // When the portal opens, cache the menu element.
-    onMenuOpen = (portal) => {
-        this.setState({ menu: portal.firstChild });
-    };
-
-    // When the portal opens, cache the menu element.
-    onSidebarOpen = (portal) => {
-        this.setState({ sidebar: portal.firstChild });
-    };
-
-    // Check if the current selection has a mark with `type` in it.
-    hasMark = (type) => {
-        const { state } = this.state;
-        if (!state.isExpanded) return;
-        return state.marks.some((mark) => mark.type == type);
-    };
-
-    // Check if the current selection has a block with `type` in it.
-    hasBlock = (type) => {
-        const { state } = this.state;
-        const { document } = state;
-        return state.blocks.some(
-            (node) =>
-                node.type == type ||
-                !!document.getClosest(node, (parent) => parent.type == type)
-        );
-    };
-
-    // Check if the current selection has an inline of `type`.
-    hasInline = (type) => {
-        const { state } = this.state;
-        return state.inlines.some((inline) => inline.type == type);
-    };
-
-    // When a mark button is clicked, toggle the current mark.
-    onClickMark = (e, type) => {
-        e.preventDefault();
-        let { state } = this.state;
-
-        state = state.transform().toggleMark(type).apply();
-
-        this.setState({ state });
     };
 
     // Toggle block type
@@ -177,6 +149,50 @@ export default class SlateEditor extends Component {
         this.setState({ state });
     };
 
+    onClickInsertHr = (e, type) => {
+        e.preventDefault();
+        let { state } = this.state;
+
+        state = state
+            .transform()
+            .insertBlock({ type: 'hr', isVoid: true })
+            .insertBlock({ type: 'paragraph', isVoid: false })
+            .apply();
+
+        this.setState({ state });
+    };
+
+    onClickInsertImage = (e) => {
+        e.preventDefault();
+        let { state } = this.state;
+
+        const src = window.prompt('Enter the URL of the image:', '');
+        if (!src) return;
+
+        state = state
+            .transform()
+            .insertInline({ type: 'image', isVoid: true, data: { src } })
+            //.insertBlock({type: 'paragraph', isVoid: false, nodes: [Slate.Text.create()]})
+            .focus()
+            .collapseToEndOfNextBlock()
+            .apply();
+
+        this.setState({ state });
+    };
+
+    onClickInsertVideo = (e, type) => {
+        e.preventDefault();
+        let { state } = this.state;
+
+        state = state
+            .transform()
+            .insertBlock({ type: 'embed', isVoid: true, data: { src: '' } })
+            //.insertBlock({type: 'paragraph', isVoid: false})
+            .apply();
+
+        this.setState({ state });
+    };
+
     onClickLink = (e) => {
         e.preventDefault();
         let { state } = this.state;
@@ -216,6 +232,39 @@ export default class SlateEditor extends Component {
         this.setState({ state });
     };
 
+    // When a mark button is clicked, toggle the current mark.
+    onClickMark = (e, type) => {
+        e.preventDefault();
+        let { state } = this.state;
+
+        state = state.transform().toggleMark(type).apply();
+
+        this.setState({ state });
+    };
+
+    onEnter = (e, state) => {
+        if (state.isExpanded) return;
+        const { startBlock, startOffset, endOffset } = state;
+
+        // On return, if at the end of a node type that should not be extended, create a new paragraph below it.
+        if (startOffset == 0 && startBlock.length == 0)
+            return this.onBackspace(e, state); //empty block
+        if (endOffset != startBlock.length) return; //not at end of block
+
+        if (
+            startBlock.type != 'heading-one' &&
+            startBlock.type != 'heading-two' &&
+            startBlock.type != 'heading-three' &&
+            startBlock.type != 'heading-four' &&
+            startBlock.type != 'block-quote' &&
+            startBlock.type != 'code-block'
+        )
+            return;
+
+        e.preventDefault();
+        return state.transform().splitBlock().setBlock('paragraph').apply();
+    };
+
     // Markdown-style quick formatting
     onKeyDown = (e, data, state) => {
         if (data.isMod) return this.onModKeyDown(e, data, state);
@@ -229,6 +278,11 @@ export default class SlateEditor extends Component {
                     ? this.onShiftEnter(e, state)
                     : this.onEnter(e, state);
         }
+    };
+
+    // When the portal opens, cache the menu element.
+    onMenuOpen = (portal) => {
+        this.setState({ menu: portal.firstChild });
     };
 
     onModKeyDown = (e, data, state) => {
@@ -255,6 +309,36 @@ export default class SlateEditor extends Component {
         return state;
     };
 
+    onPaste = (e, data, state) => {
+        console.log('** onPaste:', data.type, data.html);
+        if (data.type != 'html') return;
+        const { document } = serializer.deserialize(data.html);
+
+        return state.transform().insertFragment(document).apply();
+    };
+
+    onShiftEnter = (e, state) => {
+        if (state.isExpanded) return;
+        const { startBlock, startOffset, endOffset } = state;
+
+        // Allow soft returns for certain block types
+        if (
+            startBlock.type == 'paragraph' ||
+            startBlock.type == 'code-block' ||
+            startBlock.type == 'block-quote'
+        ) {
+            let transform = state.transform();
+            if (state.isExpanded) transform = transform.delete();
+            transform = transform.insertText('\n');
+            return transform.apply();
+        }
+    };
+
+    // When the portal opens, cache the menu element.
+    onSidebarOpen = (portal) => {
+        this.setState({ sidebar: portal.firstChild });
+    };
+
     // If space was entered, check if it was a markdown sequence
     onSpace = (e, state) => {
         if (state.isExpanded) return;
@@ -279,142 +363,66 @@ export default class SlateEditor extends Component {
         return state;
     };
 
-    // On backspace, if at the start of a non-paragraph, convert it back into a paragraph node.
-    onBackspace = (e, state) => {
-        if (state.isExpanded) return;
-        if (state.startOffset != 0) return;
-        const { startBlock } = state;
-
-        if (startBlock.type == 'paragraph') return;
-        e.preventDefault();
-
-        let transform = state.transform().setBlock('paragraph');
-
-        if (startBlock.type == 'list-item')
-            transform = transform
-                .unwrapBlock('bulleted-list')
-                .unwrapBlock('numbered-list');
-
-        state = transform.apply();
-        return state;
-    };
-
-    onShiftEnter = (e, state) => {
-        if (state.isExpanded) return;
-        const { startBlock, startOffset, endOffset } = state;
-
-        // Allow soft returns for certain block types
-        if (
-            startBlock.type == 'paragraph' ||
-            startBlock.type == 'code-block' ||
-            startBlock.type == 'block-quote'
-        ) {
-            let transform = state.transform();
-            if (state.isExpanded) transform = transform.delete();
-            transform = transform.insertText('\n');
-            return transform.apply();
-        }
-    };
-
-    onEnter = (e, state) => {
-        if (state.isExpanded) return;
-        const { startBlock, startOffset, endOffset } = state;
-
-        // On return, if at the end of a node type that should not be extended, create a new paragraph below it.
-        if (startOffset == 0 && startBlock.length == 0)
-            return this.onBackspace(e, state); //empty block
-        if (endOffset != startBlock.length) return; //not at end of block
-
-        if (
-            startBlock.type != 'heading-one' &&
-            startBlock.type != 'heading-two' &&
-            startBlock.type != 'heading-three' &&
-            startBlock.type != 'heading-four' &&
-            startBlock.type != 'block-quote' &&
-            startBlock.type != 'code-block'
-        )
-            return;
-
-        e.preventDefault();
-        return state.transform().splitBlock().setBlock('paragraph').apply();
-    };
-
-    onPaste = (e, data, state) => {
-        console.log('** onPaste:', data.type, data.html);
-        if (data.type != 'html') return;
-        const { document } = serializer.deserialize(data.html);
-
-        return state.transform().insertFragment(document).apply();
-    };
-
-    renderSidebar = () => {
+    // Check if the current selection has a block with `type` in it.
+    hasBlock = (type) => {
         const { state } = this.state;
-        const isOpen = state.isExpanded && state.isFocused;
-        return (
-            <Portal isOpened onOpen={this.onSidebarOpen}>
-                <div className="SlateEditor__sidebar">
-                    {this.renderAddBlockButton({
-                        type: 'image',
-                        label: <Icon name="photo" />,
-                        handler: this.onClickInsertImage,
-                    })}
-                    {this.renderAddBlockButton({
-                        type: 'video',
-                        label: <Icon name="video" />,
-                        handler: this.onClickInsertVideo,
-                    })}
-                    {this.renderAddBlockButton({
-                        type: 'hrule',
-                        label: <Icon name="line" />,
-                        handler: this.onClickInsertHr,
-                    })}
-                </div>
-            </Portal>
+        const { document } = state;
+        return state.blocks.some(
+            (node) =>
+                node.type == type ||
+                !!document.getClosest(node, (parent) => parent.type == type)
         );
     };
 
-    onClickInsertImage = (e) => {
-        e.preventDefault();
-        let { state } = this.state;
-
-        const src = window.prompt('Enter the URL of the image:', '');
-        if (!src) return;
-
-        state = state
-            .transform()
-            .insertInline({ type: 'image', isVoid: true, data: { src } })
-            //.insertBlock({type: 'paragraph', isVoid: false, nodes: [Slate.Text.create()]})
-            .focus()
-            .collapseToEndOfNextBlock()
-            .apply();
-
-        this.setState({ state });
+    // Check if the current selection has an inline of `type`.
+    hasInline = (type) => {
+        const { state } = this.state;
+        return state.inlines.some((inline) => inline.type == type);
     };
 
-    onClickInsertVideo = (e, type) => {
-        e.preventDefault();
-        let { state } = this.state;
-
-        state = state
-            .transform()
-            .insertBlock({ type: 'embed', isVoid: true, data: { src: '' } })
-            //.insertBlock({type: 'paragraph', isVoid: false})
-            .apply();
-
-        this.setState({ state });
+    // Check if the current selection has a mark with `type` in it.
+    hasMark = (type) => {
+        const { state } = this.state;
+        if (!state.isExpanded) return;
+        return state.marks.some((mark) => mark.type == type);
     };
 
-    onClickInsertHr = (e, type) => {
-        e.preventDefault();
-        let { state } = this.state;
+    reset = () => {
+        this.setState({ state: this.props.initialState });
+    };
 
-        state = state
-            .transform()
-            .insertBlock({ type: 'hr', isVoid: true })
-            .insertBlock({ type: 'paragraph', isVoid: false })
-            .apply();
+    // move menu to center above current selection
+    updateMenu = () => {
+        const { menu, state } = this.state;
+        if (!menu) return;
 
-        this.setState({ state });
+        if (state.isBlurred || state.isCollapsed) {
+            menu.removeAttribute('style');
+            return;
+        }
+
+        const rect = position();
+        menu.style.top = `${rect.top + window.scrollY - menu.offsetHeight}px`;
+        menu.style.left = `${
+            rect.left + window.scrollX - menu.offsetWidth / 2 + rect.width / 2
+        }px`;
+    };
+
+    // move sidebar to float left of current blank paragraph
+    updateSidebar = () => {
+        const { sidebar, state } = this.state;
+        if (!sidebar) return;
+
+        const rect = getCollapsedClientRect();
+        if (state.isBlurred || state.isExpanded || !rect) {
+            sidebar.removeAttribute('style');
+            return;
+        }
+
+        sidebar.style.top = `${rect.top + window.scrollY}px`;
+        sidebar.style.left = `${
+            rect.left + window.scrollX - sidebar.offsetWidth
+        }px`;
     };
 
     renderAddBlockButton = (props) => {
@@ -428,6 +436,79 @@ export default class SlateEditor extends Component {
                 onMouseDown={onMouseDown}
             >
                 {label}
+            </span>
+        );
+    };
+
+    renderBlockButton = (props) => {
+        const { type, label } = props;
+        const isActive = this.hasBlock(type);
+        const onMouseDown = (e) => this.onClickBlock(e, type);
+
+        return (
+            <span
+                key={type}
+                className={
+                    'SlateEditor__menu-button SlateEditor__menu-button-' + type
+                }
+                onMouseDown={onMouseDown}
+                data-active={isActive}
+            >
+                <span>{label}</span>
+            </span>
+        );
+    };
+
+    renderEditor = () => {
+        return (
+            <div className="SlateEditor Markdown">
+                <Editor
+                    schema={schema}
+                    placeholder={this.props.placeholder || 'Enter some text...'}
+                    plugins={plugins}
+                    state={this.state.state}
+                    onChange={this.onChange}
+                    onKeyDown={this.onKeyDown}
+                    onPaste={this.onPaste}
+                />
+            </div>
+        );
+    };
+
+    renderInlineButton = (props) => {
+        const { type, label } = props;
+        const isActive = this.hasInline(type);
+        const onMouseDown = (e) => this.onClickLink(e, type);
+
+        return (
+            <span
+                key={type}
+                className={
+                    'SlateEditor__menu-button SlateEditor__menu-button-' + type
+                }
+                onMouseDown={onMouseDown}
+                data-active={isActive}
+            >
+                <span>{label}</span>
+            </span>
+        );
+    };
+
+    renderMarkButton = (props) => {
+        const { type, label } = props;
+        const isActive = this.hasMark(type);
+        const onMouseDown = (e) => this.onClickMark(e, type);
+
+        return (
+            <span
+                key={type}
+                className={
+                    'SlateEditor__menu-button SlateEditor__menu-button-' + type
+                }
+                onMouseDown={onMouseDown}
+                data-active={isActive}
+            >
+                <span>{label}</span>
             </span>
         );
     };
@@ -467,111 +548,30 @@ export default class SlateEditor extends Component {
         );
     };
 
-    renderMarkButton = (props) => {
-        const { type, label } = props;
-        const isActive = this.hasMark(type);
-        const onMouseDown = (e) => this.onClickMark(e, type);
-
+    renderSidebar = () => {
+        const { state } = this.state;
+        const isOpen = state.isExpanded && state.isFocused;
         return (
-            <span
-                key={type}
-                className={
-                    'SlateEditor__menu-button SlateEditor__menu-button-' + type
-                }
-                onMouseDown={onMouseDown}
-                data-active={isActive}
-            >
-                <span>{label}</span>
-            </span>
+            <Portal isOpened onOpen={this.onSidebarOpen}>
+                <div className="SlateEditor__sidebar">
+                    {this.renderAddBlockButton({
+                        type: 'image',
+                        label: <Icon name="photo" />,
+                        handler: this.onClickInsertImage,
+                    })}
+                    {this.renderAddBlockButton({
+                        type: 'video',
+                        label: <Icon name="video" />,
+                        handler: this.onClickInsertVideo,
+                    })}
+                    {this.renderAddBlockButton({
+                        type: 'hrule',
+                        label: <Icon name="line" />,
+                        handler: this.onClickInsertHr,
+                    })}
+                </div>
+            </Portal>
         );
-    };
-
-    renderBlockButton = (props) => {
-        const { type, label } = props;
-        const isActive = this.hasBlock(type);
-        const onMouseDown = (e) => this.onClickBlock(e, type);
-
-        return (
-            <span
-                key={type}
-                className={
-                    'SlateEditor__menu-button SlateEditor__menu-button-' + type
-                }
-                onMouseDown={onMouseDown}
-                data-active={isActive}
-            >
-                <span>{label}</span>
-            </span>
-        );
-    };
-
-    renderInlineButton = (props) => {
-        const { type, label } = props;
-        const isActive = this.hasInline(type);
-        const onMouseDown = (e) => this.onClickLink(e, type);
-
-        return (
-            <span
-                key={type}
-                className={
-                    'SlateEditor__menu-button SlateEditor__menu-button-' + type
-                }
-                onMouseDown={onMouseDown}
-                data-active={isActive}
-            >
-                <span>{label}</span>
-            </span>
-        );
-    };
-
-    renderEditor = () => {
-        return (
-            <div className="SlateEditor Markdown">
-                <Editor
-                    schema={schema}
-                    placeholder={this.props.placeholder || 'Enter some text...'}
-                    plugins={plugins}
-                    state={this.state.state}
-                    onChange={this.onChange}
-                    onKeyDown={this.onKeyDown}
-                    onPaste={this.onPaste}
-                />
-            </div>
-        );
-    };
-
-    // move sidebar to float left of current blank paragraph
-    updateSidebar = () => {
-        const { sidebar, state } = this.state;
-        if (!sidebar) return;
-
-        const rect = getCollapsedClientRect();
-        if (state.isBlurred || state.isExpanded || !rect) {
-            sidebar.removeAttribute('style');
-            return;
-        }
-
-        sidebar.style.top = `${rect.top + window.scrollY}px`;
-        sidebar.style.left = `${
-            rect.left + window.scrollX - sidebar.offsetWidth
-        }px`;
-    };
-
-    // move menu to center above current selection
-    updateMenu = () => {
-        const { menu, state } = this.state;
-        if (!menu) return;
-
-        if (state.isBlurred || state.isCollapsed) {
-            menu.removeAttribute('style');
-            return;
-        }
-
-        const rect = position();
-        menu.style.top = `${rect.top + window.scrollY - menu.offsetHeight}px`;
-        menu.style.left = `${
-            rect.left + window.scrollX - menu.offsetWidth / 2 + rect.width / 2
-        }px`;
     };
 
     render = () => {

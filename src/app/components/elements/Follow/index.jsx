@@ -11,6 +11,12 @@ import tt from 'counterpart';
 const { string, bool, any } = PropTypes;
 
 export default class Follow extends Component {
+    static defaultProps = {
+        showFollow: true,
+        showMute: true,
+        fat: false,
+    };
+
     static propTypes = {
         following: string,
         follower: string, // OPTIONAL default to current user
@@ -19,12 +25,6 @@ export default class Follow extends Component {
         fat: bool,
         children: any,
         showLogin: PropTypes.func.isRequired,
-    };
-
-    static defaultProps = {
-        showFollow: true,
-        showMute: true,
-        fat: false,
     };
 
     constructor(props) {
@@ -37,6 +37,14 @@ export default class Follow extends Component {
     UNSAFE_componentWillUpdate(nextProps) {
         this.initEvents(nextProps);
     }
+
+    followLoggedOut = e => {
+        // close author preview if present
+        const author_preview = document.querySelector('.dropdown-pane.is-open');
+        if (author_preview) author_preview.remove();
+        // resume authenticate modal
+        this.props.showLogin(e);
+    };
 
     initEvents(props) {
         const {
@@ -74,14 +82,6 @@ export default class Follow extends Component {
             upd();
         };
     }
-
-    followLoggedOut = e => {
-        // close author preview if present
-        const author_preview = document.querySelector('.dropdown-pane.is-open');
-        if (author_preview) author_preview.remove();
-        // resume authenticate modal
-        this.props.showLogin(e);
-    };
 
     render() {
         const { loading } = this.props;

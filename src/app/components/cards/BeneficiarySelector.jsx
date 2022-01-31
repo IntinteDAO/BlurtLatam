@@ -7,6 +7,9 @@ import { List, Set } from 'immutable';
 import tt from 'counterpart';
 
 export class BeneficiarySelector extends Component {
+    static defaultProps = {
+        id: 'BeneficiarySelectorId',
+    };
     static propTypes = {
         // HTML props
         id: PropTypes.string, // DOM id for active component (focusing, etc...)
@@ -18,19 +21,12 @@ export class BeneficiarySelector extends Component {
         // redux connect
         following: PropTypes.array.isRequired,
     };
-    static defaultProps = {
-        id: 'BeneficiarySelectorId',
-    };
     constructor() {
         super();
         this.shouldComponentUpdate = shouldComponentUpdate(
             this,
             'BeneficiarySelector'
         );
-    }
-
-    matchAutocompleteUser(item, value) {
-        return item.toLowerCase().indexOf(value.toLowerCase()) > -1;
     }
 
     handleAddBeneficiary = (e) => {
@@ -43,10 +39,14 @@ export class BeneficiarySelector extends Component {
         }
     };
 
-    handleRemoveBeneficiary = (idx) => (e) => {
+    handleBeneficiaryPercentChange = (idx) => (e) => {
         e.preventDefault();
         const beneficiaries = this.props.value;
-        this.props.onChange(beneficiaries.filter((s, bidx) => idx != bidx));
+        const newBeneficiaries = beneficiaries.map((beneficiary, bidx) => {
+            if (idx != bidx) return beneficiary;
+            return { ...beneficiary, percent: e.target.value };
+        });
+        this.props.onChange(newBeneficiaries);
     };
 
     handleBeneficiaryUserChange = (idx) => (e) => {
@@ -68,15 +68,15 @@ export class BeneficiarySelector extends Component {
         this.props.onChange(newBeneficiaries);
     };
 
-    handleBeneficiaryPercentChange = (idx) => (e) => {
+    handleRemoveBeneficiary = (idx) => (e) => {
         e.preventDefault();
         const beneficiaries = this.props.value;
-        const newBeneficiaries = beneficiaries.map((beneficiary, bidx) => {
-            if (idx != bidx) return beneficiary;
-            return { ...beneficiary, percent: e.target.value };
-        });
-        this.props.onChange(newBeneficiaries);
+        this.props.onChange(beneficiaries.filter((s, bidx) => idx != bidx));
     };
+
+    matchAutocompleteUser(item, value) {
+        return item.toLowerCase().indexOf(value.toLowerCase()) > -1;
+    }
 
     render() {
         const { username, following, tabIndex } = this.props;

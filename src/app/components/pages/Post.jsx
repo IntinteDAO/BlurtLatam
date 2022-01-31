@@ -44,19 +44,19 @@ class Post extends Component {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
     }
 
-    toggleNegativeReplies = (e) => {
-        this.setState({
-            showNegativeComments: !this.state.showNegativeComments,
-        });
-        e.preventDefault();
-    };
-
     onHideComment = () => {
         this.setState({ commentHidden: true });
     };
 
     showAnywayClick = () => {
         this.setState({ showAnyway: true });
+    };
+
+    toggleNegativeReplies = (e) => {
+        this.setState({
+            showNegativeComments: !this.state.showNegativeComments,
+        });
+        e.preventDefault();
     };
 
     render() {

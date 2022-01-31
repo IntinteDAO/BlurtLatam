@@ -80,14 +80,14 @@ const pic = (author) => {
 
 class NotificationsList extends Component {
     // eslint-disable-next-line no-undef
-    static propTypes = {
-        username: PropTypes.string.isRequired,
-        markAsRead: PropTypes.func.isRequired,
+    static defaultProps = {
+        notifications: [],
     };
 
     // eslint-disable-next-line no-undef
-    static defaultProps = {
-        notifications: [],
+    static propTypes = {
+        username: PropTypes.string.isRequired,
+        markAsRead: PropTypes.func.isRequired,
     };
 
     // eslint-disable-next-line no-useless-constructor
@@ -109,6 +109,28 @@ class NotificationsList extends Component {
         }
         this.applyFilter();
     }
+
+    // eslint-disable-next-line no-undef
+    onClickFilter = (e) => {
+        e.preventDefault();
+        const target = e.target;
+
+        const filterElements = document.getElementsByClassName(
+            'notification__filter'
+        );
+
+        // reset
+        for (let fi = 0; fi < filterElements.length; fi += 1) {
+            const filterElement = filterElements[fi];
+            filterElement.classList.remove('selected');
+        }
+
+        target.classList.add('selected');
+        notificationFilter = target.dataset.type;
+        this.applyFilter();
+
+        target.blur();
+    };
 
     // eslint-disable-next-line no-undef
     onClickMarkAsRead = (e) => {
@@ -170,28 +192,6 @@ class NotificationsList extends Component {
                 }
             }
         }
-    };
-
-    // eslint-disable-next-line no-undef
-    onClickFilter = (e) => {
-        e.preventDefault();
-        const target = e.target;
-
-        const filterElements = document.getElementsByClassName(
-            'notification__filter'
-        );
-
-        // reset
-        for (let fi = 0; fi < filterElements.length; fi += 1) {
-            const filterElement = filterElements[fi];
-            filterElement.classList.remove('selected');
-        }
-
-        target.classList.add('selected');
-        notificationFilter = target.dataset.type;
-        this.applyFilter();
-
-        target.blur();
     };
 
     render() {

@@ -2,15 +2,6 @@ import { Component } from 'react';
 import { normalizeEmbedUrl as normalizeEmbbeddedPlayerEmbedUrl } from 'app/components/elements/EmbeddedPlayers';
 
 export default class Iframe extends Component {
-    normalizeEmbedUrl = (url) => {
-        const validEmbedUrl = normalizeEmbbeddedPlayerEmbedUrl(url);
-        if (validEmbedUrl !== false) {
-            return validEmbedUrl;
-        }
-        console.log('unable to auto-detect embed url', url);
-        return null;
-    };
-
     onChange = (e) => {
         const { node, editor } = this.props;
         const value = e.target.value;
@@ -31,30 +22,13 @@ export default class Iframe extends Component {
         e.stopPropagation();
     };
 
-    render = () => {
-        const { node, state, attributes } = this.props;
-        const isFocused = state.selection.hasEdgeIn(node);
-        const className = isFocused ? 'active' : null;
-
-        const lockStyle = {
-            position: 'absolute',
-            top: '0px',
-            left: '0px',
-            width: '100%',
-            height: '100%',
-            background: 'rgba(0,0,0,0.1)',
-        };
-
-        return (
-            <div {...attributes} className={className}>
-                <div className="videoWrapper">
-                    {this.renderFrame()}
-                    <div style={lockStyle}>
-                        {isFocused && <span>{this.renderInput()}</span>}
-                    </div>
-                </div>
-            </div>
-        );
+    normalizeEmbedUrl = (url) => {
+        const validEmbedUrl = normalizeEmbbeddedPlayerEmbedUrl(url);
+        if (validEmbedUrl !== false) {
+            return validEmbedUrl;
+        }
+        console.log('unable to auto-detect embed url', url);
+        return null;
     };
 
     renderFrame = () => {
@@ -98,6 +72,32 @@ export default class Iframe extends Component {
                 placeholder="Enter a YouTube or Vimeo URL..."
                 style={style}
             />
+        );
+    };
+
+    render = () => {
+        const { node, state, attributes } = this.props;
+        const isFocused = state.selection.hasEdgeIn(node);
+        const className = isFocused ? 'active' : null;
+
+        const lockStyle = {
+            position: 'absolute',
+            top: '0px',
+            left: '0px',
+            width: '100%',
+            height: '100%',
+            background: 'rgba(0,0,0,0.1)',
+        };
+
+        return (
+            <div {...attributes} className={className}>
+                <div className="videoWrapper">
+                    {this.renderFrame()}
+                    <div style={lockStyle}>
+                        {isFocused && <span>{this.renderInput()}</span>}
+                    </div>
+                </div>
+            </div>
         );
     };
 }

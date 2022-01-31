@@ -22,6 +22,11 @@ function topPosition(domElt) {
 }
 
 class PostsList extends Component {
+    static defaultProps = {
+        showSpam: false,
+        loading: false,
+    };
+
     static propTypes = {
         posts: PropTypes.object.isRequired,
         loading: PropTypes.bool.isRequired,
@@ -32,11 +37,6 @@ class PostsList extends Component {
         fetchState: PropTypes.func.isRequired,
         pathname: PropTypes.string,
         nsfwPref: PropTypes.string.isRequired,
-    };
-
-    static defaultProps = {
-        showSpam: false,
-        loading: false,
     };
 
     constructor() {
@@ -69,6 +69,18 @@ class PostsList extends Component {
         window.removeEventListener('keydown', this.onBackButton);
     };
 
+    attachScrollListener() {
+        window.addEventListener('scroll', this.scrollListener, {
+            capture: false,
+            passive: true,
+        });
+        window.addEventListener('resize', this.scrollListener, {
+            capture: false,
+            passive: true,
+        });
+        this.scrollListener();
+    }
+
     closeOnOutsideClick = e => {
         const inside_post = findParent(e.target, 'PostsList__post_container');
         if (!inside_post) {
@@ -88,15 +100,14 @@ class PostsList extends Component {
         }
     };
 
+    detachScrollListener() {
+        window.removeEventListener('scroll', this.scrollListener);
+        window.removeEventListener('resize', this.scrollListener);
+    }
+
     fetchIfNeeded() {
         this.scrollListener();
     }
-
-    toggleNegativeReplies = () => {
-        this.setState({
-            showNegativeComments: !this.state.showNegativeComments,
-        });
-    };
 
     scrollListener = debounce(() => {
         const el = window.document.getElementById('posts_list');
@@ -126,22 +137,11 @@ class PostsList extends Component {
         }
     }, 150);
 
-    attachScrollListener() {
-        window.addEventListener('scroll', this.scrollListener, {
-            capture: false,
-            passive: true,
+    toggleNegativeReplies = () => {
+        this.setState({
+            showNegativeComments: !this.state.showNegativeComments,
         });
-        window.addEventListener('resize', this.scrollListener, {
-            capture: false,
-            passive: true,
-        });
-        this.scrollListener();
-    }
-
-    detachScrollListener() {
-        window.removeEventListener('scroll', this.scrollListener);
-        window.removeEventListener('resize', this.scrollListener);
-    }
+    };
 
     render() {
         const {

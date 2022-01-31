@@ -21,25 +21,6 @@ export default class PdfDownload extends Component {
         this.state = { loaded: false };
     }
 
-    // Generate a list of public and private keys from a master password
-    generateKeys(name, password) {
-        return ['active', 'owner', 'posting', 'memo'].reduce(
-            (accum, kind, i) => {
-                const rawKey = PrivateKey.fromSeed(`${name}${kind}${password}`);
-                accum[`${kind}Private`] = rawKey.toString();
-                accum[`${kind}Public`] = rawKey.toPublicKey().toString();
-                return accum;
-            },
-            { master: password }
-        );
-    }
-
-    downloadPdf = () => {
-        const keys = this.generateKeys(this.props.name, this.props.password);
-        const filename = this.props.name + '_steem_keys.pdf';
-        this.renderPdf(keys, filename).save(filename);
-    };
-
     // Generate the canvas, which will be generated into a PDF
     async componentDidMount() {
         // Load jsPDF. It does not work with webpack, so it must be loaded here.
@@ -79,53 +60,16 @@ export default class PdfDownload extends Component {
         this.setState({ loaded: true });
     }
 
-    render() {
-        return (
-            <div className="pdf-download">
-                <img
-                    src="/images/pdf-logo.svg"
-                    style={{ display: 'none' }}
-                    className="pdf-logo"
-                />
-                {this.state.loaded && (
-                    <button
-                        style={{ display: 'block' }}
-                        onClick={(e) => {
-                            this.downloadPdf();
-                            e.preventDefault();
-                        }}
-                    >
-                        {this.props.label}
-                    </button>
-                )}
-            </div>
-        );
-    }
-
-    renderText(
-        ctx,
-        text,
-        { scale, x, y, lineHeight, maxWidth, color, fontSize, font }
-    ) {
-        const textLines = ctx
-            .setFont(font)
-            .setFontSize(fontSize * scale)
-            .setTextColor(color)
-            .splitTextToSize(text, maxWidth);
-        ctx.text(textLines, x, y + fontSize);
-        return textLines.length * fontSize * lineHeight;
-    }
+    downloadPdf = () => {
+        const keys = this.generateKeys(this.props.name, this.props.password);
+        const filename = this.props.name + '_steem_keys.pdf';
+        this.renderPdf(keys, filename).save(filename);
+    };
 
     drawFilledRect(ctx, x, y, w, h, { color }) {
         ctx.setDrawColor(0);
         ctx.setFillColor(color);
         ctx.rect(x, y, w, h, 'F');
-    }
-
-    drawStrokedRect(ctx, x, y, w, h, { color, lineWidth }) {
-        ctx.setLineWidth(lineWidth);
-        ctx.setDrawColor(color);
-        ctx.rect(x, y, w, h);
     }
 
     drawImageFromCanvas(ctx, selector, x, y, w, h, bgcolor) {
@@ -142,6 +86,25 @@ export default class PdfDownload extends Component {
             background: bgcolor,
         });
         ctx.addImage(canvas, 'PNG', x, y, size, size);
+    }
+
+    drawStrokedRect(ctx, x, y, w, h, { color, lineWidth }) {
+        ctx.setLineWidth(lineWidth);
+        ctx.setDrawColor(color);
+        ctx.rect(x, y, w, h);
+    }
+
+    // Generate a list of public and private keys from a master password
+    generateKeys(name, password) {
+        return ['active', 'owner', 'posting', 'memo'].reduce(
+            (accum, kind, i) => {
+                const rawKey = PrivateKey.fromSeed(`${name}${kind}${password}`);
+                accum[`${kind}Private`] = rawKey.toString();
+                accum[`${kind}Public`] = rawKey.toPublicKey().toString();
+                return accum;
+            },
+            { master: password }
+        );
     }
 
     renderPdf(keys, filename) {
@@ -735,5 +698,42 @@ export default class PdfDownload extends Component {
         });
 
         return ctx;
+    }
+
+    renderText(
+        ctx,
+        text,
+        { scale, x, y, lineHeight, maxWidth, color, fontSize, font }
+    ) {
+        const textLines = ctx
+            .setFont(font)
+            .setFontSize(fontSize * scale)
+            .setTextColor(color)
+            .splitTextToSize(text, maxWidth);
+        ctx.text(textLines, x, y + fontSize);
+        return textLines.length * fontSize * lineHeight;
+    }
+
+    render() {
+        return (
+            <div className="pdf-download">
+                <img
+                    src="/images/pdf-logo.svg"
+                    style={{ display: 'none' }}
+                    className="pdf-logo"
+                />
+                {this.state.loaded && (
+                    <button
+                        style={{ display: 'block' }}
+                        onClick={(e) => {
+                            this.downloadPdf();
+                            e.preventDefault();
+                        }}
+                    >
+                        {this.props.label}
+                    </button>
+                )}
+            </div>
+        );
     }
 }

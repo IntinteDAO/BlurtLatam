@@ -7,19 +7,19 @@ const { string, number } = PropTypes;
 
 /** Lots of iframes in a post can be very slow.  This component only inserts the iframe when it is actually needed. */
 export default class YoutubePreview extends Component {
+    static defaultProps = {
+        width: 640,
+        height: 360,
+        startTime: 0,
+        dataParams: 'enablejsapi=0&rel=0&origin=https://blurt.world',
+    };
+
     static propTypes = {
         youTubeId: string.isRequired,
         width: number,
         height: number,
         startTime: number,
         dataParams: string,
-    };
-
-    static defaultProps = {
-        width: 640,
-        height: 360,
-        startTime: 0,
-        dataParams: 'enablejsapi=0&rel=0&origin=https://blurt.world',
     };
 
     constructor() {
