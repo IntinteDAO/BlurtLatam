@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import { Component } from 'react';
 import links from 'app/utils/Links';
 import { browserHistory } from 'react-router';
 import shouldComponentUpdate from 'app/utils/shouldComponentUpdate';
 
-export default class Link extends React.Component {
+export default class Link extends Component {
     static propTypes = {
         // HTML properties
         href: PropTypes.string,

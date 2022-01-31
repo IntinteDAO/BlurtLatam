@@ -1,9 +1,9 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { findParent } from 'app/utils/DomUtils';
 import { Dropdown } from 'react-foundation-components/lib/global/dropdown';
 
-export default class FoundationDropdown extends React.Component {
+export default class FoundationDropdown extends Component {
     static propTypes = {
         show: PropTypes.bool.isRequired,
         className: PropTypes.string,

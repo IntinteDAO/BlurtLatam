@@ -1,5 +1,5 @@
 /* eslint react/prop-types: 0 */
-import React, { Component } from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Map } from 'immutable';
 import * as transactionActions from 'app/redux/TransactionReducer';

@@ -1,4 +1,5 @@
-import React, { PropTypes, Component } from 'react';
+import { PropTypes, Component } from 'react';
+import * as React from 'react';
 import ReactDOM from 'react-dom';
 import reactForm from 'app/utils/ReactForm';
 import { SUBMIT_FORM_ID } from 'shared/constants';

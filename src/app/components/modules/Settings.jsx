@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 import tt from 'counterpart';
 import * as userActions from 'app/redux/UserReducer';
@@ -6,7 +6,7 @@ import * as appActions from 'app/redux/AppReducer';
 import UserList from 'app/components/elements/UserList';
 import * as blurt from '@blurtfoundation/blurtjs';
 
-class Settings extends React.Component {
+class Settings extends Component {
     constructor(props) {
         super(props);
         this.state = {

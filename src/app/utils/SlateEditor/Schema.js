@@ -1,4 +1,3 @@
-import React from 'react';
 import Link from 'app/utils/SlateEditor/Link';
 import Image from 'app/utils/SlateEditor/Image';
 import Iframe from 'app/utils/SlateEditor/Iframe';

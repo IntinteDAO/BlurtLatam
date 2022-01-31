@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import shouldComponentUpdate from 'app/utils/shouldComponentUpdate';
@@ -6,7 +6,7 @@ import { cleanReduxInput } from 'app/utils/ReduxForms';
 import tt from 'counterpart';
 import Tooltip from 'app/components/elements/Tooltip';
 
-class CategorySelector extends React.Component {
+class CategorySelector extends Component {
     static propTypes = {
         // HTML props
         id: PropTypes.string, // DOM id for active component (focusing, etc...)

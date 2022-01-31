@@ -1,5 +1,5 @@
 /* eslint react/prop-types: 0 */
-import React from 'react';
+import { Component } from 'react';
 import Reveal from 'app/components/elements/Reveal';
 import CloseButton from 'app/components/elements/CloseButton';
 import TimeAgoWrapper from 'app/components/elements/TimeAgoWrapper';
@@ -7,7 +7,7 @@ import { browserHistory } from 'react-router';
 import tt from 'counterpart';
 import { FormattedDate } from 'react-intl';
 
-class CheckLoginOwner extends React.Component {
+class CheckLoginOwner extends Component {
     constructor() {
         super();
         this.state = {};

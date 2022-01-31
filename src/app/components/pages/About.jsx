@@ -1,8 +1,8 @@
-import React from 'react';
+import { Component } from 'react';
 import { APP_NAME, APP_URL } from 'app/client_config';
 import tt from 'counterpart';
 
-class About extends React.Component {
+class About extends Component {
     render() {
         return (
             <div className="About">

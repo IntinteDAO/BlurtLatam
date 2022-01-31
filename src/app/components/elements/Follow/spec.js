@@ -1,4 +1,3 @@
-import React from 'react';
 import { mount, configure, shallow } from 'enzyme';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';

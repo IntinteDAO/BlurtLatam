@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 // import LoadingIndicator from 'app/components/elements/LoadingIndicator';
@@ -9,7 +9,7 @@ import tt from 'counterpart';
 
 const { string, func } = PropTypes;
 
-export default class Reblog extends React.Component {
+export default class Reblog extends Component {
     static propTypes = {
         account: string,
         author: string,

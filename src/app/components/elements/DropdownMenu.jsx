@@ -1,11 +1,11 @@
-import React from 'react';
+import { createElement, Component } from 'react';
 import PropTypes from 'prop-types';
 import { browserHistory } from 'react-router';
 import Icon from 'app/components/elements/Icon';
 import VerticalMenu from './VerticalMenu';
 import { findParent } from 'app/utils/DomUtils';
 
-export default class DropdownMenu extends React.Component {
+export default class DropdownMenu extends Component {
     static propTypes = {
         items: PropTypes.arrayOf(PropTypes.object).isRequired,
         selected: PropTypes.string,
@@ -111,6 +111,6 @@ export default class DropdownMenu extends React.Component {
             (this.state.shown ? ' show' : '') +
             (className ? ` ${className}` : '') +
             (position ? ` ${position}` : '');
-        return React.createElement(el, { className: cls }, [entry, menu]);
+        return createElement(el, { className: cls }, [entry, menu]);
     }
 }

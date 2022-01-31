@@ -1,6 +1,6 @@
-import React from 'react';
+import { Component } from 'react';
 
-export default class Align extends React.Component {
+export default class Align extends Component {
     getAlignClass = () => {
         const { node } = this.props;
         switch (node.data.get('align')) {

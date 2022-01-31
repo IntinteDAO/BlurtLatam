@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import CloseButton from 'app/components/elements/CloseButton';
@@ -15,7 +15,7 @@ import shouldComponentUpdate from 'app/utils/shouldComponentUpdate';
 import TermsAgree from 'app/components/modules/TermsAgree';
 import PostAdvancedSettings from 'app/components/modules/PostAdvancedSettings';
 
-class Modals extends React.Component {
+class Modals extends Component {
     static defaultProps = {
         username: '',
         notifications: undefined,

@@ -1,8 +1,8 @@
-import React from 'react';
+import { Component } from 'react';
 import CloseButton from 'app/components/elements/CloseButton';
 import PropTypes from 'prop-types';
 
-export default class BottomPanel extends React.Component {
+export default class BottomPanel extends Component {
     static propTypes = {
         children: PropTypes.object,
         visible: PropTypes.bool,

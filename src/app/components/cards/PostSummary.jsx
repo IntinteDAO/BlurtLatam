@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import TimeAgoWrapper from 'app/components/elements/TimeAgoWrapper';
@@ -22,7 +22,7 @@ import { SIGNUP_URL } from 'shared/constants';
 import { hasNsfwTag } from 'app/utils/StateFunctions';
 import { repLog10, parsePayoutAmount } from 'app/utils/ParsersAndFormatters';
 
-class PostSummary extends React.Component {
+class PostSummary extends Component {
     static propTypes = {
         post: PropTypes.string.isRequired,
         pending_payout: PropTypes.string.isRequired,

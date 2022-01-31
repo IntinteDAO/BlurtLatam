@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable react/jsx-one-expression-per-line */
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import Author from 'app/components/elements/Author';
 import ReplyEditor from 'app/components/elements/ReplyEditor';
@@ -95,7 +95,7 @@ export function sortComments(cont, comments, sort_order) {
     comments.sort(sort_orders[sort_order]);
 }
 
-class CommentImpl extends React.Component {
+class CommentImpl extends Component {
     static propTypes = {
         // html props
         cont: PropTypes.object.isRequired,

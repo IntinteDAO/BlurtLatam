@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import CloseButton from 'app/components/elements/CloseButton';
@@ -11,7 +11,7 @@ import CheckLoginOwner from 'app/components/elements/CheckLoginOwner';
 import PromotePost from 'app/components/modules/PromotePost';
 import ExplorePost from 'app/components/modules/ExplorePost';
 
-class Dialogs extends React.Component {
+class Dialogs extends Component {
     static propTypes = {
         active_dialogs: PropTypes.object,
         hide: PropTypes.func.isRequired,

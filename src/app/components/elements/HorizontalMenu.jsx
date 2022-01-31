@@ -1,10 +1,10 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import Icon from 'app/components/elements/Icon';
 import tt from 'counterpart';
 
-export default class HorizontalMenu extends React.Component {
+export default class HorizontalMenu extends Component {
     static propTypes = {
         items: PropTypes.arrayOf(PropTypes.object).isRequired,
         title: PropTypes.string,

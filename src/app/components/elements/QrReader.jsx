@@ -1,7 +1,7 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 
-export default class Qr extends React.Component {
+export default class Qr extends Component {
     static propTypes = {
         handleScan: PropTypes.func.isRequired,
         onClose: PropTypes.func,

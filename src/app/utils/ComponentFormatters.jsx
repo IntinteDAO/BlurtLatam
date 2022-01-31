@@ -1,5 +1,3 @@
-import React from 'react';
-
 export const authorNameAndRep = (author, authorRepLog10) => (
     <span>
         <strong>{author}</strong>

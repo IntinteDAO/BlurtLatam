@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import TimeAgoWrapper from 'app/components/elements/TimeAgoWrapper';
@@ -78,7 +78,7 @@ function TimeAuthorCategoryLarge({ content, authorRepLog10 }) {
     );
 }
 
-class PostFull extends React.Component {
+class PostFull extends Component {
     static propTypes = {
         // html props
         /* Show extra options (component is being viewed alone) */

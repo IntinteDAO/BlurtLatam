@@ -1,11 +1,11 @@
-import React from 'react';
+import { Component } from 'react';
 import { browserHistory } from 'react-router';
 import { connect } from 'react-redux';
 import { actions as fetchDataSagaActions } from 'app/redux/FetchDataSaga';
 import LoadingIndicator from 'app/components/elements/LoadingIndicator';
 import SvgImage from 'app/components/elements/SvgImage';
 
-class PostWrapper extends React.Component {
+class PostWrapper extends Component {
     constructor() {
         super();
 

@@ -12,7 +12,7 @@
 /* eslint-disable no-useless-escape */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable arrow-parens */
-import React from 'react';
+import { Component } from 'react';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import reactForm from 'app/utils/ReactForm';
@@ -41,7 +41,7 @@ const remarkable = new Remarkable({ html: true, breaks: true });
 
 const RTE_DEFAULT = false;
 
-class ReplyEditor extends React.Component {
+class ReplyEditor extends Component {
     static propTypes = {
         // html component attributes
         formId: PropTypes.string.isRequired, // unique form id for each editor

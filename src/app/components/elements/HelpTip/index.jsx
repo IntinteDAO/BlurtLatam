@@ -1,8 +1,8 @@
-import React from 'react';
+import { Component } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
-export default class HelpTip extends React.Component {
+export default class HelpTip extends Component {
     static propTypes = {
         children: PropTypes.any.isRequired,
         content: PropTypes.oneOfType([PropTypes.string, PropTypes.array])

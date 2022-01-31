@@ -1,5 +1,4 @@
 /* global describe, it, before, beforeEach, after, afterEach */
-import React from 'react';
 import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-15';
 import LoadingIndicator from 'app/components/elements/LoadingIndicator';

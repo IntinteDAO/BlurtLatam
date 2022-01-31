@@ -1,7 +1,7 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 
-class LoadingIndicator extends React.Component {
+class LoadingIndicator extends Component {
     static propTypes = {
         // html component attributes
         type: PropTypes.oneOf(['dots', 'circle', 'circle-strong']),

@@ -1,5 +1,5 @@
 /* eslint react/prop-types: 0 */
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import shouldComponentUpdate from 'app/utils/shouldComponentUpdate';
@@ -27,7 +27,7 @@ const fnCloseAll = () => {
     }
 };
 
-class Author extends React.Component {
+class Author extends Component {
     static propTypes = {
         author: string.isRequired,
         follow: bool,

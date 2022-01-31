@@ -1,4 +1,4 @@
-import React from 'react';
+import { PropTypes, Component } from 'react';
 import Autocomplete from 'react-autocomplete';
 import shouldComponentUpdate from 'app/utils/shouldComponentUpdate';
 import { validate_account_name } from 'app/utils/ChainValidation';
@@ -6,17 +6,17 @@ import reactForm from 'app/utils/ReactForm';
 import { List, Set } from 'immutable';
 import tt from 'counterpart';
 
-export class BeneficiarySelector extends React.Component {
+export class BeneficiarySelector extends Component {
     static propTypes = {
         // HTML props
-        id: React.PropTypes.string, // DOM id for active component (focusing, etc...)
-        onChange: React.PropTypes.func.isRequired,
-        onBlur: React.PropTypes.func.isRequired,
-        value: React.PropTypes.array,
-        tabIndex: React.PropTypes.number,
+        id: PropTypes.string, // DOM id for active component (focusing, etc...)
+        onChange: PropTypes.func.isRequired,
+        onBlur: PropTypes.func.isRequired,
+        value: PropTypes.array,
+        tabIndex: PropTypes.number,
 
         // redux connect
-        following: React.PropTypes.array.isRequired,
+        following: PropTypes.array.isRequired,
     };
     static defaultProps = {
         id: 'BeneficiarySelectorId',

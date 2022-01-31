@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
@@ -25,7 +25,7 @@ import { actions as fetchDataSagaActions } from 'app/redux/FetchDataSaga';
 import { startPolling } from 'app/redux/PollingSaga';
 import { List } from 'immutable';
 
-class Header extends React.Component {
+class Header extends Component {
     static propTypes = {
         current_account_name: PropTypes.string,
         display_name: PropTypes.string,

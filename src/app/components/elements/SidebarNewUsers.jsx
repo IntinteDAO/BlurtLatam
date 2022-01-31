@@ -1,4 +1,3 @@
-import React from 'react';
 import tt from 'counterpart';
 import { SIGNUP_URL } from 'shared/constants';
 

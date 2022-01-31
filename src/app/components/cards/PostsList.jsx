@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import tt from 'counterpart';
@@ -21,7 +21,7 @@ function topPosition(domElt) {
     return domElt.offsetTop + topPosition(domElt.offsetParent);
 }
 
-class PostsList extends React.Component {
+class PostsList extends Component {
     static propTypes = {
         posts: PropTypes.object.isRequired,
         loading: PropTypes.bool.isRequired,

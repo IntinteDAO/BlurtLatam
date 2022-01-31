@@ -1,10 +1,10 @@
 /* eslint react/prop-types: 0 */
-import React from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import tt from 'counterpart';
 
-class UserWallet extends React.Component {
+class UserWallet extends Component {
     render() {
         const { account, walletUrl } = this.props;
         if (!account) return null;

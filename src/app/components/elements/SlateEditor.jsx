@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import Slate, { Editor, Mark, Raw, Html } from 'slate';
 import Portal from 'react-portal';
 import position from 'selection-position';
@@ -56,7 +56,7 @@ if (process.env.BROWSER) {
     plugins.push(TrailingBlock({ type: DEFAULT_NODE }));
 }
 
-export default class SlateEditor extends React.Component {
+export default class SlateEditor extends Component {
     constructor(props) {
         super(props);
         this.state = { state: props.initialState };

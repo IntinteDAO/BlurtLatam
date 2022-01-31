@@ -1,7 +1,7 @@
-import React from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 
-class GoogleAd extends React.Component {
+class GoogleAd extends Component {
     componentDidMount() {
         if (!this.props.shouldSeeAds) {
             return;

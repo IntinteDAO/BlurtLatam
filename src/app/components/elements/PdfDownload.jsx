@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { PrivateKey } from '@blurtfoundation/blurtjs/lib/auth/ecc';
 import QRious from 'qrious';
 

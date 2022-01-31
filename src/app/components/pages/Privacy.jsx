@@ -1,6 +1,6 @@
-import React from 'react';
+import { Component } from 'react';
 
-class Privacy extends React.Component {
+class Privacy extends Component {
     render() {
         return (
             <div className="Privacy row">

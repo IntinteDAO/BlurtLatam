@@ -1,5 +1,3 @@
-import React from 'react';
-
 const regex = {
     sanitize: /^https:\/\/emb\.d\.tube\/#!\/([a-zA-Z0-9-.\/]+)$/,
     main: /https:\/\/(?:emb\.)?(?:d\.tube\/#!\/(?:v\/)?)([a-zA-Z0-9\-.\/]*)/,

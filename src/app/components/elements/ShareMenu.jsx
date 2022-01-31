@@ -1,9 +1,9 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import Icon from 'app/components/elements/Icon';
 
-export default class ShareMenu extends React.Component {
+export default class ShareMenu extends Component {
     static propTypes = {
         menu: PropTypes.arrayOf(PropTypes.object).isRequired,
         title: PropTypes.string,

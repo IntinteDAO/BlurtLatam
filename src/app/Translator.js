@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 import { IntlProvider, addLocaleData } from 'react-intl';
 import en from 'react-intl/locale-data/en';
@@ -46,7 +46,7 @@ if (process.env.NODE_ENV === 'production') {
     tt.setFallbackLocale('en');
 }
 
-class Translator extends React.Component {
+class Translator extends Component {
     render() {
         const language = this.props.locale;
         tt.setLocale(language);

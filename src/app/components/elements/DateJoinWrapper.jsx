@@ -1,8 +1,8 @@
-import React from 'react';
+import { Component } from 'react';
 import tt from 'counterpart';
 import { FormattedDate } from 'react-intl';
 
-export default class DateJoinWrapper extends React.Component {
+export default class DateJoinWrapper extends Component {
     render() {
         const date = new Date(
             this.props.date === '1970-01-01T00:00:00'

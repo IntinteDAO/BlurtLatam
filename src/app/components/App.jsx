@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import AppPropTypes from 'app/utils/AppPropTypes';
@@ -13,7 +13,7 @@ import WelcomePanel from 'app/components/elements/WelcomePanel';
 import tt from 'counterpart';
 import { VIEW_MODE_WHISTLE } from 'shared/constants';
 
-class App extends React.Component {
+class App extends Component {
     constructor(props) {
         super(props);
         // TODO: put both of these and associated toggles into Redux Store.

@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import MarkdownViewer from 'app/components/cards/MarkdownViewer';
 import Icon from 'app/components/elements/Icon';
@@ -66,7 +66,7 @@ function split_into_sections(str) {
     }, {});
 }
 
-export default class HelpContent extends React.Component {
+export default class HelpContent extends Component {
     // eslint-disable-next-line react/static-property-placement
     static propTypes = {
         path: PropTypes.string.isRequired,

@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-escape */
 /* eslint-disable arrow-parens */
 /* eslint-disable no-mixed-operators */
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Slider from 'react-rangeslider';
@@ -48,7 +48,7 @@ const VOTE_WEIGHT_DROPDOWN_THRESHOLD = 50; //if BP is more than 50, enable the s
 // const SBD_PRINT_RATE_MAX = 10000;
 const MAX_WEIGHT = 10000;
 
-class Voting extends React.Component {
+class Voting extends Component {
     static propTypes = {
         // HTML properties
         post: PropTypes.string.isRequired,

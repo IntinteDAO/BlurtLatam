@@ -1,6 +1,6 @@
-import React from 'react';
+import { Component } from 'react';
 
-export class SidebarModule extends React.Component {
+export class SidebarModule extends Component {
     render() {
         return (
             <div className="c-sidebar__module">

@@ -1,9 +1,9 @@
 /* eslint react/prop-types: 0 */
-import React from 'react';
+import { Component } from 'react';
 import { FormattedRelative, injectIntl } from 'react-intl';
 import Tooltip from 'app/components/elements/Tooltip';
 
-class TimeAgoWrapper extends React.Component {
+class TimeAgoWrapper extends Component {
     render() {
         let { date, className } = this.props;
         if (date && /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d$/.test(date)) {

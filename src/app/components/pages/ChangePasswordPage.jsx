@@ -1,8 +1,8 @@
-import React from 'react';
+import { Component } from 'react';
 import ChangePassword from 'app/components/elements/ChangePassword';
 import tt from 'counterpart';
 
-class ChangePasswordPage extends React.Component {
+class ChangePasswordPage extends Component {
     render() {
         return (
             <div className="row">

@@ -1,9 +1,9 @@
 /* eslint react/prop-types: 0 */
-import React from 'react';
+import { Component } from 'react';
 import tt from 'counterpart';
 import { Link } from 'react-router';
 
-class ChangePassword extends React.Component {
+class ChangePassword extends Component {
     render() {
         return (
             <div>

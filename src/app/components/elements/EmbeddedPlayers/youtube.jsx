@@ -1,4 +1,3 @@
-import React from 'react';
 import YoutubePreview from 'app/components/elements/YoutubePreview';
 
 const regex = {

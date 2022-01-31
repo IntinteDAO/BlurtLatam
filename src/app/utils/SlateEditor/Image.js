@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 
 export default connect(
@@ -12,7 +12,7 @@ export default connect(
         },
     })
 )(
-    class Image extends React.Component {
+    class Image extends Component {
         state = {
             progress: {},
         };

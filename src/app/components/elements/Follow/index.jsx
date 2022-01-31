@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import LoadingIndicator from 'app/components/elements/LoadingIndicator';
@@ -10,7 +10,7 @@ import tt from 'counterpart';
 
 const { string, bool, any } = PropTypes;
 
-export default class Follow extends React.Component {
+export default class Follow extends Component {
     static propTypes = {
         following: string,
         follower: string, // OPTIONAL default to current user

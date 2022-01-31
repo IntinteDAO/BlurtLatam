@@ -1,5 +1,5 @@
 /* eslint react/prop-types: 0 */
-import React from 'react';
+import { Component } from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -31,7 +31,7 @@ import UserAvatar from './UserAvatar';
 
 import Blacklist from '../elements/Blacklist';
 
-export default class UserProfile extends React.Component {
+export default class UserProfile extends Component {
     constructor() {
         super();
         this.state = { showResteem: true };

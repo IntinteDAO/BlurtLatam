@@ -1,7 +1,7 @@
-import React from 'react';
+import { Component } from 'react';
 import { normalizeEmbedUrl as normalizeEmbbeddedPlayerEmbedUrl } from 'app/components/elements/EmbeddedPlayers';
 
-export default class Iframe extends React.Component {
+export default class Iframe extends Component {
     normalizeEmbedUrl = (url) => {
         const validEmbedUrl = normalizeEmbbeddedPlayerEmbedUrl(url);
         if (validEmbedUrl !== false) {

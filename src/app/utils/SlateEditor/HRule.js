@@ -1,6 +1,6 @@
-import React from 'react';
+import { Component } from 'react';
 
-export default class HRule extends React.Component {
+export default class HRule extends Component {
     render() {
         const { node, state } = this.props;
         const isFocused = state.selection.hasEdgeIn(node);

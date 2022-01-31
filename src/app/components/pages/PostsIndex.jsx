@@ -1,5 +1,5 @@
 /* eslint react/prop-types: 0 */
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
@@ -23,7 +23,7 @@ import Topics from './Topics';
 import SortOrder from 'app/components/elements/SortOrder';
 import { RECOMMENDED_FOLLOW_ACCOUNT } from 'app/client_config';
 
-class PostsIndex extends React.Component {
+class PostsIndex extends Component {
     static propTypes = {
         discussions: PropTypes.object,
         feed_posts: PropTypes.object,

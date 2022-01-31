@@ -1,7 +1,7 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 
-export default class SvgImage extends React.Component {
+export default class SvgImage extends Component {
     static propTypes = {
         name: PropTypes.string.isRequired,
         width: PropTypes.string.isRequired,

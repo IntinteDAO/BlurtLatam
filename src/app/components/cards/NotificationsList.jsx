@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { List } from 'immutable';
@@ -78,7 +78,7 @@ const pic = (author) => {
     );
 };
 
-class NotificationsList extends React.Component {
+class NotificationsList extends Component {
     // eslint-disable-next-line no-undef
     static propTypes = {
         username: PropTypes.string.isRequired,
