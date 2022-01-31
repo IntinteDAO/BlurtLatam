@@ -1,4 +1,4 @@
-import { PropTypes, Component } from 'react';
+import { Component } from 'react';
 import * as React from 'react';
 import reactForm from 'app/utils/ReactForm';
 import { SUBMIT_FORM_ID } from 'shared/constants';
@@ -6,7 +6,7 @@ import tt from 'counterpart';
 import { fromJS } from 'immutable';
 import { validateBeneficiaries } from 'app/components/cards/BeneficiarySelector';
 import BeneficiarySelector from 'app/components/cards/BeneficiarySelector';
-
+import PropTypes from 'prop-types';
 import * as userActions from 'app/redux/UserReducer';
 
 class PostAdvancedSettings extends Component {
