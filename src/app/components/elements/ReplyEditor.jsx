@@ -1175,12 +1175,7 @@ export default (formId) => connect(
             }
 
             if(!isEdit) {
-                // const message = `
-
-                //         ---
-                //         <sub>Posted from [https://blurtlatam.com](https://blurtlatam.com/${permlink})</sub>
-                //     `;
-                const message = "<br /> <hr /> <center><sub>Posted from [https://blurtlatam.com](https://blurtlatam.com/" + parent_permlink + "/@" + author + "/" + permlink + ")</sub></center>";
+                const message = "<br /> <hr /> <center><sub>Posted from [https://blurtblog.tekraze.com](https://blurtblog.tekraze.com/" + parent_permlink + "/@" + author + "/" + permlink + ")</sub></center>";
                 if(!isHtml) {
                     body+= ` ` + message;
                 } else if(isHtml) {
@@ -1254,7 +1249,7 @@ export default (formId) => connect(
             if (rtags.links.size) meta.links = Array.from(rtags.links);
             else delete meta.links;
 
-            meta.app = 'blurtlatam/0.1';
+            meta.app = 'blurtblog.tekraze/0.1';
             if (isStory) {
                 meta.format = isHtml ? 'html' : 'markdown';
                 if (summary) {
