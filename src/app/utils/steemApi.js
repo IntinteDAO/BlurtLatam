@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { api } from '@blurtfoundation/blurtjs';
 import axios from 'axios';
 import { Client } from '@busyorg/busyjs';
@@ -6,6 +7,7 @@ import stateCleaner from 'app/redux/stateCleaner';
 
 export async function getStateAsync(url) {
     // strip off query string
+    // eslint-disable-next-line prefer-destructuring
     url = url.split('?')[0];
 
     // strip off leading and trailing slashes
@@ -68,7 +70,7 @@ export async function getStateAsync(url) {
     await axios
         .get(
             'https://gitlab.com/blurt/openblurt/condenser-pinned/-/raw/master/dapps.json',
-            { timeout: 2000 }
+            { timeout: 3000 }
         )
         .then((response) => {
             if (response.status === 200) {

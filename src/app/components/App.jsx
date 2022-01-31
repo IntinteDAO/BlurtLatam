@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import AppPropTypes from 'app/utils/AppPropTypes';
@@ -24,14 +24,12 @@ class App extends Component {
         this.listenerActive = null;
     }
 
-    UNSAFE_componentWillMount() {
-        if (process.env.BROWSER) localStorage.removeItem('autopost'); // July 14 '16 compromise, renamed to autopost2
-        this.props.loginUser();
-    }
-
     componentDidMount() {
         const { nightmodeEnabled } = this.props;
         this.toggleBodyNightmode(nightmodeEnabled);
+        if (process.env.BROWSER) localStorage.removeItem('autopost'); // July 14 '16 compromise, renamed to autopost2
+        // eslint-disable-next-line react/destructuring-assignment
+        this.props.loginUser();
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {

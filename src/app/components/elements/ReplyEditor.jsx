@@ -78,7 +78,13 @@ class ReplyEditor extends Component {
         this.initForm(props);
     }
 
-    UNSAFE_componentWillMount() {
+    componentDidMount() {
+        setTimeout(() => {
+            if (this.props.isStory) this.refs.titleRef.focus();
+            else if (this.refs.postRef) this.refs.postRef.focus();
+            else if (this.refs.rte) this.refs.rte._focus();
+        }, 300);
+
         const { formId } = this.props;
 
         if (process.env.BROWSER) {
@@ -122,14 +128,6 @@ class ReplyEditor extends Component {
                     : null,
             });
         }
-    }
-
-    componentDidMount() {
-        setTimeout(() => {
-            if (this.props.isStory) this.refs.titleRef.focus();
-            else if (this.refs.postRef) this.refs.postRef.focus();
-            else if (this.refs.rte) this.refs.rte._focus();
-        }, 300);
     }
 
     shouldComponentUpdate = shouldComponentUpdate(this, 'ReplyEditor');

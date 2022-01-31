@@ -204,21 +204,21 @@ class Voting extends Component {
         this.shouldComponentUpdate = shouldComponentUpdate(this, 'Voting');
     }
 
-    UNSAFE_componentWillMount() {
+    componentDidMount() {
         const { username, active_votes } = this.props;
-        this._checkMyVote(username, active_votes);
+        this.checkMyVote(username, active_votes);
         this.getVotingManabar(username);
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
         const { username, active_votes } = nextProps;
-        this._checkMyVote(username, active_votes);
+        this.checkMyVote(username, active_votes);
         this.getVotingManabar(username);
     }
 
     componentDidUpdate(prevProps) {
         const { username, active_votes } = prevProps;
-        this._checkMyVote(username, active_votes);
+        this.checkMyVote(username, active_votes);
         this.getVotingManabar(username);
     }
 
@@ -274,7 +274,7 @@ class Voting extends Component {
         }
     }
 
-    _checkMyVote(username, active_votes) {
+    checkMyVote(username, active_votes) {
         if (username && active_votes) {
             const vote = active_votes.find(
                 (el) => el.get('voter') === username

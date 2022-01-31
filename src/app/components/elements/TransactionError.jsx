@@ -20,15 +20,19 @@ class TransactionError extends Component {
         errorKey: string,
         exception: string,
     };
-    UNSAFE_componentWillMount() {
+
+    componentDidMount() {
         const { opType, addListener } = this.props;
         addListener(opType);
     }
+
     shouldComponentUpdate = shouldComponentUpdate(this, 'TransactionError');
+
     componentWillUnmount() {
         const { opType, removeListener } = this.props;
         removeListener(opType);
     }
+
     render() {
         const { errorKey, exception, error } = this.props;
         const cn = 'error callout alert';

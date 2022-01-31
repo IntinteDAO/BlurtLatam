@@ -1,3 +1,4 @@
+import React from 'react';
 import config from 'config';
 import { renderToString } from 'react-dom/server';
 import { VIEW_MODE_WHISTLE, PARAM_VIEW_MODE } from '../shared/constants';

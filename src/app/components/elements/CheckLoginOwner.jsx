@@ -12,6 +12,7 @@ class CheckLoginOwner extends Component {
         super();
         this.state = {};
     }
+
     UNSAFE_componentWillReceiveProps(nextProps) {
         const { login_owner_pubkey } = nextProps;
         if (
@@ -39,11 +40,13 @@ class CheckLoginOwner extends Component {
             }
         }
     }
+
     onUnderstood = (e) => {
         const understood = e.target.checked;
         console.log('understood', understood);
         this.setState({ understood });
     };
+
     getKey = (props = this.props) => {
         const { previous_owner_authority } = props;
         const username = previous_owner_authority.get('account');

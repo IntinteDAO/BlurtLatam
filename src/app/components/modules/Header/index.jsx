@@ -47,16 +47,6 @@ class Header extends Component {
         };
     }
 
-    UNSAFE_componentWillMount() {
-        const {
-            loggedIn,
-            current_account_name,
-            getAccountNotifications,
-        } = this.props;
-        if (loggedIn) {
-            getAccountNotifications(current_account_name);
-        }
-    }
 
     componentDidMount() {
         if (
@@ -69,6 +59,15 @@ class Header extends Component {
         }
 
         window.addEventListener('gptadshown', (e) => this.gptAdRendered(e));
+
+        const {
+            loggedIn,
+            current_account_name,
+            getAccountNotifications,
+        } = this.props;
+        if (loggedIn) {
+            getAccountNotifications(current_account_name);
+        }
     }
 
     // Consider refactor.

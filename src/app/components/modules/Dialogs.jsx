@@ -16,6 +16,7 @@ class Dialogs extends Component {
         active_dialogs: PropTypes.object,
         hide: PropTypes.func.isRequired,
     };
+
     constructor() {
         super();
         this.shouldComponentUpdate = shouldComponentUpdate(this, 'Dialogs');
@@ -23,12 +24,14 @@ class Dialogs extends Component {
             this.props.hide(name);
         };
     }
+
     UNSAFE_componentWillReceiveProps(nextProps) {
         const { active_dialogs, hide } = nextProps;
         active_dialogs.forEach((v, k) => {
             if (!this['hide_' + k]) this['hide_' + k] = () => hide(k);
         });
     }
+
     render() {
         const { active_dialogs } = this.props;
         let idx = 0;

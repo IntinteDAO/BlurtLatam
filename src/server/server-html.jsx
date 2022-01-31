@@ -1,3 +1,4 @@
+import React from 'react';
 import * as config from 'config';
 
 export default function ServerHTML({

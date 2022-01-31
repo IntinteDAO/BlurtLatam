@@ -7,7 +7,7 @@ import { findParent } from 'app/utils/DomUtils';
 
 export default class DropdownMenu extends Component {
     static propTypes = {
-        items: PropTypes.arrayOf(PropTypes.object).isRequired,
+        items: PropTypes.object.isRequired,
         selected: PropTypes.string,
         children: PropTypes.object,
         className: PropTypes.string,

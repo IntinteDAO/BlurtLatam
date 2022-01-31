@@ -79,7 +79,16 @@ export default class HelpContent extends Component {
         this.locale = 'en';
     }
 
-    UNSAFE_componentWillMount() {
+    setVars(str) {
+        return str.replace(/(\{.+?\})/gi, (match, text) => {
+            const key = text.substr(1, text.length - 2);
+            const value =
+                this.props[key] !== undefined ? this.props[key] : text;
+            return value;
+        });
+    }
+
+    componentDidMount() {
         const md_file_path_regexp = new RegExp(`/${this.locale}/(.+).md$`);
         req.keys()
             .filter((a) => {
@@ -94,15 +103,6 @@ export default class HelpContent extends Component {
                 const content = req(filename);
                 help_locale[key] = split_into_sections(content);
             });
-    }
-
-    setVars(str) {
-        return str.replace(/(\{.+?\})/gi, (match, text) => {
-            const key = text.substr(1, text.length - 2);
-            const value =
-                this.props[key] !== undefined ? this.props[key] : text;
-            return value;
-        });
     }
 
     render() {

@@ -17,13 +17,14 @@ export default class Reblog extends Component {
         permlink: string,
         reblog: func,
     };
+    
     constructor(props) {
         super(props);
         this.shouldComponentUpdate = shouldComponentUpdate(this, 'Reblog');
         this.state = { active: false, loading: false };
     }
 
-    UNSAFE_componentWillMount() {
+    componentDidMount() {
         const { account } = this.props;
         if (account) {
             this.setState({ active: this.isReblogged(account) });

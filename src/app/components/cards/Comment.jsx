@@ -171,15 +171,12 @@ class CommentImpl extends Component {
         };
     }
 
-    UNSAFE_componentWillMount() {
-        this.initEditor(this.props);
-        this._checkHide(this.props);
-    }
-
     componentDidMount() {
         if (window.location.hash == this.props.anchor_link) {
             this.setState({ highlight: true }); // eslint-disable-line react/no-did-mount-set-state
         }
+        this.initEditor(this.props);
+        this.checkHide(this.props);
     }
 
     /**
@@ -188,7 +185,7 @@ class CommentImpl extends Component {
      *    it hides the comment body (but not the header) until the "reveal comment" link is clicked.
      */
     // eslint-disable-next-line no-underscore-dangle
-    _checkHide(props) {
+    checkHide(props) {
         const content = props.cont.get(props.content);
         if (content) {
             const hide = hideSubtree(props.cont, props.content);
