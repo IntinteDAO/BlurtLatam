@@ -1,5 +1,4 @@
 import * as config from 'config';
-import React from 'react';
 
 export default function ServerHTML({
     body,
