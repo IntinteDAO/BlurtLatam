@@ -163,7 +163,6 @@ class ReplyEditor extends Component {
                     summary: summary ? summary.value : undefined,
                 };
 
-                clearTimeout(saveEditorTimeout);
                 saveEditorTimeout = setTimeout(() => {
                     // console.log('save formId', formId, body.value)
                     localStorage.setItem(
@@ -172,6 +171,7 @@ class ReplyEditor extends Component {
                     );
                     this.showDraftSaved();
                 }, 500);
+                clearTimeout(saveEditorTimeout);
             }
         }
     }
@@ -440,6 +440,30 @@ class ReplyEditor extends Component {
     };
 
     render() {
+
+        // useEffect(() => {
+        //     if (process.env.BROWSER) {
+        //         const data = {
+        //             formId,
+        //             title: title ? title.value : undefined,
+        //             category: category ? category.value : undefined,
+        //             body: body.value,
+        //             payoutType,
+        //             beneficiaries,
+        //             summary: summary ? summary.value : undefined,
+        //         };
+        //         saveEditorTimeout = setTimeout(() => {
+        //             // console.log('save formId', formId, body.value)
+        //             localStorage.setItem(
+        //                 'replyEditorData-' + formId,
+        //                 JSON.stringify(data, null, 0)
+        //             );
+        //             this.showDraftSaved();
+        //         }, 500);
+        //         clearTimeout(saveEditorTimeout);
+        //     }
+        // }, [this.props, this.state]);
+
         const originalPost = {
             category: this.props.category,
             body: this.props.body,
