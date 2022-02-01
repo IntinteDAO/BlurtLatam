@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import LoadingIndicator from 'app/components/elements/LoadingIndicator';
@@ -29,8 +29,7 @@ class PromotePost extends Component {
 
     componentDidMount() {
         setTimeout(() => {
-            this.amountRef.focus();
-            // ReactDOM.findDOMNode(this.refs.amount).focus();
+            findDOMNode(this.refs.amount).focus();
         }, 300);
     }
 

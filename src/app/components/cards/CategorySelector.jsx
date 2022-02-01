@@ -1,3 +1,4 @@
+/* eslint-disable react/static-property-placement */
 import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -7,11 +8,7 @@ import tt from 'counterpart';
 import Tooltip from 'app/components/elements/Tooltip';
 
 class CategorySelector extends Component {
-    static defaultProps = {
-        autoComplete: 'on',
-        id: 'CategorySelectorId',
-        isEdit: false,
-    };
+
     static propTypes = {
         // HTML props
         id: PropTypes.string, // DOM id for active component (focusing, etc...)
@@ -25,8 +22,15 @@ class CategorySelector extends Component {
         tabIndex: PropTypes.number,
 
         // redux connect (overwrite in HTML)
-        trending: PropTypes.object.isRequired, // Immutable.List
+        trending: PropTypes.objectOf(PropTypes.object).isRequired, // Immutable.List
     };
+
+    static defaultProps = {
+        autoComplete: 'on',
+        id: 'CategorySelectorId',
+        isEdit: false,
+    };
+
     constructor() {
         super();
         this.state = { createCategory: true };

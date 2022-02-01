@@ -41,8 +41,6 @@ ReactGA.initialize('UA-125809453-3', {
 ReactGA.pageview(window.location.pathname + window.location.search);
 
 function runApp(initial_state) {
-    console.log('Initial state', initial_state);
-
     const konami = {
         code: 'xyzzy',
         enabled: false

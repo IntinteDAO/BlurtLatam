@@ -1,20 +1,12 @@
+/* eslint-disable react/static-property-placement */
 import PropTypes from 'prop-types';
 import { createElement, Component } from 'react';
-import { browserHistory } from 'react-router';
-import Icon from 'app/components/elements/Icon';
 import { findParent } from 'app/utils/DomUtils';
 
 export default class Dropdown extends Component {
-    static defaultProps = {
-        onHide: () => null,
-        onShow: () => null,
-        show: false,
-        className: 'dropdown-comp',
-        href: null,
-    };
 
     static propTypes = {
-        children: PropTypes.object,
+        children: PropTypes.objectOf(PropTypes.object),
         className: PropTypes.string,
         title: PropTypes.oneOfType([
             PropTypes.string,
@@ -24,6 +16,14 @@ export default class Dropdown extends Component {
         onHide: PropTypes.func,
         onShow: PropTypes.func,
         show: PropTypes.bool,
+    };
+
+    static defaultProps = {
+        onHide: () => null,
+        onShow: () => null,
+        show: false,
+        className: 'dropdown-comp',
+        href: null,
     };
 
     constructor(props) {

@@ -1,5 +1,5 @@
 /* eslint react/prop-types: 0 */
-import { Component } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import shouldComponentUpdate from 'app/utils/shouldComponentUpdate';
 import Icon from 'app/components/elements/Icon';
@@ -7,8 +7,7 @@ import { Link } from 'react-router';
 import normalizeProfile from 'app/utils/NormalizeProfile';
 import AffiliationMap from 'app/utils/AffiliationMap';
 import tt from 'counterpart';
-import Overlay from 'react-overlays/lib/Overlay';
-import { findDOMNode } from 'react-dom';
+import Overlay from 'react-overlays';
 import AuthorDropdown from '../AuthorDropdown';
 import Blacklist from '../Blacklist';
 
@@ -49,10 +48,12 @@ class Author extends Component {
         if (!this.authorProfileLink) {
             return;
         }
-        if (this.authorProfileLink.addEventListener) {
-            this.authorProfileLink.addEventListener('click', this.toggle, false);
+        // eslint-disable-next-line react/no-find-dom-node
+        const node = ReactDOM.findDOMNode(this.authorProfileLink);
+        if (node.addEventListener) {
+            node.addEventListener('click', this.toggle, false);
         } else {
-            this.authorProfileLink.attachEvent('click', this.toggle, false);
+            node.attachEvent('click', this.toggle, false);
         }
     }
 
@@ -62,10 +63,11 @@ class Author extends Component {
         if (!this.authorProfileLink) {
             return;
         }
-        if (this.authorProfileLink.removeEventListener) {
-            this.authorProfileLink.removeEventListener('click', this.toggle);
+        const node = ReactDOM.findDOMNode(this.authorProfileLink);
+        if (node.removeEventListener) {
+            node.removeEventListener('click', this.toggle);
         } else {
-            this.authorProfileLink.detachEvent('click', this.toggle);
+            node.detachEvent('click', this.toggle);
         }
     }
 
@@ -152,7 +154,7 @@ class Author extends Component {
                     onHide={this.close}
                     placement="bottom"
                     container={this}
-                    target={() => findDOMNode(this.target)}
+                    target={() => ReactDOM.findDOMNode(this.target)}
                     rootClose
                 >
                     <AuthorDropdown

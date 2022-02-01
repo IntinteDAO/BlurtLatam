@@ -1,10 +1,10 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
 export default class HelpTip extends Component {
     static propTypes = {
-        children: PropTypes.any.isRequired,
+        children: PropTypes.objectOf(PropTypes.object).isRequired,
         content: PropTypes.oneOfType([PropTypes.string, PropTypes.array])
             .isRequired,
     };
@@ -21,6 +21,7 @@ export default class HelpTip extends Component {
             visible,
         });
     };
+
     assignOutsideTouchHandler = () => {
         const handler = (e) => {
             let currentNode = e.target;

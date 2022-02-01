@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 export default class BottomPanel extends Component {
     static propTypes = {
-        children: PropTypes.object,
+        children: PropTypes.objectOf(PropTypes.object),
         visible: PropTypes.bool,
         hide: PropTypes.func.isRequired,
     };

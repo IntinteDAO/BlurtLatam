@@ -7,7 +7,7 @@ export default class FoundationDropdown extends Component {
     static propTypes = {
         show: PropTypes.bool.isRequired,
         className: PropTypes.string,
-        children: PropTypes.any,
+        children: PropTypes.objectOf(PropTypes.object),
         onHide: PropTypes.func,
     };
 

@@ -2,14 +2,15 @@ import { createElement, Component } from 'react';
 import PropTypes from 'prop-types';
 import { browserHistory } from 'react-router';
 import Icon from 'app/components/elements/Icon';
-import VerticalMenu from './VerticalMenu';
 import { findParent } from 'app/utils/DomUtils';
+import VerticalMenu from './VerticalMenu';
 
 export default class DropdownMenu extends Component {
+    // eslint-disable-next-line react/static-property-placement
     static propTypes = {
-        items: PropTypes.object.isRequired,
+        items: PropTypes.objectOf(PropTypes.object).isRequired,
         selected: PropTypes.string,
-        children: PropTypes.object,
+        children: PropTypes.objectOf(PropTypes.object),
         className: PropTypes.string,
         title: PropTypes.string,
         href: PropTypes.string,

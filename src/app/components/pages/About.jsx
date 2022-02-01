@@ -1,6 +1,5 @@
-import { Component } from 'react';
-import { APP_NAME, APP_URL } from 'app/client_config';
-import tt from 'counterpart';
+/* eslint-disable import/no-import-module-exports */
+import React, { Component } from 'react';
 
 class About extends Component {
     render() {
@@ -8,14 +7,14 @@ class About extends Component {
             <div className="About">
                 <section className="AboutMission">
                     <div className="AboutMission__heading-container">
-                        <h1 className="AboutMission__heading">About Blurtlatam</h1>
-                        <p>Blurtlatam is run by a team of witnesses including freakeao, blurthispano and blurtlatam. We want to boost the emerging communities but especially the Spanish community.</p>
+                        <h1 className="AboutMission__heading">About Blurtblog.tekraze</h1>
+                        <h2>This frontend is run by Dev and Witness @tekraze to support blurt blog</h2>
                         <p>This frontend we are running to support Blurt Blog and to provide an alternate way to access frontend.</p>
                     </div>
 
                     <div className="row">
                         <div className="column">
-                            <b>Maintained By</b> @freakeao and @tekraze
+                            <b>Maintained By</b> @tekraze
                         </div>
                     </div>
                 </section>

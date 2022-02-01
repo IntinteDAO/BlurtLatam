@@ -1,8 +1,10 @@
+import React from 'react';
 import PropTypes from 'prop-types';
-import Modal from 'react-overlays/lib/Modal';
-import Transition from 'react-overlays/lib/Transition';
+// import Modal from 'react-overlays/lib/Modal';
+import { Modal, ModalTransitionComponent } from 'react-overlays';
+// import Transition from 'react-overlays/lib/Transition';
 
-const Reveal = ({ children, onHide, show }) => {
+function Reveal({ children, onHide, show }) {
     const modalStyle = {
         bottom: 0,
         left: 0,
@@ -16,12 +18,13 @@ const Reveal = ({ children, onHide, show }) => {
 
     return (
         <Modal
-            backdrop
-            transition={Transition}
+            backdrop="static"
+            backdropTransition={ModalTransitionComponent}
+            // transition={Transition}
             onHide={onHide}
             show={show}
-            backdropClassName="reveal-overlay"
-            backdropStyle={{ display: 'block' }}
+            // backdropClassName="reveal-overlay"
+            // backdropStyle={{ display: 'block' }}
             style={modalStyle}
         >
             <div
@@ -34,7 +37,7 @@ const Reveal = ({ children, onHide, show }) => {
             </div>
         </Modal>
     );
-};
+}
 
 Reveal.propTypes = {
     show: PropTypes.bool.isRequired,

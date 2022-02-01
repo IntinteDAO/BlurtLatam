@@ -23,7 +23,7 @@ export default class Follow extends Component {
         showFollow: bool,
         showMute: bool,
         fat: bool,
-        children: any,
+        children: PropTypes.objectOf(PropTypes.object),
         showLogin: PropTypes.func.isRequired,
     };
 

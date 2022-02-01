@@ -12,7 +12,7 @@
 /* eslint-disable no-useless-escape */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable arrow-parens */
-import { Component } from 'react';
+import React, { Component } from 'react';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import reactForm from 'app/utils/ReactForm';
@@ -33,7 +33,6 @@ import { fromJS, Set } from 'immutable';
 import { Remarkable } from 'remarkable';
 import Dropzone from 'react-dropzone';
 import tt from 'counterpart';
-
 const MAX_FILE_TO_UPLOAD = 10;
 const imagesToUpload = [];
 
@@ -76,12 +75,13 @@ class ReplyEditor extends Component {
         super();
         this.state = { progress: {} };
         this.initForm(props);
+        this.postRef = React.createRef();
     }
 
     componentDidMount() {
         setTimeout(() => {
             if (this.props.isStory) this.refs.titleRef.focus();
-            else if (this.refs.postRef) this.refs.postRef.focus();
+            else if (this.postRef.current) this.postRef.current.focus();
             else if (this.refs.rte) this.refs.rte._focus();
         }, 300);
 
@@ -233,9 +233,16 @@ class ReplyEditor extends Component {
         this.uploadNextImage();
     };
 
-    onOpenClick = () => {
-        this.dropzone.open();
-    };
+    // fileDropzone = React.createRef();
+
+    // onOpenClick = () => {
+    //     console.log('Open click called');
+    //     if(this.fileDropzone.current) {
+    //         console.log('Click works');
+    //         this.fileDropzone.current.open();
+    //     }
+    //     // this.dropzone.open();
+    // };
 
     onPasteCapture = (e) => {
         try {
@@ -342,7 +349,7 @@ class ReplyEditor extends Component {
     insertPlaceHolders = () => {
         let { imagesUploadCount } = this.state;
         const { body } = this.state;
-        const { selectionStart } = this.refs.postRef;
+        const { selectionStart } = this.postRef.current;
         let placeholder = '';
 
         for (let ii = 0; ii < imagesToUpload.length; ii += 1) {
@@ -407,12 +414,12 @@ class ReplyEditor extends Component {
                 this.setState({ progress: {} });
                 const { url } = progress;
                 const imageMd = `![${image.file.name}](${url})`;
-                const { selectionStart, selectionEnd } = this.refs.postRef;
+                // const { selectionStart, selectionEnd } = this.postRef.current;
                 body.props.onChange(
                     body.value.replace(image.temporaryTag, imageMd)
                 );
                 this.uploadNextImage();
-            } else if (progress.hasOwnProperty('error')) {
+            } else if (Object.prototype.hasOwnProperty.call(progress, 'error')) {
                 this.displayErrorMessage(progress.error);
                 const imageMd = `![${image.file.name}](UPLOAD FAILED)`;
                 // Remove temporary image MD tag
@@ -593,6 +600,15 @@ class ReplyEditor extends Component {
             rtags = HtmlReady(html, { mutate: false });
         }
 
+        const fileDropzone = React.createRef();
+
+        const onOpenClick = () => {
+            if (fileDropzone.current) {
+                console.log('Click works');
+                fileDropzone.current.open();
+            }
+        };
+
         return (
             <div className="ReplyEditor row">
                 <div className="column small-12">
@@ -682,6 +698,25 @@ class ReplyEditor extends Component {
                                 />
                             ) : (
                                 <span>
+                                    <textarea
+                                        {...body.props}
+                                        ref={this.postRef}
+                                        onPasteCapture={this.onPasteCapture}
+                                        className={
+                                            type === 'submit_story'
+                                                ? 'upload-enabled'
+                                                : ''
+                                        }
+                                        disabled={loading}
+                                        rows={isStory ? 10 : 6}
+                                        placeholder={
+                                            isStory
+                                                ? tt('g.write_your_story')
+                                                : tt('g.reply')
+                                        }
+                                        autoComplete="off"
+                                        tabIndex={2}
+                                    />
                                     <Dropzone
                                         onDrop={this.onDrop}
                                         className={
@@ -689,49 +724,36 @@ class ReplyEditor extends Component {
                                                 ? 'dropzone'
                                                 : 'none'
                                         }
-                                        disableClick
                                         multiple
+                                        noClick
+                                        noKeyboard
                                         accept="image/*"
-                                        ref={(node) => {
-                                            this.dropzone = node;
-                                        }}
+                                        ref={fileDropzone}
                                     >
-                                        <textarea
-                                            {...body.props}
-                                            ref="postRef"
-                                            onPasteCapture={this.onPasteCapture}
-                                            className={
-                                                type === 'submit_story'
-                                                    ? 'upload-enabled'
-                                                    : ''
-                                            }
-                                            disabled={loading}
-                                            rows={isStory ? 10 : 6}
-                                            placeholder={
-                                                isStory
-                                                    ? tt('g.write_your_story')
-                                                    : tt('g.reply')
-                                            }
-                                            autoComplete="off"
-                                            tabIndex={2}
-                                        />
+                                        {({ getRootProps, getInputProps, isDragActive }) => {
+                                            return (
+                                                <div {...getRootProps({ className: 'dropzone' })} className={classnames('dropzone', { 'dropzone--isactive': isDragActive })}>
+                                                    <p className="drag-and-drop">
+                                                        <input {...getInputProps()} />
+                                                        {tt(
+                                                            'reply_editor.insert_images_by_dragging_dropping'
+                                                        )}
+                                                        {noClipboardData
+                                                            ? ''
+                                                            : tt(
+                                                                'reply_editor.pasting_from_the_clipboard'
+                                                            )}
+                                                        {tt('reply_editor.or_by')}
+                                                        {' '}
+                                                        <a onClick={onOpenClick}>
+                                                            {tt('reply_editor.selecting_them')}
+                                                        </a>
+                                                        .
+                                                    </p>
+                                                </div>
+                                            )
+                                        }}
                                     </Dropzone>
-                                    <p className="drag-and-drop">
-                                        {tt(
-                                            'reply_editor.insert_images_by_dragging_dropping'
-                                        )}
-                                        {noClipboardData
-                                            ? ''
-                                            : tt(
-                                                'reply_editor.pasting_from_the_clipboard'
-                                            )}
-                                        {tt('reply_editor.or_by')}
-                                        {' '}
-                                        <a onClick={this.onOpenClick}>
-                                            {tt('reply_editor.selecting_them')}
-                                        </a>
-                                        .
-                                    </p>
                                     {progress.message && (
                                         <div className="info">
                                             {progress.message}
@@ -1174,17 +1196,17 @@ export default (formId) => connect(
                 return;
             }
 
-            if(!isEdit) {
+            if (!isEdit) {
                 const message = "<br /> <hr /> <center><sub>Posted from [https://blurtblog.tekraze.com](https://blurtblog.tekraze.com/" + parent_permlink + "/@" + author + "/" + permlink + ")</sub></center>";
-                if(!isHtml) {
-                    body+= ` ` + message;
-                } else if(isHtml) {
+                if (!isHtml) {
+                    body += ` ` + message;
+                } else if (isHtml) {
                     let htmlFromBody = body;
                     if (htmlFromBody) htmlFromBody = stripHtmlWrapper(htmlFromBody);
                     if (htmlFromBody && htmlFromBody.trim() == '') htmlFromBody = null;
-                    if(this.props.RichTextEditor && htmlFromBody != null) {
+                    if (this.props.RichTextEditor && htmlFromBody != null) {
                         body = this.props.RichTextEditor.createValueFromString(htmlFromBody, 'html');
-                        body+= message;
+                        body += message;
                         isHtml = false;
                     }
                 }
