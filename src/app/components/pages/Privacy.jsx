@@ -1,4 +1,5 @@
-import { Component } from 'react';
+/* eslint-disable import/no-import-module-exports */
+import React, { Component } from 'react';
 
 class Privacy extends Component {
     render() {

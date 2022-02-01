@@ -1,7 +1,7 @@
-/* eslint-disable no-useless-escape */
-/* eslint-disable arrow-parens */
-/* eslint-disable no-mixed-operators */
-import { Component } from 'react';
+/* eslint-disable react/require-default-props */
+/* eslint-disable react/no-unused-prop-types */
+/* eslint-disable react/static-property-placement */
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Slider from 'react-rangeslider';
@@ -49,9 +49,6 @@ const VOTE_WEIGHT_DROPDOWN_THRESHOLD = 50; //if BP is more than 50, enable the s
 const MAX_WEIGHT = 10000;
 
 class Voting extends Component {
-    static defaultProps = {
-        showList: true,
-    };
 
     static propTypes = {
         // HTML properties
@@ -64,14 +61,18 @@ class Voting extends Component {
         permlink: PropTypes.string,
         username: PropTypes.string,
         is_comment: PropTypes.bool,
-        active_votes: PropTypes.object,
+        active_votes: PropTypes.any,
         loggedin: PropTypes.bool,
-        post_obj: PropTypes.object,
-        current_account: PropTypes.object,
+        post_obj: PropTypes.any,
+        current_account: PropTypes.any,
         enable_slider: PropTypes.bool,
         voting: PropTypes.bool,
         // price_per_blurt: PropTypes.number,
         // sbd_print_rate: PropTypes.number,
+    };
+
+    static defaultProps = {
+        showList: true,
     };
 
     constructor(props) {
@@ -91,10 +92,12 @@ class Voting extends Component {
             e && e.preventDefault();
             this.voteUpOrDown(true);
         };
+
         this.voteDown = (e) => {
             e && e.preventDefault();
             this.voteUpOrDown(false);
         };
+
         this.voteUpOrDown = (up) => {
             if (this.props.voting) return;
             this.setState({ votingUp: up });
@@ -149,31 +152,32 @@ class Voting extends Component {
                 : this.state.sliderWeight.down;
             localStorage.setItem(
                 'voteWeight' +
-                    (up ? '' : 'Down') +
-                    '-' +
-                    username +
-                    (is_comment ? '-comment' : ''),
+                (up ? '' : 'Down') +
+                '-' +
+                username +
+                (is_comment ? '-comment' : ''),
                 weight
             );
         };
+
         this.readSliderWeight = () => {
             const { username, enable_slider, is_comment } = this.props;
             if (enable_slider) {
                 const sliderWeightUp = Number(
                     localStorage.getItem(
                         'voteWeight' +
-                            '-' +
-                            username +
-                            (is_comment ? '-comment' : '')
+                        '-' +
+                        username +
+                        (is_comment ? '-comment' : '')
                     )
                 );
                 const sliderWeightDown = Number(
                     localStorage.getItem(
                         'voteWeight' +
-                            'Down' +
-                            '-' +
-                            username +
-                            (is_comment ? '-comment' : '')
+                        'Down' +
+                        '-' +
+                        username +
+                        (is_comment ? '-comment' : '')
                     )
                 );
                 this.setState({
@@ -235,21 +239,21 @@ class Voting extends Component {
                             : null,
                         delegated_vesting_shares_updated: account
                             ? Number(
-                                  account.delegated_vesting_shares.split(' ')[0]
-                              )
+                                account.delegated_vesting_shares.split(' ')[0]
+                            )
                             : null,
                         vesting_shares_updated: account
                             ? Number(account.vesting_shares.split(' ')[0])
                             : null,
                         received_vesting_shares_updated: account
                             ? Number(
-                                  account.received_vesting_shares.split(' ')[0]
-                              )
+                                account.received_vesting_shares.split(' ')[0]
+                            )
                             : null,
                         vesting_withdraw_rate_updated: account
                             ? Number(
-                                  account.vesting_withdraw_rate.split(' ')[0]
-                              )
+                                account.vesting_withdraw_rate.split(' ')[0]
+                            )
                             : null,
                         mana_updated: account
                             ? account.voting_manabar.current_mana
@@ -280,10 +284,9 @@ class Voting extends Component {
                 (el) => el.get('voter') === username
             );
             // weight warning, the API may send a string or a number (when zero)
-            if (vote)
-                this.setState({
-                    myVote: parseInt(vote.get('percent') || 0, 10),
-                });
+            if (vote) this.setState({
+                myVote: parseInt(vote.get('percent') || 0, 10),
+            });
         }
     }
 
@@ -562,10 +565,10 @@ class Voting extends Component {
             const { username, is_comment } = this.props;
             localStorage.setItem(
                 'voteWeight' +
-                    (up ? '' : 'Down') +
-                    '-' +
-                    username +
-                    (is_comment ? '-comment' : ''),
+                (up ? '' : 'Down') +
+                '-' +
+                username +
+                (is_comment ? '-comment' : ''),
                 weight
             );
         };
@@ -829,11 +832,11 @@ class Voting extends Component {
                 <span className="Voting__inner">
                     {(coalStatus === 'disabled' ||
                         blacklist.get(author) === undefined) && (
-                        <span className={classUp}>
-                            {voteChevron}
-                            {dropdown}
-                        </span>
-                    )}
+                            <span className={classUp}>
+                                {voteChevron}
+                                {dropdown}
+                            </span>
+                        )}
                     {payoutEl}
                 </span>
                 {voters_list}
@@ -952,18 +955,16 @@ export default connect(
         vote: (weight, { author, permlink, username, myVote, isFlag }) => {
             const confirm = () => {
                 if (myVote == null) return null;
-                if (weight === 0)
-                    return isFlag
-                        ? tt('voting_jsx.removing_your_vote')
-                        : tt(
-                              'voting_jsx.removing_your_vote_will_reset_curation_rewards_for_this_post'
-                          );
-                if (weight > 0)
-                    return isFlag
-                        ? tt('voting_jsx.changing_to_an_upvote')
-                        : tt(
-                              'voting_jsx.changing_to_an_upvote_will_reset_curation_rewards_for_this_post'
-                          );
+                if (weight === 0) return isFlag
+                    ? tt('voting_jsx.removing_your_vote')
+                    : tt(
+                        'voting_jsx.removing_your_vote_will_reset_curation_rewards_for_this_post'
+                    );
+                if (weight > 0) return isFlag
+                    ? tt('voting_jsx.changing_to_an_upvote')
+                    : tt(
+                        'voting_jsx.changing_to_an_upvote_will_reset_curation_rewards_for_this_post'
+                    );
                 // if (weight < 0)
                 //     return isFlag
                 //         ? tt('voting_jsx.changing_to_a_downvote')

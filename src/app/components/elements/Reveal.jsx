@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import Modal from 'react-overlays/lib/Modal';
-import { Modal, ModalTransitionComponent } from 'react-overlays';
-// import Transition from 'react-overlays/lib/Transition';
+import Modal from 'react-overlays/lib/Modal';
+import { Transition } from 'react-transition-group';
 
 function Reveal({ children, onHide, show }) {
     const modalStyle = {
@@ -18,13 +17,12 @@ function Reveal({ children, onHide, show }) {
 
     return (
         <Modal
-            backdrop="static"
-            backdropTransition={ModalTransitionComponent}
-            // transition={Transition}
+            backdrop
+            transition={Transition}
             onHide={onHide}
             show={show}
-            // backdropClassName="reveal-overlay"
-            // backdropStyle={{ display: 'block' }}
+            backdropClassName="reveal-overlay"
+            backdropStyle={{ display: 'block' }}
             style={modalStyle}
         >
             <div

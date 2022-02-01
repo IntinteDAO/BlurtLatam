@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import HelpContent from 'app/components/elements/HelpContent';
 
 class Faq extends Component {

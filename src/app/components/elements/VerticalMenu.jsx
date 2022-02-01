@@ -5,7 +5,7 @@ import Icon from 'app/components/elements/Icon';
 
 export default class VerticalMenu extends Component {
     static propTypes = {
-        items: PropTypes.objectOf(PropTypes.object).isRequired,
+        items: PropTypes.any,
         title: PropTypes.string,
         className: PropTypes.string,
         hideValue: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),

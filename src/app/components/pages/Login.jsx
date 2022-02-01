@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import LoginForm from 'app/components/modules/LoginForm';
 import tt from 'counterpart';
 

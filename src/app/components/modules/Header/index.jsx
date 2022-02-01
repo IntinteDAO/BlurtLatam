@@ -1,4 +1,5 @@
-import { Component } from 'react';
+/* eslint-disable react/static-property-placement */
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
@@ -46,7 +47,6 @@ class Header extends Component {
             showAnnouncement: this.props.showAnnouncement,
         };
     }
-
 
     componentDidMount() {
         if (
@@ -261,12 +261,12 @@ class Header extends Component {
 
         const logo_link =
             resolveRoute(pathname).params &&
-            resolveRoute(pathname).params.length > 1 &&
-            this.last_sort_order
+                resolveRoute(pathname).params.length > 1 &&
+                this.last_sort_order
                 ? '/' + this.last_sort_order
                 : current_account_name
-                ? `/@${current_account_name}/feed`
-                : '/';
+                    ? `/@${current_account_name}/feed`
+                    : '/';
 
         //TopRightHeader Stuff
         const defaultNavigate = (e) => {
@@ -337,11 +337,11 @@ class Header extends Component {
             { link: settings_link, icon: 'cog', value: tt('g.settings') },
             loggedIn
                 ? {
-                      link: '#',
-                      icon: 'enter',
-                      onClick: logout,
-                      value: tt('g.logout'),
-                  }
+                    link: '#',
+                    icon: 'enter',
+                    onClick: logout,
+                    value: tt('g.logout'),
+                }
                 : { link: '#', onClick: showLogin, value: tt('g.login') },
         ];
         showAd = true;

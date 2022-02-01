@@ -1,5 +1,5 @@
 /* eslint-disable react/button-has-type */
-import { Component } from 'react';
+import React, { Component } from 'react';
 import DappsList from '../cards/DappsList';
 
 class Dapps extends Component {

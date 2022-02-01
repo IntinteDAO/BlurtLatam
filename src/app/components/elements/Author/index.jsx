@@ -1,13 +1,17 @@
 /* eslint react/prop-types: 0 */
 import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
 import PropTypes from 'prop-types';
 import shouldComponentUpdate from 'app/utils/shouldComponentUpdate';
 import Icon from 'app/components/elements/Icon';
 import { Link } from 'react-router';
+// import { authorNameAndRep } from 'app/utils/ComponentFormatters';
+// import Reputation from 'app/components/elements/Reputation';
 import normalizeProfile from 'app/utils/NormalizeProfile';
 import AffiliationMap from 'app/utils/AffiliationMap';
 import tt from 'counterpart';
-import Overlay from 'react-overlays';
+import { connect } from 'react-redux';
+import Overlay from 'react-overlays/lib/Overlay';
 import AuthorDropdown from '../AuthorDropdown';
 import Blacklist from '../Blacklist';
 
@@ -23,11 +27,6 @@ const fnCloseAll = () => {
 };
 
 class Author extends Component {
-    static defaultProps = {
-        follow: true,
-        mute: true,
-        showAffiliation: false,
-    };
 
     static propTypes = {
         author: string.isRequired,
@@ -37,19 +36,25 @@ class Author extends Component {
         showAffiliation: bool,
     };
 
+    static defaultProps = {
+        follow: true,
+        mute: true,
+        showAffiliation: false,
+    };
+
     constructor(...args) {
         super(...args);
         this.state = { show: false };
-        this.toggle = this.toggle.bind(this);
-        this.close = this.close.bind(this);
+        // this.toggle = this.toggle.bind(this);
+        // this.close = this.close.bind(this);
     }
 
     componentDidMount() {
-        if (!this.authorProfileLink) {
+        if (!this.authorProfileLinkRef.current) {
             return;
         }
         // eslint-disable-next-line react/no-find-dom-node
-        const node = ReactDOM.findDOMNode(this.authorProfileLink);
+        const node = findDOMNode(this.authorProfileLinkRef.current);
         if (node.addEventListener) {
             node.addEventListener('click', this.toggle, false);
         } else {
@@ -60,16 +65,18 @@ class Author extends Component {
     shouldComponentUpdate = shouldComponentUpdate(this, 'Author');
 
     componentWillUnmount() {
-        if (!this.authorProfileLink) {
+        if (!this.authorProfileLinkRef.current) {
             return;
         }
-        const node = ReactDOM.findDOMNode(this.authorProfileLink);
+        const node = findDOMNode(this.authorProfileLinkRef.current);
         if (node.removeEventListener) {
             node.removeEventListener('click', this.toggle);
         } else {
             node.detachEvent('click', this.toggle);
         }
     }
+
+    authorProfileLinkRef = React.createRef();
 
     close = () => {
         this.setState({
@@ -130,9 +137,7 @@ class Author extends Component {
                     <strong>
                         <Link
                             className="ptc"
-                            ref={(link) => {
-                                this.authorProfileLink = link;
-                            }}
+                            ref={this.authorProfileLinkRef}
                             to={'/@' + author}
                         >
                             {author}
@@ -141,7 +146,7 @@ class Author extends Component {
                                 <span className="affiliation">
                                     {tt(
                                         'g.affiliation_' +
-                                            AffiliationMap[author]
+                                        AffiliationMap[author]
                                     )}
                                 </span>
                             ) : null}
@@ -151,11 +156,11 @@ class Author extends Component {
                 </span>
                 <Overlay
                     show={this.state.show}
+                    rootClose
                     onHide={this.close}
                     placement="bottom"
                     container={this}
-                    target={() => ReactDOM.findDOMNode(this.target)}
-                    rootClose
+                    target={() => findDOMNode(this.target)}
                 >
                     <AuthorDropdown
                         author={author}
@@ -172,10 +177,10 @@ class Author extends Component {
     }
 }
 
-import { connect } from 'react-redux';
-
 export default connect((state, ownProps) => {
-    const { author, follow, mute, authorRepLog10 } = ownProps;
+    const {
+        author, follow, mute, authorRepLog10 
+    } = ownProps;
     const username = state.user.getIn(['current', 'username']);
     const account = state.global.getIn(['accounts', author]);
     return {

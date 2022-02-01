@@ -1,4 +1,7 @@
-import { Component } from 'react';
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/label-has-associated-control */
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import LoadingIndicator from 'app/components/elements/LoadingIndicator';
@@ -8,9 +11,9 @@ import * as userActions from 'app/redux/UserReducer';
 import { Set, Map } from 'immutable';
 import tt from 'counterpart';
 
-const { string, bool, any } = PropTypes;
+const { string, bool } = PropTypes;
 
-export default class Follow extends Component {
+class Follow extends Component {
     static defaultProps = {
         showFollow: true,
         showMute: true,
@@ -23,7 +26,7 @@ export default class Follow extends Component {
         showFollow: bool,
         showMute: bool,
         fat: bool,
-        children: PropTypes.objectOf(PropTypes.object),
+        children: PropTypes.any,
         showLogin: PropTypes.func.isRequired,
     };
 
@@ -38,7 +41,7 @@ export default class Follow extends Component {
         this.initEvents(nextProps);
     }
 
-    followLoggedOut = e => {
+    followLoggedOut = (e) => {
         // close author preview if present
         const author_preview = document.querySelector('.dropdown-pane.is-open');
         if (author_preview) author_preview.remove();
@@ -85,12 +88,14 @@ export default class Follow extends Component {
 
     render() {
         const { loading } = this.props;
-        if (loading)
-            return (
-                <span>
-                    <LoadingIndicator /> {tt('g.loading')}&hellip;
-                </span>
-            );
+        if (loading) return (
+            <span>
+                <LoadingIndicator />
+                {' '}
+                {tt('g.loading')}
+                &hellip;
+            </span>
+        );
         if (loading !== false) {
             // must know what the user is already following before any update can happen
             return <span />;
@@ -98,22 +103,23 @@ export default class Follow extends Component {
 
         const { follower, following } = this.props; // html
         // Show follow preview for new users
-        if (!follower || !following)
-            return (
-                <span>
-                    <label
-                        className="button slim hollow secondary"
-                        onClick={this.followLoggedOut}
-                    >
-                        {tt('g.follow')}
-                    </label>
-                </span>
-            );
+        if (!follower || !following) return (
+            <span>
+                <label
+                    className="button slim hollow secondary"
+                    onClick={this.followLoggedOut}
+                >
+                    {tt('g.follow')}
+                </label>
+            </span>
+        );
         // Can't follow or ignore self
         if (follower === following) return <span />;
 
         const { followingWhat } = this.props; // redux
-        const { showFollow, showMute, fat, children } = this.props; // html
+        const {
+            showFollow, showMute, fat, children
+        } = this.props; // html
         const { busy } = this.state;
 
         const cnBusy = busy ? 'disabled' : '';
@@ -145,7 +151,12 @@ export default class Follow extends Component {
                     </label>
                 )}
 
-                {children && <span>&nbsp;&nbsp;{children}</span>}
+                {children && (
+                    <span>
+                        &nbsp;&nbsp;
+                        {children}
+                    </span>
+                )}
             </span>
         );
     }
@@ -154,7 +165,7 @@ export default class Follow extends Component {
 const emptyMap = Map();
 const emptySet = Set();
 
-module.exports = connect(
+export default connect(
     (state, ownProps) => {
         let { follower } = ownProps;
         if (!follower) {
@@ -175,8 +186,8 @@ module.exports = connect(
         const followingWhat = f.get('blog_result', emptySet).contains(following)
             ? 'blog'
             : f.get('ignore_result', emptySet).contains(following)
-            ? 'ignore'
-            : null;
+                ? 'ignore'
+                : null;
 
         return {
             follower,
@@ -204,18 +215,18 @@ module.exports = connect(
         ) => {
             const what = action ? [action] : [];
             const json = ['follow', { follower, following, what }];
-            let operation = {
+            const operation = {
                 id: 'follow',
                 required_posting_auths: [follower],
                 json: JSON.stringify(json),
             };
-            let size = JSON.stringify(operation).replace(/[\[\]\,\"]/g, '')
+            const size = JSON.stringify(operation).replace(/[\[\]\,\"]/g, '')
                 .length;
-            let bw_fee = Math.max(
+            const bw_fee = Math.max(
                 0.001,
                 ((size / 1024) * bandwidthKbytesFee).toFixed(3)
             );
-            let fee = (operationFlatFee + bw_fee).toFixed(3);
+            const fee = (operationFlatFee + bw_fee).toFixed(3);
             dispatch(
                 transactionActions.broadcastOperation({
                     type: 'custom_json',

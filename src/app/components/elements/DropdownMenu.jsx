@@ -8,9 +8,9 @@ import VerticalMenu from './VerticalMenu';
 export default class DropdownMenu extends Component {
     // eslint-disable-next-line react/static-property-placement
     static propTypes = {
-        items: PropTypes.objectOf(PropTypes.object).isRequired,
+        items: PropTypes.any.isRequired,
         selected: PropTypes.string,
-        children: PropTypes.objectOf(PropTypes.object),
+        children: PropTypes.any,
         className: PropTypes.string,
         title: PropTypes.string,
         href: PropTypes.string,

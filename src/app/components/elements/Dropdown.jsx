@@ -6,7 +6,7 @@ import { findParent } from 'app/utils/DomUtils';
 export default class Dropdown extends Component {
 
     static propTypes = {
-        children: PropTypes.objectOf(PropTypes.object),
+        children: PropTypes.any,
         className: PropTypes.string,
         title: PropTypes.oneOfType([
             PropTypes.string,

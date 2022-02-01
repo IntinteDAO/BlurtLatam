@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import SvgImage from 'app/components/elements/SvgImage';
 import { translateHtml } from 'app/Translator';
 

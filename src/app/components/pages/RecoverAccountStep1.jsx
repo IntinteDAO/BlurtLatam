@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import tt from 'counterpart';
 import { APP_DOMAIN, APP_NAME } from 'app/client_config';
 import { Link } from 'react-router';

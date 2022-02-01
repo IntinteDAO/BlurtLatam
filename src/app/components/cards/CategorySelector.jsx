@@ -22,7 +22,8 @@ class CategorySelector extends Component {
         tabIndex: PropTypes.number,
 
         // redux connect (overwrite in HTML)
-        trending: PropTypes.objectOf(PropTypes.object).isRequired, // Immutable.List
+        // eslint-disable-next-line react/forbid-prop-types
+        trending: PropTypes.any.isRequired, // Immutable.List
     };
 
     static defaultProps = {

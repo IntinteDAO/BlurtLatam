@@ -1,5 +1,5 @@
 /* eslint react/prop-types: 0 */
-import { Component } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Map } from 'immutable';
 import * as transactionActions from 'app/redux/TransactionReducer';
@@ -21,14 +21,15 @@ import { extractLoginData } from 'app/utils/UserUtil';
 import { browserHistory } from 'react-router';
 
 class LoginForm extends Component {
-    static defaultProps = {
-        afterLoginRedirectToWelcome: false,
-    };
 
     static propTypes = {
         // Steemit.
         loginError: PropTypes.string,
         onCancel: PropTypes.func,
+    };
+
+    static defaultProps = {
+        afterLoginRedirectToWelcome: false,
     };
 
     constructor(props) {
