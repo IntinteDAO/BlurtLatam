@@ -18,6 +18,7 @@ export default class StatsLoggerClient {
             // Implement debug loggers here, as any new calls are added in methods below.
             this.SDC = {
                 timing() {
+                    // eslint-disable-next-line prefer-rest-params
                     console.log('StatsLoggerClient call: ', arguments);
                 }
             };

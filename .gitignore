@@ -51,3 +51,5 @@ lib
 # m3 local files
 .chicken
 m3info.md
+
+.eslintcache
