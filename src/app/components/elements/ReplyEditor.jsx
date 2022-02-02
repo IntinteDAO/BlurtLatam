@@ -157,7 +157,7 @@ class ReplyEditor extends Component {
             });
         }
 
-//        add tinymce
+        //        add tinymce
         const script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/tinymce/5.10.2/tinymce.min.js';
         script.type = 'module';
@@ -257,6 +257,14 @@ class ReplyEditor extends Component {
 
     // As rte_editor is updated, keep the (invisible) 'body' field in sync.
     onChange = (rte_value) => {
+        this.setState({ rte_value });
+        const html = stateToHtml(rte_value);
+        const { body } = this.state;
+        if (body.value !== html) body.props.onChange(html);
+    };
+
+    onChange2 = (rte_value) => {
+        console.log('Rte value', rte_value);
         this.setState({ rte_value });
         const html = stateToHtml(rte_value);
         const { body } = this.state;
@@ -408,7 +416,7 @@ class ReplyEditor extends Component {
     insertPlaceHolders = () => {
         let { imagesUploadCount } = this.state;
         const { body } = this.state;
-        const { selectionStart } = this.postRef.current || this.commentEditorRef.current;
+        const { selectionStart } = this.postRef.current;
         let placeholder = '';
 
         for (let ii = 0; ii < imagesToUpload.length; ii += 1) {
@@ -837,7 +845,12 @@ class ReplyEditor extends Component {
                                     )}
                                     {!isStory && typeof window !== "undefined" && (
                                         <Editor
+                                            ref={this.commentEditorRef}
+                                            onBlur={body.onBlur}
+                                            onEditorChange={this.onChange2}
+                                            // onChange={this.onChange2}
                                             apiKey="vd092f869ur5xpeos999x9befq5jxh5nghgomhiwq83etisx"
+                                            value={this.state.rte_value}
                                             init={{
                                                 branding: false,
                                                 plugins: "emoticons link code image anchor codesample hr imagetools lists table nonbreaking preview quickbars help wordcount",
@@ -1301,19 +1314,25 @@ export default (formId) => connect(
                 return;
             }
 
+            // For footer message
             if (!isEdit) {
-                const message = "<br /> <hr /> <center><sub>Posted from [https://blurtblog.tekraze.com](https://blurtblog.tekraze.com/" + parent_permlink + "/@" + author + "/" + permlink + ")</sub></center>";
-                if (!isHtml) {
-                    body += ` ` + message;
-                } else if (isHtml) {
+                const messageMarkdown = "<br /> <hr /> <center><sub>Posted from [https://blurtblog.tekraze.com](https://blurtblog.tekraze.com/" + parent_permlink + "/@" + author + "/" + permlink + ")</sub></center>";
+                const messageHTML = '<br /> <hr /> <center><sub>Posted from <a href="https://blurtblog.tekraze.com/' + parent_permlink + '/@' + author + '/' + permlink + '">https://blurtblog.tekraze.com</a></sub></center>';
+                if (!isStory) {
+                    body += ` ` + messageHTML;
+                    isHtml = true;
+                } else if (!isHtmlTest(body)) {
+                    body += ` ` + messageMarkdown;
+                } else if (isHtmlTest(body)) {
                     let htmlFromBody = body;
                     if (htmlFromBody) htmlFromBody = stripHtmlWrapper(htmlFromBody);
                     if (htmlFromBody && htmlFromBody.trim() == '') htmlFromBody = null;
-                    if (this.props.RichTextEditor && htmlFromBody != null) {
+
+                    if (this.props && Object.prototype.hasOwnProperty.call(this.props, 'RichTextEditor') && htmlFromBody != null) {
                         body = this.props.RichTextEditor.createValueFromString(htmlFromBody, 'html');
-                        body += message;
-                        isHtml = false;
                     }
+                    body += messageMarkdown;
+                    isHtml = false;
                 }
             }
 
