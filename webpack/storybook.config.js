@@ -5,38 +5,6 @@ import webpack from 'webpack';
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-// const css_loaders = [
-//     // {
-//     //     loader: 'style-loader',
-//     // },
-//     {
-//         loader: 'css-loader',
-//     },
-//     {
-//         loader: 'postcss-loader',
-//     },
-//     MiniCssExtractPlugin.loader,
-// ];
-
-// const scss_loaders = [
-//     {
-//         loader: 'css-loader',
-//     },
-//     {
-//         loader: 'postcss-loader',
-//     },
-//     {
-//         loader: 'sass-loader',
-//         options: {
-//             sourceMap: true,
-//             data: '@import "app";',
-//             includePaths: [
-//                 path.join(__dirname, '../src/app/assets/stylesheets'),
-//             ],
-//         },
-//     },
-// ];
-
 module.exports = (baseConfig, env) => {
     const config = genDefaultConfig(baseConfig, env);
     config.resolve = {
@@ -98,7 +66,6 @@ module.exports = (baseConfig, env) => {
             {
                 test: /\.css$/,
                 use: [
-                    // 'style-loader',
                     'css-loader',
                     {
                         loader: 'postcss-loader',

@@ -33,6 +33,8 @@ import { fromJS, Set } from 'immutable';
 import { Remarkable } from 'remarkable';
 import Dropzone from 'react-dropzone';
 import tt from 'counterpart';
+import 'emoji-mart/css/emoji-mart.css';
+import { Picker } from 'emoji-mart';
 // import dynamic from "next/dynamic";
 
 // import tinymce from 'tinymce/tinymce';
@@ -58,8 +60,8 @@ import tt from 'counterpart';
 // import 'tinymce/plugins/wordcount';
 // import 'tinymce/skins/ui/oxide/skin.min.css';
 
-import { Editor } from '@tinymce/tinymce-react';
-import Prism from "prismjs";
+// import { Editor } from '@tinymce/tinymce-react';
+// import Prism from "prismjs";
 
 const MAX_FILE_TO_UPLOAD = 10;
 const imagesToUpload = [];
@@ -232,6 +234,27 @@ class ReplyEditor extends Component {
             }
         }
     }
+
+    // getSnapshotBeforeUpdate(prevProps, prevState) {
+    //     // Are we adding new items to the list?
+    //     // Capture the scroll position so we can adjust scroll later.
+    //     if (prevProps.list.length < this.props.list.length) {
+    //       return (
+    //         this.listRef.scrollHeight - this.listRef.scrollTop
+    //       );
+    //     }
+    //     return null;
+    //   }
+
+    //   componentDidUpdate(prevProps, prevState, snapshot) {
+    //     // If we have a snapshot value, we've just added new items.
+    //     // Adjust scroll so these new items don't push the old ones out of view.
+    //     // (snapshot here is the value returned from getSnapshotBeforeUpdate)
+    //     if (snapshot !== null) {
+    //       this.listRef.scrollTop =
+    //         this.listRef.scrollHeight - snapshot;
+    //     }
+    //   }
 
     commentEditorRef = React.createRef();
 
@@ -506,6 +529,25 @@ class ReplyEditor extends Component {
         }
     };
 
+    addEmoji = (data) => {
+        this.setState({ showEmojiPicker: false });
+
+        const { body } = this.state;
+        const { selectionStart } = this.postRef.current;
+        const nativeEmoji = data.native;
+
+        // Insert the temporary tag where the cursor currently is
+        body.props.onChange(
+            body.value.substring(0, selectionStart) +
+            nativeEmoji +
+            body.value.substring(selectionStart, body.value.length)
+        );
+    };
+
+    openEmojiPicker = () => {
+        this.setState({ showEmojiPicker: true });
+    };
+
     render() {
         const originalPost = {
             category: this.props.category,
@@ -769,66 +811,66 @@ class ReplyEditor extends Component {
                                 />
                             ) : (
                                 <span>
-                                    {isStory && (
-                                        <span>
-                                            <textarea
-                                                {...body.props}
-                                                ref={this.postRef}
-                                                onPasteCapture={this.onPasteCapture}
-                                                className={
-                                                    type === 'submit_story'
-                                                        ? 'upload-enabled'
-                                                        : ''
-                                                }
-                                                disabled={loading}
-                                                rows={isStory ? 10 : 6}
-                                                placeholder={
-                                                    isStory
-                                                        ? tt('g.write_your_story')
-                                                        : tt('g.reply')
-                                                }
-                                                autoComplete="off"
-                                                tabIndex={2}
-                                            />
-                                            <Dropzone
-                                                onDrop={this.onDrop}
-                                                className={
-                                                    type === 'submit_story'
-                                                        ? 'dropzone'
-                                                        : 'none'
-                                                }
-                                                multiple
-                                                noClick
-                                                noKeyboard
-                                                accept="image/*"
-                                                ref={fileDropzone}
-                                            >
-                                                {({ getRootProps, getInputProps, isDragActive }) => {
-                                                    return (
-                                                        <div {...getRootProps({ className: 'dropzone' })} className={classnames('dropzone', { 'dropzone--isactive': isDragActive })}>
-                                                            <p className="drag-and-drop">
-                                                                <input {...getInputProps()} />
-                                                                {tt(
-                                                                    'reply_editor.insert_images_by_dragging_dropping'
-                                                                )}
-                                                                {noClipboardData
-                                                                    ? ''
-                                                                    : tt(
-                                                                        'reply_editor.pasting_from_the_clipboard'
-                                                                    )}
-                                                                {tt('reply_editor.or_by')}
-                                                                {' '}
-                                                                <a onClick={onOpenClick}>
-                                                                    {tt('reply_editor.selecting_them')}
-                                                                </a>
-                                                                .
-                                                            </p>
-                                                        </div>
-                                                    )
-                                                }}
-                                            </Dropzone>
-                                        </span>
-                                    )}
+                                    {/* {isStory && ( */}
+                                    {/* <span> */}
+                                    <textarea
+                                        {...body.props}
+                                        ref={this.postRef}
+                                        onPasteCapture={this.onPasteCapture}
+                                        className={
+                                            type === 'submit_story'
+                                                ? 'upload-enabled'
+                                                : ''
+                                        }
+                                        disabled={loading}
+                                        rows={isStory ? 10 : 6}
+                                        placeholder={
+                                            isStory
+                                                ? tt('g.write_your_story')
+                                                : tt('g.reply')
+                                        }
+                                        autoComplete="off"
+                                        tabIndex={2}
+                                    />
+                                    <Dropzone
+                                        onDrop={this.onDrop}
+                                        className={
+                                            type === 'submit_story'
+                                                ? 'dropzone'
+                                                : 'none'
+                                        }
+                                        multiple
+                                        noClick
+                                        noKeyboard
+                                        accept="image/*"
+                                        ref={fileDropzone}
+                                    >
+                                        {({ getRootProps, getInputProps, isDragActive }) => {
+                                            return (
+                                                <div {...getRootProps({ className: 'dropzone' })} className={classnames('dropzone', { 'dropzone--isactive': isDragActive })}>
+                                                    <p className="drag-and-drop">
+                                                        <input {...getInputProps()} />
+                                                        {tt(
+                                                            'reply_editor.insert_images_by_dragging_dropping'
+                                                        )}
+                                                        {noClipboardData
+                                                            ? ''
+                                                            : tt(
+                                                                'reply_editor.pasting_from_the_clipboard'
+                                                            )}
+                                                        {tt('reply_editor.or_by')}
+                                                        {' '}
+                                                        <a onClick={onOpenClick}>
+                                                            {tt('reply_editor.selecting_them')}
+                                                        </a>
+                                                        .
+                                                    </p>
+                                                </div>
+                                            )
+                                        }}
+                                    </Dropzone>
+                                    {/* </span> */}
+                                    {/* )} */}
                                     {progress.message && (
                                         <div className="info">
                                             {progress.message}
@@ -843,7 +885,7 @@ class ReplyEditor extends Component {
                                             {progress.error}
                                         </div>
                                     )}
-                                    {!isStory && typeof window !== "undefined" && (
+                                    {/* {!isStory && typeof window !== "undefined" && (
                                         <Editor
                                             ref={this.commentEditorRef}
                                             onBlur={body.onBlur}
@@ -885,7 +927,7 @@ class ReplyEditor extends Component {
                                             }}
                                             ref={this.commentEditorRef}
                                         />
-                                    )}
+                                    )} */}
                                 </span>
                             )}
                         </div>
@@ -895,6 +937,24 @@ class ReplyEditor extends Component {
                                     && body.error
                                     && body.error !== 'Required'
                                     && body.error}
+                            </div>
+                        </div>
+
+                        <br />
+                        <div className={vframe_section_shrink_class}>
+                            <div className="text-center">
+                                {!this.state.showEmojiPicker && (
+                                    <button
+                                        className="button light"
+                                        type="button"
+                                        onClick={this.openEmojiPicker}
+                                    >
+                                        Add Emoji
+                                    </button>
+                                )}
+                                {this.state.showEmojiPicker && (
+                                    <Picker onSelect={this.addEmoji} />
+                                )}
                             </div>
                         </div>
 

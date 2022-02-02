@@ -65,6 +65,7 @@
         "diff-match-patch": "1.0.5",
         "disk-stat": "1.0.4",
         "ecurve": "1.0.6",
+        "emoji-mart": "^3.0.1",
         "estraverse-fb": "1.3.2",
         "foundation-sites": "git+https://gitlab.com/blurt/openblurt/foundation-sites#fbd6dcba3da42183c54ee6f98f1f43eeea33734e",
         "git-rev-sync": "2.0.0",
