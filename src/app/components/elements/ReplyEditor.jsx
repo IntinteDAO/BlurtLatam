@@ -33,6 +33,34 @@ import { fromJS, Set } from 'immutable';
 import { Remarkable } from 'remarkable';
 import Dropzone from 'react-dropzone';
 import tt from 'counterpart';
+// import dynamic from "next/dynamic";
+
+// import tinymce from 'tinymce/tinymce';
+// import "tinymce";
+
+// import 'tinymce/icons/default';
+// import "tinymce/themes/silver";
+// import 'tinymce/plugins/emoticons';
+// import 'tinymce/plugins/emoticons/js/emojis';
+// import 'tinymce/plugins/table';
+// import 'tinymce/plugins/help';
+// import 'tinymce/plugins/lists';
+// import 'tinymce/plugins/nonbreaking';
+// import 'tinymce/plugins/quickbars';
+// import 'tinymce/plugins/preview';
+// import 'tinymce/plugins/imagetools';
+// import 'tinymce/plugins/codesample';
+// import 'tinymce/plugins/code';
+// import 'tinymce/plugins/hr';
+// import 'tinymce/plugins/anchor';
+// import 'tinymce/plugins/image';
+// import 'tinymce/plugins/link';
+// import 'tinymce/plugins/wordcount';
+// import 'tinymce/skins/ui/oxide/skin.min.css';
+
+import { Editor } from '@tinymce/tinymce-react';
+import Prism from "prismjs";
+
 const MAX_FILE_TO_UPLOAD = 10;
 const imagesToUpload = [];
 
@@ -128,6 +156,35 @@ class ReplyEditor extends Component {
                     : null,
             });
         }
+
+//        add tinymce
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/tinymce/5.10.2/tinymce.min.js';
+        script.type = 'module';
+        script.async = true;
+        document.head.appendChild(script);
+        // if(typeof window !== "undefined") {
+        //     require('tinymce/tinymce');
+        //     require('tinymce/skins/ui/oxide/skin.min.css');
+        //     require('tinymce/icons/default');
+        //     require("tinymce/themes/silver");
+        //     require('tinymce/plugins/emoticons');
+        //     require('tinymce/plugins/emoticons/js/emojis');
+        //     require('tinymce/plugins/table');
+        //     require('tinymce/plugins/help');
+        //     require('tinymce/plugins/lists');
+        //     require('tinymce/plugins/nonbreaking');
+        //     require('tinymce/plugins/quickbars');
+        //     require('tinymce/plugins/preview');
+        //     require('tinymce/plugins/imagetools');
+        //     require('tinymce/plugins/codesample');
+        //     require('tinymce/plugins/code');
+        //     require('tinymce/plugins/hr');
+        //     require('tinymce/plugins/anchor');
+        //     require('tinymce/plugins/image');
+        //     require('tinymce/plugins/link');
+        //     require('tinymce/plugins/wordcount');
+        // }
     }
 
     shouldComponentUpdate = shouldComponentUpdate(this, 'ReplyEditor');
@@ -175,6 +232,8 @@ class ReplyEditor extends Component {
             }
         }
     }
+
+    commentEditorRef = React.createRef();
 
     onCancel = (e) => {
         if (e) e.preventDefault();
@@ -349,7 +408,7 @@ class ReplyEditor extends Component {
     insertPlaceHolders = () => {
         let { imagesUploadCount } = this.state;
         const { body } = this.state;
-        const { selectionStart } = this.postRef.current;
+        const { selectionStart } = this.postRef.current || this.commentEditorRef.current;
         let placeholder = '';
 
         for (let ii = 0; ii < imagesToUpload.length; ii += 1) {
@@ -440,30 +499,6 @@ class ReplyEditor extends Component {
     };
 
     render() {
-
-        // useEffect(() => {
-        //     if (process.env.BROWSER) {
-        //         const data = {
-        //             formId,
-        //             title: title ? title.value : undefined,
-        //             category: category ? category.value : undefined,
-        //             body: body.value,
-        //             payoutType,
-        //             beneficiaries,
-        //             summary: summary ? summary.value : undefined,
-        //         };
-        //         saveEditorTimeout = setTimeout(() => {
-        //             // console.log('save formId', formId, body.value)
-        //             localStorage.setItem(
-        //                 'replyEditorData-' + formId,
-        //                 JSON.stringify(data, null, 0)
-        //             );
-        //             this.showDraftSaved();
-        //         }, 500);
-        //         clearTimeout(saveEditorTimeout);
-        //     }
-        // }, [this.props, this.state]);
-
         const originalPost = {
             category: this.props.category,
             body: this.props.body,
@@ -585,6 +620,10 @@ class ReplyEditor extends Component {
             ? 'vframe__section--shrink'
             : '';
         const RichTextEditor = this.props.richTextEditor;
+
+        // if(typeof window !== "undefined") {
+        //     const TinyMceEditor = require('@tinymce/tinymce-react');
+        // }
 
         // Cover Image Selection Code
         let selectedCoverImage = '';
@@ -722,62 +761,66 @@ class ReplyEditor extends Component {
                                 />
                             ) : (
                                 <span>
-                                    <textarea
-                                        {...body.props}
-                                        ref={this.postRef}
-                                        onPasteCapture={this.onPasteCapture}
-                                        className={
-                                            type === 'submit_story'
-                                                ? 'upload-enabled'
-                                                : ''
-                                        }
-                                        disabled={loading}
-                                        rows={isStory ? 10 : 6}
-                                        placeholder={
-                                            isStory
-                                                ? tt('g.write_your_story')
-                                                : tt('g.reply')
-                                        }
-                                        autoComplete="off"
-                                        tabIndex={2}
-                                    />
-                                    <Dropzone
-                                        onDrop={this.onDrop}
-                                        className={
-                                            type === 'submit_story'
-                                                ? 'dropzone'
-                                                : 'none'
-                                        }
-                                        multiple
-                                        noClick
-                                        noKeyboard
-                                        accept="image/*"
-                                        ref={fileDropzone}
-                                    >
-                                        {({ getRootProps, getInputProps, isDragActive }) => {
-                                            return (
-                                                <div {...getRootProps({ className: 'dropzone' })} className={classnames('dropzone', { 'dropzone--isactive': isDragActive })}>
-                                                    <p className="drag-and-drop">
-                                                        <input {...getInputProps()} />
-                                                        {tt(
-                                                            'reply_editor.insert_images_by_dragging_dropping'
-                                                        )}
-                                                        {noClipboardData
-                                                            ? ''
-                                                            : tt(
-                                                                'reply_editor.pasting_from_the_clipboard'
-                                                            )}
-                                                        {tt('reply_editor.or_by')}
-                                                        {' '}
-                                                        <a onClick={onOpenClick}>
-                                                            {tt('reply_editor.selecting_them')}
-                                                        </a>
-                                                        .
-                                                    </p>
-                                                </div>
-                                            )
-                                        }}
-                                    </Dropzone>
+                                    {isStory && (
+                                        <span>
+                                            <textarea
+                                                {...body.props}
+                                                ref={this.postRef}
+                                                onPasteCapture={this.onPasteCapture}
+                                                className={
+                                                    type === 'submit_story'
+                                                        ? 'upload-enabled'
+                                                        : ''
+                                                }
+                                                disabled={loading}
+                                                rows={isStory ? 10 : 6}
+                                                placeholder={
+                                                    isStory
+                                                        ? tt('g.write_your_story')
+                                                        : tt('g.reply')
+                                                }
+                                                autoComplete="off"
+                                                tabIndex={2}
+                                            />
+                                            <Dropzone
+                                                onDrop={this.onDrop}
+                                                className={
+                                                    type === 'submit_story'
+                                                        ? 'dropzone'
+                                                        : 'none'
+                                                }
+                                                multiple
+                                                noClick
+                                                noKeyboard
+                                                accept="image/*"
+                                                ref={fileDropzone}
+                                            >
+                                                {({ getRootProps, getInputProps, isDragActive }) => {
+                                                    return (
+                                                        <div {...getRootProps({ className: 'dropzone' })} className={classnames('dropzone', { 'dropzone--isactive': isDragActive })}>
+                                                            <p className="drag-and-drop">
+                                                                <input {...getInputProps()} />
+                                                                {tt(
+                                                                    'reply_editor.insert_images_by_dragging_dropping'
+                                                                )}
+                                                                {noClipboardData
+                                                                    ? ''
+                                                                    : tt(
+                                                                        'reply_editor.pasting_from_the_clipboard'
+                                                                    )}
+                                                                {tt('reply_editor.or_by')}
+                                                                {' '}
+                                                                <a onClick={onOpenClick}>
+                                                                    {tt('reply_editor.selecting_them')}
+                                                                </a>
+                                                                .
+                                                            </p>
+                                                        </div>
+                                                    )
+                                                }}
+                                            </Dropzone>
+                                        </span>
+                                    )}
                                     {progress.message && (
                                         <div className="info">
                                             {progress.message}
@@ -791,6 +834,44 @@ class ReplyEditor extends Component {
                                             {' '}
                                             {progress.error}
                                         </div>
+                                    )}
+                                    {!isStory && typeof window !== "undefined" && (
+                                        <Editor
+                                            apiKey="vd092f869ur5xpeos999x9befq5jxh5nghgomhiwq83etisx"
+                                            init={{
+                                                branding: false,
+                                                plugins: "emoticons link code image anchor codesample hr imagetools lists table nonbreaking preview quickbars help wordcount",
+                                                toolbar: "emoticons | formatgroup paragraphgroup insertgroup | code codesample anchor | media nonbreaking preview help wordcount",
+                                                toolbar_location: "bottom",
+                                                imagetools_cors_hosts: ['blurt.live', 'blurtblog.tekraze.com', 'blurtlatam.com', 'blurt.blog'],
+                                                menubar: false,
+                                                toolbar_groups: {
+                                                    formatgroup: {
+                                                        icon: 'format',
+                                                        tooltip: 'Formatting',
+                                                        items: 'bold italic underline strikethrough | forecolor backcolor | superscript subscript | removeformat'
+                                                    },
+                                                    paragraphgroup: {
+                                                        icon: 'paragraph',
+                                                        tooltip: 'Paragraph format',
+                                                        items: 'h1 h2 h3 h4 h5 h6 | bullist numlist | alignleft aligncenter alignright | indent outdent'
+                                                    },
+                                                    insertgroup: {
+                                                        icon: 'plus',
+                                                        tooltip: 'Insert',
+                                                        items: 'link image emoticons hr'
+                                                    }
+                                                },
+                                                media_live_embeds: true,
+                                                media_alt_source: false,
+                                                media_poster: false,
+                                                quickbars_insert_toolbar: 'quicktable image media codesample',
+                                                quickbars_selection_toolbar: 'bold italic underline | h1 h2 h3 | formatselect | bullist numlist | blockquote quicklink',
+                                                contextmenu: 'undo redo | inserttable | cell row column deletetable | help',
+                                                image_advtab: true
+                                            }}
+                                            ref={this.commentEditorRef}
+                                        />
                                     )}
                                 </span>
                             )}

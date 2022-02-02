@@ -21,9 +21,9 @@ const postcss_loader = {
 
 const css_loaders = [
     MiniCssExtractPlugin.loader,
-    {
-        loader: 'style-loader'
-    },
+    // {
+    //     loader: 'style-loader'
+    // },
     {
         loader: 'css-loader',
         options: {
