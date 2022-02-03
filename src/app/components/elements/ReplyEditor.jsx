@@ -34,7 +34,8 @@ import { Remarkable } from 'remarkable';
 import Dropzone from 'react-dropzone';
 import tt from 'counterpart';
 import 'emoji-mart/css/emoji-mart.css';
-import { Picker } from 'emoji-mart';
+import { Picker, Emoji } from 'emoji-mart';
+
 // import dynamic from "next/dynamic";
 
 // import tinymce from 'tinymce/tinymce';
@@ -544,8 +545,9 @@ class ReplyEditor extends Component {
         );
     };
 
-    openEmojiPicker = () => {
-        this.setState({ showEmojiPicker: true });
+    toggleEmojiPicker = () => {
+        const { showEmojiPicker } = this.state;
+        this.setState({ showEmojiPicker: !showEmojiPicker });
     };
 
     render() {
@@ -850,6 +852,10 @@ class ReplyEditor extends Component {
                                                 <div {...getRootProps({ className: 'dropzone' })} className={classnames('dropzone', { 'dropzone--isactive': isDragActive })}>
                                                     <p className="drag-and-drop">
                                                         <input {...getInputProps()} />
+                                                        <a type="button" onClick={this.toggleEmojiPicker}>
+                                                            <Emoji emoji={{ id: 'smiley', skin: 2 }} size={28} />
+                                                        </a>
+                                                        &nbsp; | &nbsp;
                                                         {tt(
                                                             'reply_editor.insert_images_by_dragging_dropping'
                                                         )}
@@ -943,15 +949,6 @@ class ReplyEditor extends Component {
                         <br />
                         <div className={vframe_section_shrink_class}>
                             <div className="text-center">
-                                {!this.state.showEmojiPicker && (
-                                    <button
-                                        className="button light"
-                                        type="button"
-                                        onClick={this.openEmojiPicker}
-                                    >
-                                        Add Emoji
-                                    </button>
-                                )}
                                 {this.state.showEmojiPicker && (
                                     <Picker onSelect={this.addEmoji} />
                                 )}

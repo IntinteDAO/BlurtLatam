@@ -52,7 +52,12 @@ export async function getStateAsync(url) {
         });
 
     await axios
-        .get('https://blurt-coal.tekraze.com', { timeout: 3000 })
+        .get('https://blurt-coal.tekraze.com', {
+            timeout: 3000,
+            headers: {
+                'Access-Control-Allow-Origin': '*'
+            }
+        })
         .then((response) => {
             const map = new Map();
             if (response.status === 200) {
@@ -64,21 +69,19 @@ export async function getStateAsync(url) {
             }
         })
         .catch((error) => {
-            console.error(error);
+            console.warn(error);
         });
 
-    await axios
-        .get(
-            'https://gitlab.com/blurt/openblurt/condenser-pinned/-/raw/master/dapps.json',
-            { timeout: 3000 }
-        )
-        .then((response) => {
-            if (response.status === 200) {
-                raw.dapps = response.data;
-            }
+    await fetch(
+        'https://gitlab.com/blurt/openblurt/condenser-pinned/-/raw/master/dapps.json',
+        { mode: 'no-cors' }
+    )
+        .then((response) => response.json())
+        .then((data) => {
+            if (data) raw.dapps = data;
         })
-        .catch((error) => {
-            console.error(error);
+        .catch((err) => {
+            console.warn('Cors Blocked for DApps', err);
         });
 
     const rewardFund = await getRewardFund();
