@@ -2,6 +2,7 @@
 import { api } from '@blurtfoundation/blurtjs';
 import axios from 'axios';
 import { Client } from '@busyorg/busyjs';
+import fetch from 'cross-fetch';
 
 import stateCleaner from 'app/redux/stateCleaner';
 
@@ -73,8 +74,7 @@ export async function getStateAsync(url) {
         });
 
     await fetch(
-        'https://gitlab.com/blurt/openblurt/condenser-pinned/-/raw/master/dapps.json',
-        { mode: 'no-cors' }
+        'https://gitlab.com/blurt/openblurt/condenser-pinned/-/raw/master/dapps.json'
     )
         .then((response) => response.json())
         .then((data) => {
