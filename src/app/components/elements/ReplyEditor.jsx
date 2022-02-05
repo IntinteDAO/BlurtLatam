@@ -1375,11 +1375,12 @@ export default (formId) => connect(
             if (!isEdit) {
                 const messageMarkdown = "<br /> <hr /> <center><sub>Posted from [https://blurtblog.tekraze.com](https://blurtblog.tekraze.com/" + parent_permlink + "/@" + author + "/" + permlink + ")</sub></center>";
                 const messageHTML = '<br /> <hr /> <center><sub>Posted from <a href="https://blurtblog.tekraze.com/' + parent_permlink + '/@' + author + '/' + permlink + '">https://blurtblog.tekraze.com</a></sub></center>';
-                if (!isStory) {
+                // if (!isStory) {
+                //     body += ` ` + messageHTML;
+                //     isHtml = true;
+                // } else
+                if (!isHtmlTest(body)) {
                     body += ` ` + messageHTML;
-                    isHtml = true;
-                } else if (!isHtmlTest(body)) {
-                    body += ` ` + messageMarkdown;
                 } else if (isHtmlTest(body)) {
                     let htmlFromBody = body;
                     if (htmlFromBody) htmlFromBody = stripHtmlWrapper(htmlFromBody);
@@ -1388,7 +1389,7 @@ export default (formId) => connect(
                     if (this.props && Object.prototype.hasOwnProperty.call(this.props, 'RichTextEditor') && htmlFromBody != null) {
                         body = this.props.RichTextEditor.createValueFromString(htmlFromBody, 'html');
                     }
-                    body += messageMarkdown;
+                    body += messageHTML;
                     isHtml = false;
                 }
             }
@@ -1452,7 +1453,7 @@ export default (formId) => connect(
             if (rtags.links.size) meta.links = Array.from(rtags.links);
             else delete meta.links;
 
-            meta.app = 'blurtblog.tekraze/0.1';
+            meta.app = 'blurtlatam/0.1';
             if (isStory) {
                 meta.format = isHtml ? 'html' : 'markdown';
                 if (summary) {
