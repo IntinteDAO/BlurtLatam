@@ -1,5 +1,5 @@
 /* eslint react/prop-types: 0 */
-import React from 'react';
+import { Component } from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -31,7 +31,7 @@ import UserAvatar from './UserAvatar';
 
 import Blacklist from '../elements/Blacklist';
 
-export default class UserProfile extends React.Component {
+export default class UserProfile extends Component {
     constructor() {
         super();
         this.state = { showResteem: true };
@@ -40,7 +40,6 @@ export default class UserProfile extends React.Component {
                 window.print();
             }
         };
-        this.loadMore = this.loadMore.bind(this);
     }
 
     shouldComponentUpdate(np, ns) {
@@ -88,7 +87,7 @@ export default class UserProfile extends React.Component {
         );
     }
 
-    loadMore(last_post, category, showResteem) {
+    loadMore = (last_post, category, showResteem) => {
         const { accountname } = this.props;
 
         if (!last_post) return;
@@ -130,7 +129,7 @@ export default class UserProfile extends React.Component {
             accountname,
             postFilter,
         });
-    }
+    };
 
     toggleShowResteem = (e) => {
         e.preventDefault();

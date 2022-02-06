@@ -22,7 +22,7 @@ class Blacklist extends Component {
 }
 
 export default connect((state, ownProps) => {
-    const userPreferences = state.app.get('user_preferences').toJS();
+    // const userPreferences = state.app.get('user_preferences').toJS();
     const coalStatus = 'enabled';
     const blacklist =
         state.global.getIn(['blacklist']) == undefined

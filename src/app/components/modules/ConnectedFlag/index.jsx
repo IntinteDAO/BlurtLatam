@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 import { selectors as appSelectors } from 'app/redux/AppReducer';
 import Flag from 'app/components/modules/Flag';

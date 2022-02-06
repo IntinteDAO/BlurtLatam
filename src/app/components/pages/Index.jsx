@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { Component } from 'react';
 import SvgImage from 'app/components/elements/SvgImage';
 import { translateHtml } from 'app/Translator';
 
-export default class Index extends React.Component {
+export default class Index extends Component {
     render() {
         return (
             <div className="Index">

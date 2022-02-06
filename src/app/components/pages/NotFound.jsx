@@ -1,8 +1,8 @@
-import React from 'react';
+import { Component } from 'react';
 import Icon from 'app/components/elements/Icon';
 import BlurtLogo from 'app/components/elements/BlurtLogo';
 
-class NotFound extends React.Component {
+class NotFound extends Component {
     render() {
         return (
             <div>

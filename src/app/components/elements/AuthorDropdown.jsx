@@ -1,57 +1,57 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 import { Link } from 'react-router';
 import Userpic from 'app/components/elements/Userpic';
 import Follow from 'app/components/elements/Follow';
-// import Reputation from 'app/components/elements/Reputation';
 
-const AuthorDropdown = (props) => {
-    const author_link = (
-        <span
-            className="author"
-            itemProp="author"
-            itemScope
-            itemType="http://schema.org/Person"
-        >
-            <Link to={'/@' + props.author}>
-                <strong>{props.author}</strong>
-            </Link>{' '}
-            {/* <Reputation value={props.authorRepLog10} /> */}
-        </span>
-    );
-    if (!(props.follow || props.mute) || props.username === props.author) {
-        return author_link;
-    } else {
+export default class AuthorDropdown extends Component {
+
+    render() {
+        const {
+            author, follow, username, name, mute, about
+        } = this.props;
+        const author_link = (
+            <span
+                className="author"
+                itemProp="author"
+                itemScope
+                itemType="http://schema.org/Person"
+            >
+                <Link to={'/@' + author}>
+                    <strong>{author}</strong>
+                </Link>
+                {/* <Reputation value={props.authorRepLog10} /> */}
+            </span>
+        );
+        if (!(follow || mute) || username === author) {
+            return author_link;
+        }
+
         return (
             <div className="Author__container">
                 <div className="Author__dropdown">
-                    <Link to={'/@' + props.author}>
-                        <Userpic account={props.author} />
+                    <Link to={'/@' + author}>
+                        <Userpic account={author} />
                     </Link>
-                    <Link to={'/@' + props.author} className="Author__name">
-                        {props.name}
+                    <Link to={'/@' + author} className="Author__name">
+                        {name}
                     </Link>
-                    <Link to={'/@' + props.author} className="Author__username">
-                        @{props.author}
+                    <Link to={'/@' + author} className="Author__username">
+                        @
+                        {author}
                     </Link>
                     <div>
                         <Follow
                             className="float-right"
-                            follower={props.username}
-                            following={props.author}
+                            follower={username}
+                            following={author}
                             what="blog"
-                            showFollow={props.follow}
-                            showMute={props.mute}
+                            showFollow={follow}
+                            showMute={mute}
                         />
                     </div>
-                    <div className="Author__bio">{props.about}</div>
+                    <div className="Author__bio">{about}</div>
                 </div>
             </div>
         );
     }
-};
-
-export default AuthorDropdown;
-
-AuthorDropdown.propTypes = {};
-AuthorDropdown.defaultProps = {};
+}

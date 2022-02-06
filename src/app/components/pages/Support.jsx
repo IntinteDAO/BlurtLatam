@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { Component } from 'react';
 import tt from 'counterpart';
 import { APP_NAME } from 'app/client_config';
 
-class Support extends React.Component {
+class Support extends Component {
     render() {
         return (
             <div className="row">

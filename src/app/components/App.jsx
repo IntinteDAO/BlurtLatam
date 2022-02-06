@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import AppPropTypes from 'app/utils/AppPropTypes';
@@ -13,7 +13,7 @@ import WelcomePanel from 'app/components/elements/WelcomePanel';
 import tt from 'counterpart';
 import { VIEW_MODE_WHISTLE } from 'shared/constants';
 
-class App extends React.Component {
+class App extends Component {
     constructor(props) {
         super(props);
         // TODO: put both of these and associated toggles into Redux Store.
@@ -24,28 +24,16 @@ class App extends React.Component {
         this.listenerActive = null;
     }
 
-    toggleBodyNightmode(nightmodeEnabled) {
-        if (nightmodeEnabled) {
-            document.body.classList.remove('theme-light');
-            document.body.classList.add('theme-dark');
-        } else {
-            document.body.classList.remove('theme-dark');
-            document.body.classList.add('theme-light');
-        }
-    }
-
-    componentWillReceiveProps(nextProps) {
-        const { nightmodeEnabled } = nextProps;
+    componentDidMount() {
+        const { nightmodeEnabled } = this.props;
         this.toggleBodyNightmode(nightmodeEnabled);
-    }
-
-    componentWillMount() {
         if (process.env.BROWSER) localStorage.removeItem('autopost'); // July 14 '16 compromise, renamed to autopost2
+        // eslint-disable-next-line react/destructuring-assignment
         this.props.loginUser();
     }
 
-    componentDidMount() {
-        const { nightmodeEnabled } = this.props;
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        const { nightmodeEnabled } = nextProps;
         this.toggleBodyNightmode(nightmodeEnabled);
     }
 
@@ -70,6 +58,16 @@ class App extends React.Component {
     setShowBannerFalse = () => {
         this.setState({ showBanner: false });
     };
+
+    toggleBodyNightmode(nightmodeEnabled) {
+        if (nightmodeEnabled) {
+            document.body.classList.remove('theme-light');
+            document.body.classList.add('theme-dark');
+        } else {
+            document.body.classList.remove('theme-dark');
+            document.body.classList.add('theme-light');
+        }
+    }
 
     render() {
         const {

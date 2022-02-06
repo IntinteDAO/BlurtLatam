@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
@@ -6,7 +6,7 @@ import { browserHistory } from 'react-router';
 import { numberWithCommas } from 'app/utils/StateFunctions';
 import tt from 'counterpart';
 
-export default class TagsIndex extends React.Component {
+export default class TagsIndex extends Component {
     static propTypes = {
         tagsAll: PropTypes.object.isRequired,
     };

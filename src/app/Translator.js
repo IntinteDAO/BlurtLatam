@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { IntlProvider, addLocaleData } from 'react-intl';
 import en from 'react-intl/locale-data/en';
@@ -46,19 +46,21 @@ if (process.env.NODE_ENV === 'production') {
     tt.setFallbackLocale('en');
 }
 
-class Translator extends React.Component {
+class Translator extends Component {
     render() {
-        const language = this.props.locale;
-        tt.setLocale(language);
+        const { locale } = this.props;
+        tt.setLocale(locale);
+        const { children } = this.props;
         return (
+            // eslint-disable-next-line react/jsx-filename-extension
             <IntlProvider
                 // to ensure dynamic language change, "key" property with same "locale" info must be added
                 // see: https://github.com/yahoo/react-intl/wiki/Components#multiple-intl-contexts
-                key={language}
-                locale={language}
+                key={locale}
+                locale={locale}
                 defaultLocale={DEFAULT_LANGUAGE}
             >
-                {this.props.children}
+                {children}
             </IntlProvider>
         );
     }
@@ -69,9 +71,14 @@ export default connect((state, ownProps) => {
     return { ...ownProps, locale };
 })(Translator);
 
-export const FormattedHTMLMessage = ({ id, params, className }) => (
-    <div
-        className={'FormattedHTMLMessage' + (className ? ` ${className}` : '')}
-        dangerouslySetInnerHTML={{ __html: tt(id, params) }}
-    />
-);
+export function FormattedHTMLMessage({ id, params, className }) {
+    return (
+        <div
+            className={
+                'FormattedHTMLMessage' + (className ? ` ${className}` : '')
+            }
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{ __html: tt(id, params) }}
+        />
+    );
+}

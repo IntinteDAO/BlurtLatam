@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 export const icons = [
@@ -74,7 +74,7 @@ const rem_sizes = {
     '10x': '10.0',
 };
 
-export default class Icon extends React.Component {
+export default class Icon extends Component {
     static propTypes = {
         name: PropTypes.string.isRequired,
         size: PropTypes.oneOf(['1x', '1_5x', '2x', '3x', '4x', '5x', '10x']),

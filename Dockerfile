@@ -3,7 +3,9 @@ FROM node:16.13.2-alpine3.15
 
 LABEL maintainer jacob@blurt.foundation
 
-RUN apk -U add  git build-base python3 libtool libsodium autoconf automake gnupg gcc g++ make
+RUN apk -U add git build-base python3 libtool libsodium autoconf automake gnupg gcc g++ make
+
+RUN rm -vrf /var/cache/apk/*
 
 COPY . /condenser
 

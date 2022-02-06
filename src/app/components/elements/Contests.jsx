@@ -1,4 +1,3 @@
-import React from 'react';
 import tt from 'counterpart';
 import { Link } from 'react-router';
 import TimeAgoWrapper from 'app/components/elements/TimeAgoWrapper';

@@ -1,11 +1,14 @@
+/* eslint-disable no-undef */
 import { api } from '@blurtfoundation/blurtjs';
 import axios from 'axios';
 import { Client } from '@busyorg/busyjs';
+import fetch from 'cross-fetch';
 
 import stateCleaner from 'app/redux/stateCleaner';
 
 export async function getStateAsync(url) {
     // strip off query string
+    // eslint-disable-next-line prefer-destructuring
     url = url.split('?')[0];
 
     // strip off leading and trailing slashes
@@ -50,7 +53,12 @@ export async function getStateAsync(url) {
         });
 
     await axios
-        .get('https://blurt-coal.tekraze.com', { timeout: 3000 })
+        .get('https://blurt-coal.tekraze.com', {
+            timeout: 3000,
+            headers: {
+                'Access-Control-Allow-Origin': '*'
+            }
+        })
         .then((response) => {
             const map = new Map();
             if (response.status === 200) {
@@ -62,21 +70,18 @@ export async function getStateAsync(url) {
             }
         })
         .catch((error) => {
-            console.error(error);
+            console.warn(error);
         });
 
-    await axios
-        .get(
-            'https://gitlab.com/blurt/openblurt/condenser-pinned/-/raw/master/dapps.json',
-            { timeout: 2000 }
-        )
-        .then((response) => {
-            if (response.status === 200) {
-                raw.dapps = response.data;
-            }
+    await fetch(
+        'https://gitlab.com/blurt/openblurt/condenser-pinned/-/raw/master/dapps.json'
+    )
+        .then((response) => response.json())
+        .then((data) => {
+            if (data) raw.dapps = data;
         })
-        .catch((error) => {
-            console.error(error);
+        .catch((err) => {
+            console.warn('Cors Blocked for DApps', err);
         });
 
     const rewardFund = await getRewardFund();

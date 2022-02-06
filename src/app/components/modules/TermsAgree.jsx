@@ -1,5 +1,5 @@
 /* eslint react/prop-types: 0 */
-import React, { Component } from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import tt from 'counterpart';
@@ -9,17 +9,20 @@ import HelpContent from 'app/components/elements/HelpContent';
 import * as userActions from 'app/redux/UserReducer';
 
 class TermsAgree extends Component {
+    static propTypes = {
+        username: PropTypes.string.isRequired,
+        acceptTerms: PropTypes.func.isRequired,
+    };
+
     constructor() {
         super();
         this.state = {
             tosChecked: false,
             privacyChecked: false,
         };
-        this.termsAgree = this.termsAgree.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this);
     }
 
-    handleInputChange(event) {
+    handleInputChange = event => {
         const target = event.target;
         const value =
             target.type === 'checkbox' ? target.checked : target.value;
@@ -28,16 +31,11 @@ class TermsAgree extends Component {
         this.setState({
             [name]: value,
         });
-    }
+    };
 
-    termsAgree(e) {
+    termsAgree = e => {
         // let user proceed
         this.props.acceptTerms(e);
-    }
-
-    static propTypes = {
-        username: PropTypes.string.isRequired,
-        acceptTerms: PropTypes.func.isRequired,
     };
 
     render() {

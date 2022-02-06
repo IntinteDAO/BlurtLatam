@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { Component } from 'react';
 import LoginForm from 'app/components/modules/LoginForm';
 import tt from 'counterpart';
 
-class Login extends React.Component {
+class Login extends Component {
     render() {
         if (!process.env.BROWSER) {
             // don't render this page on the server

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import DropdownMenu from 'app/components/elements/DropdownMenu';
@@ -13,12 +13,12 @@ function userLink(name) {
 }
 
 class UserNames extends Component {
+    static defaultProps = {
+        size: 2,
+    };
     static propTypes = {
         names: PropTypes.array,
         size: PropTypes.number,
-    };
-    static defaultProps = {
-        size: 2,
     };
 
     render() {

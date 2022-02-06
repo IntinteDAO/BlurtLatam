@@ -1,4 +1,5 @@
-import React from 'react';
+import PropTypes from 'prop-types';
+import { Component } from 'react';
 import Autocomplete from 'react-autocomplete';
 import shouldComponentUpdate from 'app/utils/shouldComponentUpdate';
 import { validate_account_name } from 'app/utils/ChainValidation';
@@ -6,20 +7,20 @@ import reactForm from 'app/utils/ReactForm';
 import { List, Set } from 'immutable';
 import tt from 'counterpart';
 
-export class BeneficiarySelector extends React.Component {
-    static propTypes = {
-        // HTML props
-        id: React.PropTypes.string, // DOM id for active component (focusing, etc...)
-        onChange: React.PropTypes.func.isRequired,
-        onBlur: React.PropTypes.func.isRequired,
-        value: React.PropTypes.array,
-        tabIndex: React.PropTypes.number,
-
-        // redux connect
-        following: React.PropTypes.array.isRequired,
-    };
+export class BeneficiarySelector extends Component {
     static defaultProps = {
         id: 'BeneficiarySelectorId',
+    };
+    static propTypes = {
+        // HTML props
+        id: PropTypes.string, // DOM id for active component (focusing, etc...)
+        onChange: PropTypes.func.isRequired,
+        onBlur: PropTypes.func.isRequired,
+        value: PropTypes.array,
+        tabIndex: PropTypes.number,
+
+        // redux connect
+        following: PropTypes.array.isRequired,
     };
     constructor() {
         super();
@@ -27,10 +28,6 @@ export class BeneficiarySelector extends React.Component {
             this,
             'BeneficiarySelector'
         );
-    }
-
-    matchAutocompleteUser(item, value) {
-        return item.toLowerCase().indexOf(value.toLowerCase()) > -1;
     }
 
     handleAddBeneficiary = (e) => {
@@ -43,10 +40,14 @@ export class BeneficiarySelector extends React.Component {
         }
     };
 
-    handleRemoveBeneficiary = (idx) => (e) => {
+    handleBeneficiaryPercentChange = (idx) => (e) => {
         e.preventDefault();
         const beneficiaries = this.props.value;
-        this.props.onChange(beneficiaries.filter((s, bidx) => idx != bidx));
+        const newBeneficiaries = beneficiaries.map((beneficiary, bidx) => {
+            if (idx != bidx) return beneficiary;
+            return { ...beneficiary, percent: e.target.value };
+        });
+        this.props.onChange(newBeneficiaries);
     };
 
     handleBeneficiaryUserChange = (idx) => (e) => {
@@ -68,15 +69,15 @@ export class BeneficiarySelector extends React.Component {
         this.props.onChange(newBeneficiaries);
     };
 
-    handleBeneficiaryPercentChange = (idx) => (e) => {
+    handleRemoveBeneficiary = (idx) => (e) => {
         e.preventDefault();
         const beneficiaries = this.props.value;
-        const newBeneficiaries = beneficiaries.map((beneficiary, bidx) => {
-            if (idx != bidx) return beneficiary;
-            return { ...beneficiary, percent: e.target.value };
-        });
-        this.props.onChange(newBeneficiaries);
+        this.props.onChange(beneficiaries.filter((s, bidx) => idx != bidx));
     };
+
+    matchAutocompleteUser(item, value) {
+        return item.toLowerCase().indexOf(value.toLowerCase()) > -1;
+    }
 
     render() {
         const { username, following, tabIndex } = this.props;

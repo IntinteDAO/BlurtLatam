@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable react/static-property-placement */
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
@@ -25,7 +26,7 @@ import { actions as fetchDataSagaActions } from 'app/redux/FetchDataSaga';
 import { startPolling } from 'app/redux/PollingSaga';
 import { List } from 'immutable';
 
-class Header extends React.Component {
+class Header extends Component {
     static propTypes = {
         current_account_name: PropTypes.string,
         display_name: PropTypes.string,
@@ -47,7 +48,7 @@ class Header extends React.Component {
         };
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         const {
             loggedIn,
             current_account_name,
@@ -59,59 +60,49 @@ class Header extends React.Component {
     }
 
     componentDidMount() {
-        if (
-            !this.props.gptEnabled ||
-            !process.env.BROWSER ||
-            !window.googletag ||
-            !window.googletag.pubads
-        ) {
-            return null;
-        }
-
-        window.addEventListener('gptadshown', (e) => this.gptAdRendered(e));
-    }
-
-    componentWillUnmount() {
-        if (
-            !this.props.gptEnabled ||
-            !process.env.BROWSER ||
-            !window.googletag ||
-            !window.googletag.pubads
-        ) {
-            return null;
+        if(this.props.gptEnabled && process.env.BROWSER) {
+            window.addEventListener('gptadshown', (e) => this.gptAdRendered(e));
         }
     }
 
     // Consider refactor.
     // I think 'last sort order' is something available through react-router-redux history.
     // Therefore no need to store it in the window global like this.
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.pathname !== this.props.pathname) {
             const route = resolveRoute(nextProps.pathname);
             if (
-                route &&
-                route.page === 'PostsIndex' &&
-                route.params &&
-                route.params.length > 0
+                route
+                && route.page === 'PostsIndex'
+                && route.params
+                && route.params.length > 0
             ) {
-                const sort_order =
-                    route.params[0] !== 'home' ? route.params[0] : null;
-                if (sort_order)
-                    window.last_sort_order = this.last_sort_order = sort_order;
+                const sort_order = route.params[0] !== 'home' ? route.params[0] : null;
+                if (sort_order) window.last_sort_order = this.last_sort_order = sort_order;
             }
         }
     }
 
-    headroomOnUnpin() {
-        this.setState({ showAd: false });
+    componentWillUnmount() {
+        if(this.props.gptEnabled && process.env.BROWSER) {
+            window.addEventListener('gptadshown', (e) => this.gptAdRendered(e));
+        }
+
+        if(window && this.props.gptEnabled && process.env.BROWSER) {
+            window.removeEventListener('gptadshown');
+        }
+    }
+
+    gptAdRendered() {
+        this.setState({ showAd: true, gptAdRendered: true });
     }
 
     headroomOnUnfix() {
         this.setState({ showAd: true });
     }
 
-    gptAdRendered() {
-        this.setState({ showAd: true, gptAdRendered: true });
+    headroomOnUnpin() {
+        this.setState({ showAd: false });
     }
 
     hideAnnouncement() {
@@ -145,9 +136,9 @@ class Header extends React.Component {
         let lastSeenTimestamp = 0;
         let unreadNotificationCount = 0;
         if (
-            loggedIn &&
-            notifications !== undefined &&
-            typeof localStorage !== 'undefined'
+            loggedIn
+            && notifications !== undefined
+            && typeof localStorage !== 'undefined'
         ) {
             if (localStorage.getItem('last_timestamp') !== null) {
                 lastSeenTimestamp = localStorage.getItem('last_timestamp');
@@ -155,7 +146,7 @@ class Header extends React.Component {
                 localStorage.setItem('last_timestamp', 0);
             }
             notifications.get('unread_notifications').map((notification) => {
-                let timestamp = notification.toJS().timestamp;
+                const {timestamp} = notification.toJS();
                 if (lastSeenTimestamp < timestamp) {
                     unreadNotificationCount++;
                 }
@@ -175,15 +166,13 @@ class Header extends React.Component {
                 page_title = tt('header_jsx.home');
                 const account_name = route.params[1];
                 if (
-                    current_account_name &&
-                    account_name.indexOf(current_account_name) === 1
-                )
-                    home_account = true;
+                    current_account_name
+                    && account_name.indexOf(current_account_name) === 1
+                ) home_account = true;
             } else {
                 topic = route.params.length > 1 ? route.params[1] : '';
                 tags = [topic];
-                const type =
-                    route.params[0] == 'payout_comments' ? 'comments' : 'posts';
+                const type = route.params[0] == 'payout_comments' ? 'comments' : 'posts';
                 let prefix = route.params[0];
                 if (prefix == 'created') prefix = 'New';
                 if (prefix == 'payout') prefix = 'Pending payout';
@@ -249,25 +238,22 @@ class Header extends React.Component {
 
         // Format first letter of all titles and lowercase user name
         if (route.page !== 'UserProfile') {
-            page_title =
-                page_title.charAt(0).toUpperCase() + page_title.slice(1);
+            page_title = page_title.charAt(0).toUpperCase() + page_title.slice(1);
         }
 
         if (
-            process.env.BROWSER &&
-            route.page !== 'Post' &&
-            route.page !== 'PostNoCategory'
-        )
-            document.title = page_title + ' — ' + APP_NAME;
+            process.env.BROWSER
+            && route.page !== 'Post'
+            && route.page !== 'PostNoCategory'
+        ) document.title = page_title + ' — ' + APP_NAME;
 
-        const logo_link =
-            resolveRoute(pathname).params &&
-            resolveRoute(pathname).params.length > 1 &&
-            this.last_sort_order
+        const logo_link = resolveRoute(pathname).params
+                && resolveRoute(pathname).params.length > 1
+                && this.last_sort_order
                 ? '/' + this.last_sort_order
                 : current_account_name
-                ? `/@${current_account_name}/feed`
-                : '/';
+                    ? `/@${current_account_name}/feed`
+                    : '/';
 
         //TopRightHeader Stuff
         const defaultNavigate = (e) => {
@@ -276,8 +262,7 @@ class Header extends React.Component {
             } else {
                 e.preventDefault();
             }
-            const a =
-                e.target.nodeName.toLowerCase() === 'a'
+            const a = e.target.nodeName.toLowerCase() === 'a'
                     ? e.target
                     : e.target.parentNode;
             browserHistory.push(a.pathname + a.search + a.hash);
@@ -300,9 +285,8 @@ class Header extends React.Component {
         const settings_link = `/@${username}/settings`;
         const pathCheck = userPath === '/submit.html' ? true : null;
         const notifications_link = `/@${username}/notifications`;
-        const notif_label =
-            tt('g.notifications') +
-            (unreadNotificationCount > 0
+        const notif_label = tt('g.notifications')
+            + (unreadNotificationCount > 0
                 ? ` (${unreadNotificationCount})`
                 : '');
         const user_menu = [
@@ -338,11 +322,11 @@ class Header extends React.Component {
             { link: settings_link, icon: 'cog', value: tt('g.settings') },
             loggedIn
                 ? {
-                      link: '#',
-                      icon: 'enter',
-                      onClick: logout,
-                      value: tt('g.logout'),
-                  }
+                    link: '#',
+                    icon: 'enter',
+                    onClick: logout,
+                    value: tt('g.logout'),
+                }
                 : { link: '#', onClick: showLogin, value: tt('g.login') },
         ];
         showAd = true;
@@ -416,20 +400,20 @@ class Header extends React.Component {
                             {/*USER AVATAR */}
                             {loggedIn && (
                                 <DropdownMenu
-                                    className={'Header__usermenu'}
+                                    className="Header__usermenu"
                                     items={user_menu}
                                     title={username}
                                     el="span"
                                     selected={tt('g.rewards')}
                                     position="left"
                                 >
-                                    <li className={'Header__userpic '}>
+                                    <li className="Header__userpic ">
                                         <span title={username}>
                                             <Userpic account={username} />
                                         </span>
                                     </li>
                                     {unreadNotificationCount > 0 && (
-                                        <div className={'Header__notification'}>
+                                        <div className="Header__notification">
                                             <span>
                                                 {unreadNotificationCount}
                                             </span>

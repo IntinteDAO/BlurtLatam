@@ -26,6 +26,7 @@
         "auth_token": "SDC_TWILIO_AUTH_TOKEN"
     },
     "price_info_url": "SDC_PRICE_INFO_URL",
+    "tinymce_api_key": "SDC_TINYMCE_API_KEY",
     "coal_url": "https://blurt-coal.tekraze.com/",
     "upload_image": "SDC_UPLOAD_IMAGE_URL",
     "session_cookie_key": "SDC_SESSION_COOKIE_KEY",

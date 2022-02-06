@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
-export default class HelpTip extends React.Component {
+export default class HelpTip extends Component {
     static propTypes = {
-        children: PropTypes.any.isRequired,
+        children: PropTypes.objectOf(PropTypes.object).isRequired,
         content: PropTypes.oneOfType([PropTypes.string, PropTypes.array])
             .isRequired,
     };
@@ -16,18 +16,10 @@ export default class HelpTip extends React.Component {
         };
     }
 
-    show = () => this.setVisibility(true);
-    hide = () => this.setVisibility(false);
-
     setVisibility = (visible) => {
         this.setState({
             visible,
         });
-    };
-
-    handleTouch = () => {
-        this.show();
-        this.assignOutsideTouchHandler();
     };
 
     assignOutsideTouchHandler = () => {
@@ -44,6 +36,15 @@ export default class HelpTip extends React.Component {
         };
         document.addEventListener('touchstart', handler);
     };
+
+    handleTouch = () => {
+        this.show();
+        this.assignOutsideTouchHandler();
+    };
+
+    hide = () => this.setVisibility(false);
+
+    show = () => this.setVisibility(true);
 
     render() {
         const { props, state, show, hide, handleTouch } = this;

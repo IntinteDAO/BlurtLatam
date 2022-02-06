@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Component } from 'react';
@@ -24,6 +23,14 @@ const remarkableToSpec = new Remarkable({
 });
 
 class MarkdownViewer extends Component {
+    static defaultProps = {
+        allowDangerousHTML: false,
+        breaks: true,
+        className: '',
+        hideImages: false,
+        large: false,
+    };
+
     static propTypes = {
         // HTML properties
         text: PropTypes.string,
@@ -36,14 +43,6 @@ class MarkdownViewer extends Component {
         hideImages: PropTypes.bool, // whether to replace images with just a span containing the src url
         breaks: PropTypes.bool, // true to use bastardized markdown that cares about newlines
         // used for the ImageUserBlockList
-    };
-
-    static defaultProps = {
-        allowDangerousHTML: false,
-        breaks: true,
-        className: '',
-        hideImages: false,
-        large: false,
     };
 
     constructor() {

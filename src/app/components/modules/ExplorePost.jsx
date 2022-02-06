@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { serverApiRecordEvent } from 'app/utils/ServerApiClient';
@@ -18,11 +18,6 @@ class ExplorePost extends Component {
             copied: false,
             copiedMD: false,
         };
-        this.onCopy = this.onCopy.bind(this);
-        this.onCopyMD = this.onCopyMD.bind(this);
-        // this.Steemd = this.Steemd.bind(this);
-        // this.Steemdb = this.Steemdb.bind(this);
-        // this.Busy = this.Busy.bind(this);
     }
 
     // Steemd() {
@@ -37,17 +32,17 @@ class ExplorePost extends Component {
     //     serverApiRecordEvent('Busy view', this.props.permlink);
     // }
 
-    onCopy() {
+    onCopy = () => {
         this.setState({
             copied: true,
         });
-    }
+    };
 
-    onCopyMD() {
+    onCopyMD = () => {
         this.setState({
             copiedMD: true,
         });
-    }
+    };
 
     render() {
         const link = this.props.permlink;

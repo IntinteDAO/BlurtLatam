@@ -1,18 +1,13 @@
-/* eslint-disable react/button-has-type */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/interactive-supports-focus */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable no-restricted-globals */
+/* eslint-disable jsx-a11y/anchor-is-valid */
+/* eslint-disable jsx-a11y/tabindex-no-positive */
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/require-default-props */
 /* eslint-disable react/static-property-placement */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/anchor-is-valid */
-/* eslint-disable jsx-a11y/tabindex-no-positive */
-/* eslint-disable react/no-string-refs */
-/* eslint-disable no-useless-escape */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable arrow-parens */
-import React from 'react';
+import React, { Component } from 'react';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import reactForm from 'app/utils/ReactForm';
@@ -33,6 +28,8 @@ import { fromJS, Set } from 'immutable';
 import { Remarkable } from 'remarkable';
 import Dropzone from 'react-dropzone';
 import tt from 'counterpart';
+import 'emoji-mart/css/emoji-mart.css';
+import { Picker, Emoji } from 'emoji-mart';
 
 const MAX_FILE_TO_UPLOAD = 10;
 const imagesToUpload = [];
@@ -41,7 +38,8 @@ const remarkable = new Remarkable({ html: true, breaks: true });
 
 const RTE_DEFAULT = false;
 
-class ReplyEditor extends React.Component {
+class ReplyEditor extends Component {
+
     static propTypes = {
         // html component attributes
         formId: PropTypes.string.isRequired, // unique form id for each editor
@@ -76,9 +74,20 @@ class ReplyEditor extends React.Component {
         super();
         this.state = { progress: {} };
         this.initForm(props);
+        this.postRef = React.createRef();
+        this.rteRef = React.createRef();
+        this.titleRef = React.createRef();
+        this.draftRef = React.createRef();
+        this.summaryRef = React.createRef;
     }
 
-    componentWillMount() {
+    componentDidMount() {
+        setTimeout(() => {
+            if (this.props.isStory) this.titleRef.current.focus();
+            else if (this.postRef.current) this.postRef.current.focus();
+            else if (this.rteRef.current) this.rteRef.current.focus();
+        }, 300);
+
         const { formId } = this.props;
 
         if (process.env.BROWSER) {
@@ -124,17 +133,9 @@ class ReplyEditor extends React.Component {
         }
     }
 
-    componentDidMount() {
-        setTimeout(() => {
-            if (this.props.isStory) this.refs.titleRef.focus();
-            else if (this.refs.postRef) this.refs.postRef.focus();
-            else if (this.refs.rte) this.refs.rte._focus();
-        }, 300);
-    }
-
     shouldComponentUpdate = shouldComponentUpdate(this, 'ReplyEditor');
 
-    componentWillUpdate(nextProps, nextState) {
+    UNSAFE_componentWillUpdate(nextProps, nextState) {
         if (process.env.BROWSER) {
             const ts = this.state;
             const ns = nextState;
@@ -165,7 +166,6 @@ class ReplyEditor extends React.Component {
                     summary: summary ? summary.value : undefined,
                 };
 
-                clearTimeout(saveEditorTimeout);
                 saveEditorTimeout = setTimeout(() => {
                     // console.log('save formId', formId, body.value)
                     localStorage.setItem(
@@ -174,9 +174,132 @@ class ReplyEditor extends React.Component {
                     );
                     this.showDraftSaved();
                 }, 500);
+                clearTimeout(saveEditorTimeout);
             }
         }
     }
+
+    onCancel = (e) => {
+        if (e) e.preventDefault();
+        const { formId, onCancel, defaultPayoutType } = this.props;
+        const { replyForm, body } = this.state;
+        if (
+            !body.value
+            // eslint-disable-next-line no-alert
+            // eslint-disable-next-line no-restricted-globals
+            || confirm(tt('reply_editor.are_you_sure_you_want_to_clear_this_form'))
+        ) {
+            replyForm.resetForm();
+            this.setState({
+                rte_value: stateFromHtml(this.props.richTextEditor),
+            });
+            this.setState({ progress: {} });
+            this.props.setPayoutType(formId, defaultPayoutType);
+            this.props.setBeneficiaries(formId, []);
+            if (onCancel) onCancel(e);
+        }
+    };
+
+    // As rte_editor is updated, keep the (invisible) 'body' field in sync.
+    onChange = (rte_value) => {
+        this.setState({ rte_value });
+        const html = stateToHtml(rte_value);
+        const { body } = this.state;
+        if (body.value !== html) body.props.onChange(html);
+    };
+
+    onDrop = (acceptedFiles, rejectedFiles) => {
+        if (!acceptedFiles.length) {
+            if (rejectedFiles.length) {
+                this.displayErrorMessage('Please insert only image files.');
+                console.log('onDrop Rejected files: ', rejectedFiles);
+            }
+            return;
+        }
+        if (acceptedFiles.length > MAX_FILE_TO_UPLOAD) {
+            this.displayErrorMessage(
+                `Please upload up to maximum ${MAX_FILE_TO_UPLOAD} images.`
+            );
+            console.log('onDrop too many files to upload');
+            return;
+        }
+
+        for (let fi = 0; fi < acceptedFiles.length; fi += 1) {
+            const acceptedFile = acceptedFiles[fi];
+            const imageToUpload = {
+                file: acceptedFile,
+                temporaryTag: '',
+            };
+            imagesToUpload.push(imageToUpload);
+        }
+
+        this.insertPlaceHolders();
+        this.uploadNextImage();
+    };
+
+    onPasteCapture = (e) => {
+        try {
+            if (e.clipboardData) {
+                e.clipboardData.items.forEach((item) => {
+                    if (item.kind === 'file' && /^image\//.test(item.type)) {
+                        const blob = item.getAsFile();
+                        imagesToUpload.push({
+                            file: blob,
+                            temporaryTag: '',
+                        });
+                    }
+                });
+                this.insertPlaceHolders();
+                this.uploadNextImage();
+            } else {
+                // http://joelb.me/blog/2011/code-snippet-accessing-clipboard-images-with-javascript/
+                // contenteditable element that catches all pasted data
+                this.setState({ noClipboardData: true });
+            }
+        } catch (error) {
+            console.error('Error analyzing clipboard event', error);
+        }
+    };
+
+    onSummaryChange = (e) => {
+        const { value } = e.target;
+        // TODO block links in title (they do not make good permlinks)
+        const hasMarkdown = /(?:\*[\w\s]*\*|\#[\w\s]*\#|_[\w\s]*_|~[\w\s]*~|\]\s*\(|\]\s*\[)/.test(
+            value
+        );
+        this.setState({
+            summaryWarn: hasMarkdown
+                ? tt('reply_editor.markdown_not_supported')
+                : '',
+        });
+        const { summary } = this.state;
+        summary.props.onChange(e);
+    };
+
+    onTitleChange = (e) => {
+        const { value } = e.target;
+        // TODO block links in title (they do not make good permlinks)
+        const hasMarkdown = /(?:\*[\w\s]*\*|\#[\w\s]*\#|_[\w\s]*_|~[\w\s]*~|\]\s*\(|\]\s*\[)/.test(
+            value
+        );
+        this.setState({
+            titleWarn: hasMarkdown
+                ? tt('reply_editor.markdown_not_supported')
+                : '',
+        });
+        const { title } = this.state;
+        title.props.onChange(e);
+    };
+
+    displayErrorMessage = (message) => {
+        this.setState({
+            progress: { error: message },
+        });
+
+        setTimeout(() => {
+            this.setState({ progress: {} });
+        }, 6000); // clear message
+    };
 
     initForm(props) {
         const { isStory, type, fields } = props;
@@ -216,181 +339,17 @@ class ReplyEditor extends React.Component {
         });
     }
 
-    onTitleChange = (e) => {
-        const { value } = e.target;
-        // TODO block links in title (they do not make good permlinks)
-        const hasMarkdown = /(?:\*[\w\s]*\*|\#[\w\s]*\#|_[\w\s]*_|~[\w\s]*~|\]\s*\(|\]\s*\[)/.test(
-            value
-        );
-        this.setState({
-            titleWarn: hasMarkdown
-                ? tt('reply_editor.markdown_not_supported')
-                : '',
-        });
-        const { title } = this.state;
-        title.props.onChange(e);
-    };
-
-    onSummaryChange = (e) => {
-        const { value } = e.target;
-        // TODO block links in title (they do not make good permlinks)
-        const hasMarkdown = /(?:\*[\w\s]*\*|\#[\w\s]*\#|_[\w\s]*_|~[\w\s]*~|\]\s*\(|\]\s*\[)/.test(
-            value
-        );
-        this.setState({
-            summaryWarn: hasMarkdown
-                ? tt('reply_editor.markdown_not_supported')
-                : '',
-        });
-        const { summary } = this.state;
-        summary.props.onChange(e);
-    };
-
-    onCancel = (e) => {
-        if (e) e.preventDefault();
-        const { formId, onCancel, defaultPayoutType } = this.props;
-        const { replyForm, body } = this.state;
-        if (
-            !body.value
-            // eslint-disable-next-line no-alert
-            || confirm(tt('reply_editor.are_you_sure_you_want_to_clear_this_form'))
-        ) {
-            replyForm.resetForm();
-            this.setState({
-                rte_value: stateFromHtml(this.props.richTextEditor),
-            });
-            this.setState({ progress: {} });
-            this.props.setPayoutType(formId, defaultPayoutType);
-            this.props.setBeneficiaries(formId, []);
-            if (onCancel) onCancel(e);
-        }
-    };
-
-    // As rte_editor is updated, keep the (invisible) 'body' field in sync.
-    onChange = (rte_value) => {
-        this.setState({ rte_value });
-        const html = stateToHtml(rte_value);
-        const { body } = this.state;
-        if (body.value !== html) body.props.onChange(html);
-    };
-
-    toggleRte = (e) => {
-        e.preventDefault();
-        const state = { rte: !this.state.rte };
-        if (state.rte) {
-            const { body } = this.state;
-            state.rte_value = isHtmlTest(body.value)
-                ? stateFromHtml(this.props.richTextEditor, body.value)
-                : stateFromMarkdown(this.props.richTextEditor, body.value);
-        }
-        this.setState(state);
-        localStorage.setItem('replyEditorData-rte', !this.state.rte);
-    };
-
-    showDraftSaved() {
-        try {
-            // this.refs = React.createRef();
-            const { draft } = this.refs;
-            draft.className = 'ReplyEditor__draft';
-            // eslint-disable-next-line no-void
-            void draft.offsetWidth; // reset animation
-            draft.className = 'ReplyEditor__draft ReplyEditor__draft-saved';
-        } catch (err) {
-            // do nothing
-        }
-    }
-
-    showAdvancedSettings = (e) => {
-        e.preventDefault();
-        this.props.setPayoutType(this.props.formId, this.props.payoutType);
-        this.props.showAdvancedSettings(this.props.formId);
-    };
-
-    displayErrorMessage = (message) => {
-        this.setState({
-            progress: { error: message },
-        });
-
-        setTimeout(() => {
-            this.setState({ progress: {} });
-        }, 6000); // clear message
-    };
-
-    onDrop = (acceptedFiles, rejectedFiles) => {
-        if (!acceptedFiles.length) {
-            if (rejectedFiles.length) {
-                this.displayErrorMessage('Please insert only image files.');
-                console.log('onDrop Rejected files: ', rejectedFiles);
-            }
-            return;
-        }
-        if (acceptedFiles.length > MAX_FILE_TO_UPLOAD) {
-            this.displayErrorMessage(
-                `Please upload up to maximum ${MAX_FILE_TO_UPLOAD} images.`
-            );
-            console.log('onDrop too many files to upload');
-            return;
-        }
-
-        for (let fi = 0; fi < acceptedFiles.length; fi += 1) {
-            const acceptedFile = acceptedFiles[fi];
-            const imageToUpload = {
-                file: acceptedFile,
-                temporaryTag: '',
-            };
-            imagesToUpload.push(imageToUpload);
-        }
-
-        this.insertPlaceHolders();
-        this.uploadNextImage();
-    };
-
-    onOpenClick = () => {
-        this.dropzone.open();
-    };
-
-    onPasteCapture = (e) => {
-        try {
-            if (e.clipboardData) {
-                e.clipboardData.items.forEach(item => {
-                    if (item.kind === 'file' && /^image\//.test(item.type)) {
-                        const blob = item.getAsFile();
-                        imagesToUpload.push({
-                            file: blob,
-                            temporaryTag: '',
-                        });
-                    }
-                });
-                this.insertPlaceHolders();
-                this.uploadNextImage();
-            } else {
-                // http://joelb.me/blog/2011/code-snippet-accessing-clipboard-images-with-javascript/
-                // contenteditable element that catches all pasted data
-                this.setState({ noClipboardData: true });
-            }
-        } catch (error) {
-            console.error('Error analyzing clipboard event', error);
-        }
-    };
-
-    uploadNextImage = () => {
-        if (imagesToUpload.length > 0) {
-            const nextImage = imagesToUpload.pop();
-            this.upload(nextImage);
-        }
-    };
-
     insertPlaceHolders = () => {
         let { imagesUploadCount } = this.state;
         const { body } = this.state;
-        const { selectionStart } = this.refs.postRef;
+        const { selectionStart } = this.postRef.current;
         let placeholder = '';
 
         for (let ii = 0; ii < imagesToUpload.length; ii += 1) {
             const imageToUpload = imagesToUpload[ii];
 
             if (imageToUpload.temporaryTag === '') {
-                imagesUploadCount++;
+                imagesUploadCount+= 1;
                 imageToUpload.temporaryTag = `![Uploading image #${imagesUploadCount}...]()`;
                 placeholder += `\n${imageToUpload.temporaryTag}\n`;
             }
@@ -405,6 +364,37 @@ class ReplyEditor extends React.Component {
         );
     };
 
+    showAdvancedSettings = (e) => {
+        e.preventDefault();
+        this.props.setPayoutType(this.props.formId, this.props.payoutType);
+        this.props.showAdvancedSettings(this.props.formId);
+    };
+
+    showDraftSaved() {
+        try {
+            const { draft } = this.draftRef.current;
+            draft.className = 'ReplyEditor__draft';
+            // eslint-disable-next-line no-void
+            void draft.offsetWidth; // reset animation
+            draft.className = 'ReplyEditor__draft ReplyEditor__draft-saved';
+        } catch (err) {
+            // do nothing
+        }
+    }
+
+    toggleRte = (e) => {
+        e.preventDefault();
+        const state = { rte: !this.state.rte };
+        if (state.rte) {
+            const { body } = this.state;
+            state.rte_value = isHtmlTest(body.value)
+                ? stateFromHtml(this.props.richTextEditor, body.value)
+                : stateFromMarkdown(this.props.richTextEditor, body.value);
+        }
+        this.setState(state);
+        localStorage.setItem('replyEditorData-rte', !this.state.rte);
+    };
+
     upload = (image) => {
         const { uploadImage } = this.props;
         this.setState({
@@ -416,12 +406,12 @@ class ReplyEditor extends React.Component {
                 this.setState({ progress: {} });
                 const { url } = progress;
                 const imageMd = `![${image.file.name}](${url})`;
-                const { selectionStart, selectionEnd } = this.refs.postRef;
+                // const { selectionStart, selectionEnd } = this.postRef.current;
                 body.props.onChange(
                     body.value.replace(image.temporaryTag, imageMd)
                 );
                 this.uploadNextImage();
-            } else if (progress.hasOwnProperty('error')) {
+            } else if (Object.prototype.hasOwnProperty.call(progress, 'error')) {
                 this.displayErrorMessage(progress.error);
                 const imageMd = `![${image.file.name}](UPLOAD FAILED)`;
                 // Remove temporary image MD tag
@@ -432,6 +422,31 @@ class ReplyEditor extends React.Component {
                 this.setState({ progress });
             }
         });
+    };
+
+    uploadNextImage = () => {
+        if (imagesToUpload.length > 0) {
+            const nextImage = imagesToUpload.pop();
+            this.upload(nextImage);
+        }
+    };
+
+    addEmoji = (data) => {
+        this.setState({ showEmojiPicker: false });
+
+        const { body } = this.state;
+        const { selectionStart } = this.postRef.current;
+        const nativeEmoji = data.native;
+
+        // Insert the temporary tag where the cursor currently is
+        body.props.onChange(
+            body.value.substring(0, selectionStart) + nativeEmoji + body.value.substring(selectionStart, body.value.length)
+        );
+    };
+
+    toggleEmojiPicker = () => {
+        const { showEmojiPicker } = this.state;
+        this.setState({ showEmojiPicker: !showEmojiPicker });
     };
 
     render() {
@@ -557,6 +572,10 @@ class ReplyEditor extends React.Component {
             : '';
         const RichTextEditor = this.props.richTextEditor;
 
+        // if(typeof window !== "undefined") {
+        //     const TinyMceEditor = require('@tinymce/tinymce-react');
+        // }
+
         // Cover Image Selection Code
         let selectedCoverImage = '';
         if (jsonMetadata && jsonMetadata.image) {
@@ -595,11 +614,20 @@ class ReplyEditor extends React.Component {
             rtags = HtmlReady(html, { mutate: false });
         }
 
+        const fileDropzone = React.createRef();
+
+        const onOpenClick = () => {
+            if (fileDropzone.current) {
+                console.log('Click works');
+                fileDropzone.current.open();
+            }
+        };
+
         return (
             <div className="ReplyEditor row">
                 <div className="column small-12">
                     <div
-                        ref="draft"
+                        ref={this.draftRef}
                         className="ReplyEditor__draft ReplyEditor__draft-hide"
                     >
                         {tt('reply_editor.draft_saved')}
@@ -632,7 +660,7 @@ class ReplyEditor extends React.Component {
                                         disabled={loading}
                                         placeholder={tt('reply_editor.title')}
                                         autoComplete="off"
-                                        ref="titleRef"
+                                        ref={this.titleRef}
                                         tabIndex={1}
                                         // eslint-disable-next-line react/jsx-props-no-spreading
                                         {...title.props}
@@ -675,7 +703,7 @@ class ReplyEditor extends React.Component {
                         >
                             {process.env.BROWSER && rte ? (
                                 <RichTextEditor
-                                    ref="rte"
+                                    ref={this.rteRef}
                                     readOnly={loading}
                                     value={this.state.rte_value}
                                     onChange={this.onChange}
@@ -684,6 +712,27 @@ class ReplyEditor extends React.Component {
                                 />
                             ) : (
                                 <span>
+                                    {/* {isStory && ( */}
+                                    {/* <span> */}
+                                    <textarea
+                                        {...body.props}
+                                        ref={this.postRef}
+                                        onPasteCapture={this.onPasteCapture}
+                                        className={
+                                            type === 'submit_story'
+                                                ? 'upload-enabled'
+                                                : ''
+                                        }
+                                        disabled={loading}
+                                        rows={isStory ? 10 : 6}
+                                        placeholder={
+                                            isStory
+                                                ? tt('g.write_your_story')
+                                                : tt('g.reply')
+                                        }
+                                        autoComplete="off"
+                                        tabIndex={2}
+                                    />
                                     <Dropzone
                                         onDrop={this.onDrop}
                                         className={
@@ -691,49 +740,40 @@ class ReplyEditor extends React.Component {
                                                 ? 'dropzone'
                                                 : 'none'
                                         }
-                                        disableClick
                                         multiple
+                                        noClick
+                                        noKeyboard
                                         accept="image/*"
-                                        ref={(node) => {
-                                            this.dropzone = node;
-                                        }}
+                                        ref={fileDropzone}
                                     >
-                                        <textarea
-                                            {...body.props}
-                                            ref="postRef"
-                                            onPasteCapture={this.onPasteCapture}
-                                            className={
-                                                type === 'submit_story'
-                                                    ? 'upload-enabled'
-                                                    : ''
-                                            }
-                                            disabled={loading}
-                                            rows={isStory ? 10 : 6}
-                                            placeholder={
-                                                isStory
-                                                    ? tt('g.write_your_story')
-                                                    : tt('g.reply')
-                                            }
-                                            autoComplete="off"
-                                            tabIndex={2}
-                                        />
+                                        {({ getRootProps, getInputProps, isDragActive }) => {
+                                            return (
+                                                <div {...getRootProps({ className: 'dropzone' })} className={classnames('dropzone', { 'dropzone--isactive': isDragActive })}>
+                                                    <p className="drag-and-drop">
+                                                        <input {...getInputProps()} />
+                                                        <a role="button" type="button" onClick={this.toggleEmojiPicker}>
+                                                            <Emoji emoji={{ id: 'smiley', skin: 2 }} size={26} />
+                                                        </a>
+                                                        &nbsp; | &nbsp;
+                                                        {tt(
+                                                            'reply_editor.insert_images_by_dragging_dropping'
+                                                        )}
+                                                        {noClipboardData
+                                                            ? ''
+                                                            : tt(
+                                                                'reply_editor.pasting_from_the_clipboard'
+                                                            )}
+                                                        {tt('reply_editor.or_by')}
+                                                        {' '}
+                                                        <a onClick={onOpenClick}>
+                                                            {tt('reply_editor.selecting_them')}
+                                                        </a>
+                                                        .
+                                                    </p>
+                                                </div>
+                                            )
+                                        }}
                                     </Dropzone>
-                                    <p className="drag-and-drop">
-                                        {tt(
-                                            'reply_editor.insert_images_by_dragging_dropping'
-                                        )}
-                                        {noClipboardData
-                                            ? ''
-                                            : tt(
-                                                'reply_editor.pasting_from_the_clipboard'
-                                            )}
-                                        {tt('reply_editor.or_by')}
-                                        {' '}
-                                        <a onClick={this.onOpenClick}>
-                                            {tt('reply_editor.selecting_them')}
-                                        </a>
-                                        .
-                                    </p>
                                     {progress.message && (
                                         <div className="info">
                                             {progress.message}
@@ -748,6 +788,7 @@ class ReplyEditor extends React.Component {
                                             {progress.error}
                                         </div>
                                     )}
+
                                 </span>
                             )}
                         </div>
@@ -757,6 +798,15 @@ class ReplyEditor extends React.Component {
                                     && body.error
                                     && body.error !== 'Required'
                                     && body.error}
+                            </div>
+                        </div>
+
+                        <br />
+                        <div className={vframe_section_shrink_class}>
+                            <div className="text-center">
+                                {this.state.showEmojiPicker && (
+                                    <Picker onSelect={this.addEmoji} />
+                                )}
                             </div>
                         </div>
 
@@ -775,7 +825,7 @@ class ReplyEditor extends React.Component {
                                         disabled={loading}
                                         placeholder={tt('reply_editor.summary')}
                                         autoComplete="off"
-                                        ref="summaryRef"
+                                        ref={this.summaryRef}
                                         tabIndex={0}
                                     />
                                 </span>
@@ -882,10 +932,7 @@ class ReplyEditor extends React.Component {
                                                     </span>
                                                 )}
                                         </div>
-                                        <a
-                                            href="#"
-                                            onClick={this.showAdvancedSettings}
-                                        >
+                                        <a href="#" onClick={this.showAdvancedSettings}>
                                             {tt(
                                                 'reply_editor.advanced_settings'
                                             )}
@@ -935,6 +982,7 @@ class ReplyEditor extends React.Component {
                             )}
                             {!loading && !this.props.onCancel && (
                                 <button
+                                    type="button"
                                     className="button hollow no-border"
                                     tabIndex={5}
                                     disabled={submitting}
@@ -1034,7 +1082,7 @@ const richTextEditor = process.env.BROWSER
     ? require('react-rte-image').default
     : null;
 
-export default (formId) => connect(
+export default (formIdVal) => connect(
     // mapStateToProps
     (state, ownProps) => {
         const username = state.user.getIn(['current', 'username']);
@@ -1069,7 +1117,7 @@ export default (formId) => connect(
         let payoutType = state.user.getIn([
             'current',
             'post',
-            formId,
+            formIdVal,
             'payoutType',
         ]);
         if (!payoutType) {
@@ -1078,7 +1126,7 @@ export default (formId) => connect(
         let beneficiaries = state.user.getIn([
             'current',
             'post',
-            formId,
+            formIdVal,
             'beneficiaries',
         ]);
         beneficiaries = beneficiaries ? beneficiaries.toJS() : [];
@@ -1097,7 +1145,7 @@ export default (formId) => connect(
                 summary,
             },
             state,
-            formId,
+            formIdVal,
             richTextEditor,
             beneficiaries,
             tags,
@@ -1158,9 +1206,8 @@ export default (formId) => connect(
                     parent_permlink: permlink,
                     author: username,
                     // permlink,  assigned in TransactionSaga
-                }
-                : // edit existing
-                isEdit
+                }// edit existing
+                : isEdit
                     ? {
                         author, permlink, parent_author, parent_permlink
                     }
@@ -1176,24 +1223,26 @@ export default (formId) => connect(
                 return;
             }
 
-            if(!isEdit) {
-                // const message = `
-
-                //         ---
-                //         <sub>Posted from [https://blurtlatam.com](https://blurtlatam.com/${permlink})</sub>
-                //     `;
-                const message = "<br /> <hr /> <center><sub>Posted from [https://blurtlatam.com](https://blurtlatam.com/" + parent_permlink + "/@" + author + "/" + permlink + ")</sub></center>";
-                if(!isHtml) {
-                    body+= ` ` + message;
-                } else if(isHtml) {
+            // For footer message
+            if (!isEdit) {
+                // const messageMarkdown = "<br /> <hr /> <center><sub>Posted from [https://blurtlatam.com](https://blurtlatam.com/" + parent_permlink + "/@" + author + "/" + permlink + ")</sub></center>";
+                const messageHTML = '<br /> <hr /> <center><sub>Posted from <a href="https://blurtlatam.com/' + parent_permlink + '/@' + author + '/' + permlink + '">https://blurtlatam.com</a></sub></center>';
+                // if (!isStory) {
+                //     body += ` ` + messageHTML;
+                //     isHtml = true;
+                // } else
+                if (!isHtmlTest(body)) {
+                    body += ` ` + messageHTML;
+                } else if (isHtmlTest(body)) {
                     let htmlFromBody = body;
                     if (htmlFromBody) htmlFromBody = stripHtmlWrapper(htmlFromBody);
                     if (htmlFromBody && htmlFromBody.trim() == '') htmlFromBody = null;
-                    if(this.props.RichTextEditor && htmlFromBody != null) {
+
+                    if (this.props && Object.prototype.hasOwnProperty.call(this.props, 'RichTextEditor') && htmlFromBody != null) {
                         body = this.props.RichTextEditor.createValueFromString(htmlFromBody, 'html');
-                        body+= message;
-                        isHtml = false;
                     }
+                    body += messageHTML;
+                    isHtml = false;
                 }
             }
 
@@ -1290,27 +1339,27 @@ export default (formId) => connect(
             startLoadingIndicator();
 
             const originalBody = isEdit ? originalPost.body : null;
-            const __config = { originalBody };
-            console.log('config', __config);
+            const config = { originalBody };
+            console.log('config', config);
             // Avoid changing payout option during edits #735
             if (!isEdit && isStory) {
-                if (!__config.comment_options) {
-                    __config.comment_options = {
+                if (!config.comment_options) {
+                    config.comment_options = {
                         author: username,
                         permlink,
                     };
                 }
-                if (!__config.comment_options.extensions) {
-                    __config.comment_options.extensions = [];
+                if (!config.comment_options.extensions) {
+                    config.comment_options.extensions = [];
                 }
                 switch (payoutType) {
                     case '0%': // decline payout
-                        __config.comment_options = {
+                        config.comment_options = {
                             max_accepted_payout: '0.000 BLURT',
                         };
                         break;
                     case '100%':
-                        __config.comment_options.extensions.push([
+                        config.comment_options.extensions.push([
                             1,
                             {
                                 percent_blurt: 0,
@@ -1322,8 +1371,8 @@ export default (formId) => connect(
                     default: // dd//
                 }
                 if (beneficiaries && beneficiaries.length > 0) {
-                    if (!__config.comment_options.extensions) {
-                        __config.comment_options.extensions = [];
+                    if (!config.comment_options.extensions) {
+                        config.comment_options.extensions = [];
                     }
 
                     const beneficiariesList = [
@@ -1342,15 +1391,15 @@ export default (formId) => connect(
                         },
                     ];
 
-                    __config.comment_options.extensions.splice(
+                    config.comment_options.extensions.splice(
                         0,
                         0,
                         beneficiariesList
                     );
-                    __config.comment_options.extensions.join();
+                    config.comment_options.extensions.join();
                 } else {
-                    if (!__config.comment_options) {
-                        __config.comment_options = {};
+                    if (!config.comment_options) {
+                        config.comment_options = {};
                     }
                     const account = state.global.getIn([
                         'accounts',
@@ -1376,7 +1425,7 @@ export default (formId) => connect(
                         }
                     }
                     if (referrer) {
-                        __config.comment_options.extensions.push([
+                        config.comment_options.extensions.push([
                             0,
                             {
                                 beneficiaries: [
@@ -1397,7 +1446,7 @@ export default (formId) => connect(
                 title,
                 body,
                 json_metadata: meta,
-                __config,
+                config,
             };
             const operationFlatFee = state.global.getIn([
                 'props',

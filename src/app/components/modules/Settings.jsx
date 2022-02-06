@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 import tt from 'counterpart';
 import * as userActions from 'app/redux/UserReducer';
@@ -6,48 +6,20 @@ import * as appActions from 'app/redux/AppReducer';
 import UserList from 'app/components/elements/UserList';
 import * as blurt from '@blurtfoundation/blurtjs';
 
-class Settings extends React.Component {
+class Settings extends Component {
     constructor(props) {
         super(props);
         this.state = {
             errorMessage: '',
             successMessage: '',
         };
-        this.onNsfwPrefChange = this.onNsfwPrefChange.bind(this);
     }
 
-    onNsfwPrefChange(e) {
+    onNsfwPrefChange = e => {
         this.props.setUserPreferences({
             ...this.props.user_preferences,
             nsfwPref: e.currentTarget.value,
         });
-    }
-
-    handleDefaultBlogPayoutChange = (event) => {
-        this.props.setUserPreferences({
-            ...this.props.user_preferences,
-            defaultBlogPayout: event.target.value,
-        });
-    };
-
-    handleDefaultCommentPayoutChange = (event) => {
-        this.props.setUserPreferences({
-            ...this.props.user_preferences,
-            defaultCommentPayout: event.target.value,
-        });
-    };
-
-    handleDefaultCommentsSortOrderChange = (event) => {
-        this.props.setUserPreferences({
-            ...this.props.user_preferences,
-            defaultCommentsSortOrder: event.target.value,
-        });
-    };
-
-    handleLanguageChange = (event) => {
-        const locale = event.target.value;
-        const userPreferences = { ...this.props.user_preferences, locale };
-        this.props.setUserPreferences(userPreferences);
     };
 
     getPreferredApiEndpoint = () => {
@@ -88,6 +60,33 @@ class Settings extends React.Component {
             }
         }
         return entries;
+    };
+
+    handleDefaultBlogPayoutChange = (event) => {
+        this.props.setUserPreferences({
+            ...this.props.user_preferences,
+            defaultBlogPayout: event.target.value,
+        });
+    };
+
+    handleDefaultCommentPayoutChange = (event) => {
+        this.props.setUserPreferences({
+            ...this.props.user_preferences,
+            defaultCommentPayout: event.target.value,
+        });
+    };
+
+    handleDefaultCommentsSortOrderChange = (event) => {
+        this.props.setUserPreferences({
+            ...this.props.user_preferences,
+            defaultCommentsSortOrder: event.target.value,
+        });
+    };
+
+    handleLanguageChange = (event) => {
+        const locale = event.target.value;
+        const userPreferences = { ...this.props.user_preferences, locale };
+        this.props.setUserPreferences(userPreferences);
     };
     handlePreferredAPIEndpointChange = (event) => {
         if (typeof window !== 'undefined') {

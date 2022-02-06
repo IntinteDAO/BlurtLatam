@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable react/jsx-one-expression-per-line */
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import Author from 'app/components/elements/Author';
 import ReplyEditor from 'app/components/elements/ReplyEditor';
@@ -95,7 +95,11 @@ export function sortComments(cont, comments, sort_order) {
     comments.sort(sort_orders[sort_order]);
 }
 
-class CommentImpl extends React.Component {
+class CommentImpl extends Component {
+    static defaultProps = {
+        depth: 1,
+    };
+
     static propTypes = {
         // html props
         cont: PropTypes.object.isRequired,
@@ -115,14 +119,10 @@ class CommentImpl extends React.Component {
         anchor_link: PropTypes.string.isRequired,
         deletePost: PropTypes.func.isRequired,
     };
-    static defaultProps = {
-        depth: 1,
-    };
 
     constructor() {
         super();
         this.state = { collapsed: false, hide_body: false, highlight: false };
-        this.revealBody = this.revealBody.bind(this);
         this.shouldComponentUpdate = shouldComponentUpdate(this, 'Comment');
         this.onShowReply = () => {
             const { showReply } = this.state;
@@ -169,18 +169,14 @@ class CommentImpl extends React.Component {
                 this.props.bandwidth_kbytes_fee
             );
         };
-        this.toggleCollapsed = this.toggleCollapsed.bind(this);
-    }
-
-    componentWillMount() {
-        this.initEditor(this.props);
-        this._checkHide(this.props);
     }
 
     componentDidMount() {
         if (window.location.hash == this.props.anchor_link) {
             this.setState({ highlight: true }); // eslint-disable-line react/no-did-mount-set-state
         }
+        this.initEditor(this.props);
+        this.checkHide(this.props);
     }
 
     /**
@@ -189,7 +185,7 @@ class CommentImpl extends React.Component {
      *    it hides the comment body (but not the header) until the "reveal comment" link is clicked.
      */
     // eslint-disable-next-line no-underscore-dangle
-    _checkHide(props) {
+    checkHide(props) {
         const content = props.cont.get(props.content);
         if (content) {
             const hide = hideSubtree(props.cont, props.content);
@@ -206,14 +202,6 @@ class CommentImpl extends React.Component {
             }
             this.setState({ hide, hide_body: notOwn && (hide || gray) });
         }
-    }
-
-    toggleCollapsed() {
-        this.setState({ collapsed: !this.state.collapsed });
-    }
-
-    revealBody() {
-        this.setState({ hide_body: false });
     }
 
     initEditor(props) {
@@ -239,6 +227,14 @@ class CommentImpl extends React.Component {
         }
         this.setState({ PostReplyEditor, PostEditEditor });
     }
+
+    revealBody = () => {
+        this.setState({ hide_body: false });
+    };
+
+    toggleCollapsed = () => {
+        this.setState({ collapsed: !this.state.collapsed });
+    };
 
     render() {
         const { cont, content } = this.props;

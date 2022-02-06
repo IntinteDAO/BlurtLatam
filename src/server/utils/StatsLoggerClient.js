@@ -1,4 +1,4 @@
-import SDC from 'statsd-client';
+import SDC from 'hot-shots';
 
 /**
  * In production, log stats to statsd.
@@ -9,7 +9,7 @@ export default class StatsLoggerClient {
         if (STATSD_IP) {
             this.SDC = new SDC({
                 host: STATSD_IP,
-                prefix: 'condenser',
+                prefix: 'condenser'
             });
         } else {
             console.log(
@@ -18,8 +18,9 @@ export default class StatsLoggerClient {
             // Implement debug loggers here, as any new calls are added in methods below.
             this.SDC = {
                 timing() {
+                    // eslint-disable-next-line prefer-rest-params
                     console.log('StatsLoggerClient call: ', arguments);
-                },
+                }
             };
         }
     }
@@ -29,7 +30,8 @@ export default class StatsLoggerClient {
      * log them all to statsd.
      */
     logTimers(tuples) {
-        const timestamp = +new Date();
+        // const timestamp = +new Date();
+        // eslint-disable-next-line array-callback-return
         tuples.map((tuple) => {
             this.SDC.timing(tuple[0], tuple[1]);
         });

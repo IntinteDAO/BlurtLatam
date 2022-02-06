@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Comment from 'app/components/cards/Comment';
 import PostFull from 'app/components/cards/PostFull';
@@ -19,7 +19,7 @@ import { isLoggedIn } from 'app/utils/UserUtil';
 import AdSense from 'react-adsense';
 import Icon from 'app/components/elements/Icon';
 
-class Post extends React.Component {
+class Post extends Component {
     static propTypes = {
         content: PropTypes.object.isRequired,
         post: PropTypes.string,
@@ -44,19 +44,19 @@ class Post extends React.Component {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
     }
 
-    toggleNegativeReplies = (e) => {
-        this.setState({
-            showNegativeComments: !this.state.showNegativeComments,
-        });
-        e.preventDefault();
-    };
-
     onHideComment = () => {
         this.setState({ commentHidden: true });
     };
 
     showAnywayClick = () => {
         this.setState({ showAnyway: true });
+    };
+
+    toggleNegativeReplies = (e) => {
+        this.setState({
+            showNegativeComments: !this.state.showNegativeComments,
+        });
+        e.preventDefault();
     };
 
     render() {

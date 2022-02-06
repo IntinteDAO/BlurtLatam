@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import ReactDOM from 'react-dom';
-import * as transactionActions from 'app/redux/TransactionReducer';
-import * as globalActions from 'app/redux/GlobalReducer';
 import LoadingIndicator from 'app/components/elements/LoadingIndicator';
 import {
     DEBT_TOKEN,
@@ -28,23 +25,15 @@ class PromotePost extends Component {
             amountError: '',
             trxError: '',
         };
-        this.onSubmit = this.onSubmit.bind(this);
-        this.errorCallback = this.errorCallback.bind(this);
-        this.amountChange = this.amountChange.bind(this);
-        // this.assetChange = this.assetChange.bind(this);
     }
 
     componentDidMount() {
         setTimeout(() => {
-            ReactDOM.findDOMNode(this.refs.amount).focus();
+            findDOMNode(this.refs.amount).focus();
         }, 300);
     }
 
-    errorCallback(estr) {
-        this.setState({ trxError: estr, loading: false });
-    }
-
-    onSubmit(e) {
+    onSubmit = e => {
         e.preventDefault();
         const { author, permlink, onClose } = this.props;
         const { amount } = this.state;
@@ -59,13 +48,17 @@ class PromotePost extends Component {
             currentUser: this.props.currentUser,
             errorCallback: this.errorCallback,
         });
-    }
+    };
 
-    amountChange(e) {
+    amountChange = e => {
         const amount = e.target.value;
         // console.log('-- PromotePost.amountChange -->', amount);
         this.setState({ amount });
-    }
+    };
+
+    errorCallback = estr => {
+        this.setState({ trxError: estr, loading: false });
+    };
 
     // assetChange(e) {
     //     const asset = e.target.value;
@@ -105,7 +98,7 @@ class PromotePost extends Component {
                                         type="text"
                                         placeholder={tt('g.amount')}
                                         value={amount}
-                                        ref="amount"
+                                        ref={amount => this.amountRef = amount}
                                         autoComplete="off"
                                         disabled={loading}
                                         onChange={this.amountChange}

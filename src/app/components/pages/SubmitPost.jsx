@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{ Component } from 'react';
 import { browserHistory } from 'react-router';
 import ReplyEditor from 'app/components/elements/ReplyEditor';
 import { SUBMIT_FORM_ID } from 'shared/constants';
@@ -8,7 +8,7 @@ const formId = SUBMIT_FORM_ID;
 // const SubmitReplyEditor = ReplyEditor(formId, richTextEditor);
 const SubmitReplyEditor = ReplyEditor(formId);
 
-class SubmitPost extends React.Component {
+class SubmitPost extends Component {
     // static propTypes = {
     //     routeParams: PropTypes.object.isRequired,
     // }

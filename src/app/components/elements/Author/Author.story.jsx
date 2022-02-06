@@ -4,9 +4,9 @@ import { withKnobs } from '@storybook/addon-knobs';
 import rootReducer from 'app/redux/RootReducer';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
-import Author from './index';
 import { Center } from 'decorators';
 import { IntlProvider } from 'react-intl';
+import Author from './index';
 
 const store = createStore(rootReducer);
 

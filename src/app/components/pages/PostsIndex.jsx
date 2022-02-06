@@ -1,5 +1,6 @@
+/* eslint-disable import/no-import-module-exports */
 /* eslint react/prop-types: 0 */
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
@@ -23,7 +24,11 @@ import Topics from './Topics';
 import SortOrder from 'app/components/elements/SortOrder';
 import { RECOMMENDED_FOLLOW_ACCOUNT } from 'app/client_config';
 
-class PostsIndex extends React.Component {
+class PostsIndex extends Component {
+    static defaultProps = {
+        showSpam: false,
+    };
+
     static propTypes = {
         discussions: PropTypes.object,
         feed_posts: PropTypes.object,
@@ -36,14 +41,9 @@ class PostsIndex extends React.Component {
         categories: PropTypes.object,
     };
 
-    static defaultProps = {
-        showSpam: false,
-    };
-
     constructor() {
         super();
         this.state = {};
-        this.loadMore = this.loadMore.bind(this);
         this.shouldComponentUpdate = shouldComponentUpdate(this, 'PostsIndex');
     }
 
@@ -57,13 +57,17 @@ class PostsIndex extends React.Component {
         }
     }
 
+    onShowSpam = () => {
+        this.setState({ showSpam: !this.state.showSpam });
+    };
+
     getPosts(order, category) {
         const topic_discussions = this.props.discussions.get(category || '');
         if (!topic_discussions) return null;
         return topic_discussions.get(order);
     }
 
-    loadMore(last_post) {
+    loadMore = last_post => {
         if (!last_post) return;
         let {
             accountname,
@@ -84,10 +88,8 @@ class PostsIndex extends React.Component {
             category,
             accountname,
         });
-    }
-    onShowSpam = () => {
-        this.setState({ showSpam: !this.state.showSpam });
     };
+
     render() {
         let { category, order = constants.DEFAULT_SORT_ORDER } =
             this.props.routeParams;

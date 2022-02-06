@@ -1,23 +1,23 @@
 /* eslint react/prop-types: 0 */
-import React from 'react';
+import { Component } from 'react';
 import UserListRow from 'app/components/cards/UserListRow';
 import tt from 'counterpart';
 
 const PER_PAGE = 50;
 
-class UserList extends React.Component {
+class UserList extends Component {
     constructor() {
         super();
         this.state = { historyIndex: 0 };
     }
 
-    _setHistoryPagePrevious = () => {
-        const newIndex = this.state.historyIndex - PER_PAGE;
+    _setHistoryPageNext = () => {
+        const newIndex = this.state.historyIndex + PER_PAGE;
         this.setState({ historyIndex: Math.max(0, newIndex) });
     };
 
-    _setHistoryPageNext = () => {
-        const newIndex = this.state.historyIndex + PER_PAGE;
+    _setHistoryPagePrevious = () => {
+        const newIndex = this.state.historyIndex - PER_PAGE;
         this.setState({ historyIndex: Math.max(0, newIndex) });
     };
 

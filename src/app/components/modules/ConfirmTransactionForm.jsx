@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as transactionActions from 'app/redux/TransactionReducer';
@@ -27,22 +27,22 @@ class ConfirmTransactionForm extends Component {
     componentWillUnmount() {
         document.body.removeEventListener('click', this.closeOnOutsideClick);
     }
-    closeOnOutsideClick = (e) => {
-        const inside_dialog = findParent(e.target, 'ConfirmTransactionForm');
-        if (!inside_dialog) this.onCancel();
-    };
     onCancel = () => {
         const { confirmErrorCallback, onCancel } = this.props;
         if (confirmErrorCallback) confirmErrorCallback();
         if (onCancel) onCancel();
     };
-    okClick = () => {
-        const { okClick, confirmBroadcastOperation } = this.props;
-        okClick(confirmBroadcastOperation);
-    };
     onCheckbox = (e) => {
         const checkboxChecked = e.target.checked;
         this.setState({ checkboxChecked });
+    };
+    closeOnOutsideClick = (e) => {
+        const inside_dialog = findParent(e.target, 'ConfirmTransactionForm');
+        if (!inside_dialog) this.onCancel();
+    };
+    okClick = () => {
+        const { okClick, confirmBroadcastOperation } = this.props;
+        okClick(confirmBroadcastOperation);
     };
     render() {
         const { onCancel, okClick, onCheckbox } = this;

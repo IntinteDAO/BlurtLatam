@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { Component } from 'react';
 import HelpContent from 'app/components/elements/HelpContent';
 
-class Faq extends React.Component {
+class Faq extends Component {
     render() {
         return (
             <div className="row">

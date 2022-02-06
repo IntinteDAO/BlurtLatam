@@ -1,17 +1,18 @@
-import React, { PropTypes, Component } from 'react';
-import ReactDOM from 'react-dom';
+/* eslint-disable react/react-in-jsx-scope */
+import { Component } from 'react';
 import reactForm from 'app/utils/ReactForm';
 import { SUBMIT_FORM_ID } from 'shared/constants';
 import tt from 'counterpart';
 import { fromJS } from 'immutable';
 import { validateBeneficiaries } from 'app/components/cards/BeneficiarySelector';
 import BeneficiarySelector from 'app/components/cards/BeneficiarySelector';
-
+import PropTypes from 'prop-types';
 import * as userActions from 'app/redux/UserReducer';
+import { connect } from 'react-redux';
 
 class PostAdvancedSettings extends Component {
     static propTypes = {
-        formId: React.PropTypes.string.isRequired,
+        formId: PropTypes.string.isRequired,
     };
 
     constructor(props) {
@@ -44,12 +45,13 @@ class PostAdvancedSettings extends Component {
     };
 
     render() {
-        const { formId, username, defaultPayoutType, initialPayoutType } =
-            this.props;
+        const {
+            formId, username, defaultPayoutType, initialPayoutType
+        } = this.props;
         const { beneficiaries, payoutType } = this.state;
+        // eslint-disable-next-line react/destructuring-assignment
         const { submitting, valid, handleSubmit } = this.state.advancedSettings;
-        const disabled =
-            submitting || !(valid || payoutType !== initialPayoutType);
+        const disabled = submitting || !(valid || payoutType !== initialPayoutType);
 
         const form = (
             <form
@@ -124,8 +126,8 @@ class PostAdvancedSettings extends Component {
                 </div>
                 <BeneficiarySelector {...beneficiaries.props} tabIndex={1} />
                 <div className="error">
-                    {(beneficiaries.touched || beneficiaries.value) &&
-                        beneficiaries.error}
+                    {(beneficiaries.touched || beneficiaries.value)
+                        && beneficiaries.error}
                     &nbsp;
                 </div>
                 <div className="row">
@@ -157,8 +159,6 @@ class PostAdvancedSettings extends Component {
         );
     }
 }
-
-import { connect } from 'react-redux';
 
 export default connect(
     // mapStateToProps
@@ -199,21 +199,18 @@ export default connect(
 
     // mapDispatchToProps
     (dispatch) => ({
-        hideAdvancedSettings: () =>
-            dispatch(userActions.hidePostAdvancedSettings()),
-        setPayoutType: (formId, payoutType) =>
-            dispatch(
-                userActions.set({
-                    key: ['current', 'post', formId, 'payoutType'],
-                    value: payoutType,
-                })
-            ),
-        setBeneficiaries: (formId, beneficiaries) =>
-            dispatch(
-                userActions.set({
-                    key: ['current', 'post', formId, 'beneficiaries'],
-                    value: fromJS(beneficiaries),
-                })
-            ),
+        hideAdvancedSettings: () => dispatch(userActions.hidePostAdvancedSettings()),
+        setPayoutType: (formId, payoutType) => dispatch(
+            userActions.set({
+                key: ['current', 'post', formId, 'payoutType'],
+                value: payoutType,
+            })
+        ),
+        setBeneficiaries: (formId, beneficiaries) => dispatch(
+            userActions.set({
+                key: ['current', 'post', formId, 'beneficiaries'],
+                value: fromJS(beneficiaries),
+            })
+        ),
     })
 )(PostAdvancedSettings);

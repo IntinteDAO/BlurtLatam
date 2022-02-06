@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {
     genIframeMd as genDtubeIframeMd,
     validateIframeUrl as validateDtubeIframeUrl,

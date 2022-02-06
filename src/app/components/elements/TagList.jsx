@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router';
 import { filterTags } from 'app/utils/StateFunctions';
 import DropdownMenu from 'app/components/elements/DropdownMenu';

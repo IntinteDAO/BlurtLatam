@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { Component } from 'react';
 import tt from 'counterpart';
 import { APP_DOMAIN, APP_NAME } from 'app/client_config';
 import { Link } from 'react-router';
 
-class RecoverAccountStep1 extends React.Component {
+class RecoverAccountStep1 extends Component {
     render() {
         return (
             <div className="RestoreAccount">

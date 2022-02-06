@@ -1,5 +1,5 @@
-import * as config from 'config';
 import React from 'react';
+import * as config from 'config';
 
 export default function ServerHTML({
     body,

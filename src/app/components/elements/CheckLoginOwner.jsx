@@ -1,5 +1,5 @@
 /* eslint react/prop-types: 0 */
-import React from 'react';
+import { Component } from 'react';
 import Reveal from 'app/components/elements/Reveal';
 import CloseButton from 'app/components/elements/CloseButton';
 import TimeAgoWrapper from 'app/components/elements/TimeAgoWrapper';
@@ -7,12 +7,13 @@ import { browserHistory } from 'react-router';
 import tt from 'counterpart';
 import { FormattedDate } from 'react-intl';
 
-class CheckLoginOwner extends React.Component {
+class CheckLoginOwner extends Component {
     constructor() {
         super();
         this.state = {};
     }
-    componentWillReceiveProps(nextProps) {
+
+    UNSAFE_componentWillReceiveProps(nextProps) {
         const { login_owner_pubkey } = nextProps;
         if (
             login_owner_pubkey &&
@@ -39,6 +40,19 @@ class CheckLoginOwner extends React.Component {
             }
         }
     }
+
+    onUnderstood = (e) => {
+        const understood = e.target.checked;
+        console.log('understood', understood);
+        this.setState({ understood });
+    };
+
+    getKey = (props = this.props) => {
+        const { previous_owner_authority } = props;
+        const username = previous_owner_authority.get('account');
+        const key = `${username}_previous_owner_authority_last_valid_time`;
+        return key;
+    };
     hide = () => {
         const { understood } = this.state;
         if (understood) {
@@ -47,20 +61,9 @@ class CheckLoginOwner extends React.Component {
         }
         this.setState({ last_valid_time: null, last_valid_date: null });
     };
-    getKey = (props = this.props) => {
-        const { previous_owner_authority } = props;
-        const username = previous_owner_authority.get('account');
-        const key = `${username}_previous_owner_authority_last_valid_time`;
-        return key;
-    };
     recover = () => {
         this.hide();
         browserHistory.push('/recover_account_step_1');
-    };
-    onUnderstood = (e) => {
-        const understood = e.target.checked;
-        console.log('understood', understood);
-        this.setState({ understood });
     };
     render() {
         const { last_valid_time, last_valid_date } = this.state;

@@ -1,8 +1,8 @@
-import React from 'react';
+import { Component } from 'react';
 import { Link } from 'react-router';
 import tt from 'counterpart';
 
-class Witnesses extends React.Component {
+class Witnesses extends Component {
     render() {
         return (
             <div className="row">

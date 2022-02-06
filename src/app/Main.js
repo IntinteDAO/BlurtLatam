@@ -13,7 +13,6 @@ import * as blurtjs from '@blurtfoundation/blurtjs';
 import { determineViewMode } from 'app/utils/Links';
 import frontendLogger from 'app/utils/FrontendLogger';
 import ReactGA from 'react-ga';
-import ConsoleExports from './utils/ConsoleExports';
 
 window.addEventListener('error', frontendLogger);
 
@@ -24,7 +23,8 @@ const CMD_LOG_O = 'log-on';
 try {
     if (process.env.NODE_ENV === 'development') {
         // Adds some object refs to the global window object
-        ConsoleExports.init(window);
+        // ConsoleExports.init(window);
+        // Disabled as react 16 not support this
     }
 } catch (e) {
     console.error(e);
@@ -35,17 +35,15 @@ try {
 ReactGA.initialize('UA-125809453-3', {
     titleCase: false,
     gaOptions: {
-        siteSpeedSampleRate: 100,
-    },
+        siteSpeedSampleRate: 100
+    }
 });
 ReactGA.pageview(window.location.pathname + window.location.search);
 
 function runApp(initial_state) {
-    console.log('Initial state', initial_state);
-
     const konami = {
         code: 'xyzzy',
-        enabled: false,
+        enabled: false
     };
     const buff = konami.code.split('');
     const cmd = (command) => {
@@ -91,7 +89,7 @@ function runApp(initial_state) {
         cmd(CMD_LOG_O);
     }
 
-    const {config} = initial_state.offchain;
+    const { config } = initial_state.offchain;
     const alternativeApiEndpoints = config.alternative_api_endpoints;
 
     const currentApiEndpoint = localStorage.getItem('user_preferred_api_endpoint') === null
@@ -102,7 +100,7 @@ function runApp(initial_state) {
         retry: true,
         useAppbaseApi: !!config.blurtd_use_appbase,
         alternative_api_endpoints: alternativeApiEndpoints,
-        failover_threshold: config.failover_threshold,
+        failover_threshold: config.failover_threshold
     });
     blurtjs.config.set('address_prefix', config.address_prefix);
     blurtjs.config.set('chain_id', config.chain_id);
@@ -126,12 +124,14 @@ function runApp(initial_state) {
             .toString()
             .split('\t')[0];
         initial_state.user.current = {
-            username,
+            username
         };
     }
 
     // eslint-disable-next-line no-unused-vars
-    const location = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    const location = `${window.location.pathname}${window.location.search}${
+        window.location.hash
+    }`;
 
     try {
         clientRender(initial_state);

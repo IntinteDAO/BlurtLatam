@@ -1,8 +1,8 @@
 /* eslint-disable react/button-has-type */
-import React from 'react';
+import React, { Component } from 'react';
 import DappsList from '../cards/DappsList';
 
-class Dapps extends React.Component {
+class Dapps extends Component {
     render() {
         return (
             <div className="text-center">

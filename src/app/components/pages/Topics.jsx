@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, browserHistory } from 'react-router';
 import { connect } from 'react-redux';
 

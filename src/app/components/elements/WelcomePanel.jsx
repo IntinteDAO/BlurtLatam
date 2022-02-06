@@ -1,11 +1,11 @@
-import React from 'react';
+import { Component } from 'react';
 import CloseButton from 'app/components/elements/CloseButton';
 import { Link } from 'react-router';
 import tt from 'counterpart';
 import { SIGNUP_URL } from 'shared/constants';
 import imgSrc from 'app/assets/images/blurt-girl-splash.png';
 
-export default class WelcomePanel extends React.Component {
+export default class WelcomePanel extends Component {
     constructor(props) {
         super(props);
         this.setShowBannerFalse = props.setShowBannerFalse;

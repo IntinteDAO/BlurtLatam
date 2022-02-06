@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import CloseButton from 'app/components/elements/CloseButton';
@@ -11,11 +11,12 @@ import CheckLoginOwner from 'app/components/elements/CheckLoginOwner';
 import PromotePost from 'app/components/modules/PromotePost';
 import ExplorePost from 'app/components/modules/ExplorePost';
 
-class Dialogs extends React.Component {
+class Dialogs extends Component {
     static propTypes = {
         active_dialogs: PropTypes.object,
         hide: PropTypes.func.isRequired,
     };
+
     constructor() {
         super();
         this.shouldComponentUpdate = shouldComponentUpdate(this, 'Dialogs');
@@ -23,12 +24,14 @@ class Dialogs extends React.Component {
             this.props.hide(name);
         };
     }
-    componentWillReceiveProps(nextProps) {
+
+    UNSAFE_componentWillReceiveProps(nextProps) {
         const { active_dialogs, hide } = nextProps;
         active_dialogs.forEach((v, k) => {
             if (!this['hide_' + k]) this['hide_' + k] = () => hide(k);
         });
     }
+
     render() {
         const { active_dialogs } = this.props;
         let idx = 0;

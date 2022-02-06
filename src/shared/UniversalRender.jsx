@@ -31,6 +31,7 @@ import { routeRegex } from 'app/ResolveRoute';
 import { contentStats } from 'app/utils/StateFunctions';
 import ScrollBehavior from 'scroll-behavior';
 import { getStateAsync } from 'app/utils/steemApi';
+import { composeWithDevTools } from '@redux-devtools/extension';
 
 let get_state_perf;
 let get_content_perf = false;
@@ -195,7 +196,6 @@ class OffsetScrollBehavior extends ScrollBehavior {
 
 const bindMiddleware = (middleware) => {
     if (process.env.BROWSER && process.env.NODE_ENV === 'development') {
-        const { composeWithDevTools } = require('redux-devtools-extension');
         return composeWithDevTools(applyMiddleware(...middleware));
     }
     return applyMiddleware(...middleware);

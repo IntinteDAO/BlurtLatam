@@ -1,5 +1,3 @@
-import React from 'react';
-
 const regex = {
     sanitize: /^(https?:)?\/\/player.twitch.tv\/.*/i,
     main: /https?:\/\/(?:www.)?twitch.tv\/(?:(videos)\/)?([a-zA-Z0-9][\w]{3,24})/i,

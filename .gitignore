@@ -34,7 +34,11 @@ build/
 # Condenser things
 .DS_Store
 .coverage
-node_modules
+node_modules/
+./node_modules/
+./tmp
+# ./dist/*
+./lib
 *.log
 yarn.lock
 dist
@@ -47,3 +51,6 @@ lib
 # m3 local files
 .chicken
 m3info.md
+
+.eslintcache
+./.eslintcache

@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import tt from 'counterpart';
@@ -21,7 +21,12 @@ function topPosition(domElt) {
     return domElt.offsetTop + topPosition(domElt.offsetParent);
 }
 
-class PostsList extends React.Component {
+class PostsList extends Component {
+    static defaultProps = {
+        showSpam: false,
+        loading: false,
+    };
+
     static propTypes = {
         posts: PropTypes.object.isRequired,
         loading: PropTypes.bool.isRequired,
@@ -34,11 +39,6 @@ class PostsList extends React.Component {
         nsfwPref: PropTypes.string.isRequired,
     };
 
-    static defaultProps = {
-        showSpam: false,
-        loading: false,
-    };
-
     constructor() {
         super();
         this.state = {
@@ -46,8 +46,6 @@ class PostsList extends React.Component {
             showNegativeComments: false,
         };
         this.scrollListener = this.scrollListener.bind(this);
-        this.onBackButton = this.onBackButton.bind(this);
-        this.closeOnOutsideClick = this.closeOnOutsideClick.bind(this);
         this.shouldComponentUpdate = shouldComponentUpdate(this, 'PostsList');
     }
 
@@ -65,13 +63,25 @@ class PostsList extends React.Component {
         document.getElementsByTagName('body')[0].className = '';
     }
 
-    onBackButton(e) {
+    onBackButton = e => {
         if ('keyCode' in e && e.keyCode !== 27) return;
         window.removeEventListener('popstate', this.onBackButton);
         window.removeEventListener('keydown', this.onBackButton);
+    };
+
+    attachScrollListener() {
+        window.addEventListener('scroll', this.scrollListener, {
+            capture: false,
+            passive: true,
+        });
+        window.addEventListener('resize', this.scrollListener, {
+            capture: false,
+            passive: true,
+        });
+        this.scrollListener();
     }
 
-    closeOnOutsideClick(e) {
+    closeOnOutsideClick = e => {
         const inside_post = findParent(e.target, 'PostsList__post_container');
         if (!inside_post) {
             const inside_top_bar = findParent(
@@ -88,17 +98,16 @@ class PostsList extends React.Component {
                 this.closePostModal();
             }
         }
+    };
+
+    detachScrollListener() {
+        window.removeEventListener('scroll', this.scrollListener);
+        window.removeEventListener('resize', this.scrollListener);
     }
 
     fetchIfNeeded() {
         this.scrollListener();
     }
-
-    toggleNegativeReplies = () => {
-        this.setState({
-            showNegativeComments: !this.state.showNegativeComments,
-        });
-    };
 
     scrollListener = debounce(() => {
         const el = window.document.getElementById('posts_list');
@@ -128,22 +137,11 @@ class PostsList extends React.Component {
         }
     }, 150);
 
-    attachScrollListener() {
-        window.addEventListener('scroll', this.scrollListener, {
-            capture: false,
-            passive: true,
+    toggleNegativeReplies = () => {
+        this.setState({
+            showNegativeComments: !this.state.showNegativeComments,
         });
-        window.addEventListener('resize', this.scrollListener, {
-            capture: false,
-            passive: true,
-        });
-        this.scrollListener();
-    }
-
-    detachScrollListener() {
-        window.removeEventListener('scroll', this.scrollListener);
-        window.removeEventListener('resize', this.scrollListener);
-    }
+    };
 
     render() {
         const {
