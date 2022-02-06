@@ -1373,8 +1373,8 @@ export default (formId) => connect(
 
             // For footer message
             if (!isEdit) {
-                const messageMarkdown = "<br /> <hr /> <center><sub>Posted from [https://blurtblog.tekraze.com](https://blurtblog.tekraze.com/" + parent_permlink + "/@" + author + "/" + permlink + ")</sub></center>";
-                const messageHTML = '<br /> <hr /> <center><sub>Posted from <a href="https://blurtblog.tekraze.com/' + parent_permlink + '/@' + author + '/' + permlink + '">https://blurtblog.tekraze.com</a></sub></center>';
+                const messageMarkdown = "<br /> <hr /> <center><sub>Posted from [https://blurtlatam.com](https://blurtlatam.com/" + parent_permlink + "/@" + author + "/" + permlink + ")</sub></center>";
+                const messageHTML = '<br /> <hr /> <center><sub>Posted from <a href="https://blurtlatam.com/' + parent_permlink + '/@' + author + '/' + permlink + '">https://blurtlatam.com</a></sub></center>';
                 // if (!isStory) {
                 //     body += ` ` + messageHTML;
                 //     isHtml = true;
