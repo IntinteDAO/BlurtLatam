@@ -1,17 +1,12 @@
-/* eslint-disable react/button-has-type */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/interactive-supports-focus */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable no-restricted-globals */
+/* eslint-disable jsx-a11y/anchor-is-valid */
+/* eslint-disable jsx-a11y/tabindex-no-positive */
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/require-default-props */
 /* eslint-disable react/static-property-placement */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/anchor-is-valid */
-/* eslint-disable jsx-a11y/tabindex-no-positive */
-/* eslint-disable react/no-string-refs */
-/* eslint-disable no-useless-escape */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable arrow-parens */
 import React, { Component } from 'react';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
@@ -36,34 +31,6 @@ import tt from 'counterpart';
 import 'emoji-mart/css/emoji-mart.css';
 import { Picker, Emoji } from 'emoji-mart';
 
-// import dynamic from "next/dynamic";
-
-// import tinymce from 'tinymce/tinymce';
-// import "tinymce";
-
-// import 'tinymce/icons/default';
-// import "tinymce/themes/silver";
-// import 'tinymce/plugins/emoticons';
-// import 'tinymce/plugins/emoticons/js/emojis';
-// import 'tinymce/plugins/table';
-// import 'tinymce/plugins/help';
-// import 'tinymce/plugins/lists';
-// import 'tinymce/plugins/nonbreaking';
-// import 'tinymce/plugins/quickbars';
-// import 'tinymce/plugins/preview';
-// import 'tinymce/plugins/imagetools';
-// import 'tinymce/plugins/codesample';
-// import 'tinymce/plugins/code';
-// import 'tinymce/plugins/hr';
-// import 'tinymce/plugins/anchor';
-// import 'tinymce/plugins/image';
-// import 'tinymce/plugins/link';
-// import 'tinymce/plugins/wordcount';
-// import 'tinymce/skins/ui/oxide/skin.min.css';
-
-// import { Editor } from '@tinymce/tinymce-react';
-// import Prism from "prismjs";
-
 const MAX_FILE_TO_UPLOAD = 10;
 const imagesToUpload = [];
 
@@ -72,14 +39,6 @@ const remarkable = new Remarkable({ html: true, breaks: true });
 const RTE_DEFAULT = false;
 
 class ReplyEditor extends Component {
-    static defaultProps = {
-        // eslint-disable-next-line react/default-props-match-prop-types
-        isStory: false,
-        author: '',
-        parent_author: '',
-        parent_permlink: '',
-        type: 'submit_comment',
-    };
 
     static propTypes = {
         // html component attributes
@@ -102,18 +61,31 @@ class ReplyEditor extends Component {
         summary: PropTypes.string,
     };
 
+    static defaultProps = {
+        // eslint-disable-next-line react/default-props-match-prop-types
+        isStory: false,
+        author: '',
+        parent_author: '',
+        parent_permlink: '',
+        type: 'submit_comment',
+    };
+
     constructor(props) {
         super();
         this.state = { progress: {} };
         this.initForm(props);
         this.postRef = React.createRef();
+        this.rteRef = React.createRef();
+        this.titleRef = React.createRef();
+        this.draftRef = React.createRef();
+        this.summaryRef = React.createRef;
     }
 
     componentDidMount() {
         setTimeout(() => {
-            if (this.props.isStory) this.refs.titleRef.focus();
+            if (this.props.isStory) this.titleRef.current.focus();
             else if (this.postRef.current) this.postRef.current.focus();
-            else if (this.refs.rte) this.refs.rte._focus();
+            else if (this.rteRef.current) this.rteRef.current.focus();
         }, 300);
 
         const { formId } = this.props;
@@ -159,35 +131,6 @@ class ReplyEditor extends Component {
                     : null,
             });
         }
-
-        //        add tinymce
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/tinymce/5.10.2/tinymce.min.js';
-        script.type = 'module';
-        script.async = true;
-        document.head.appendChild(script);
-        // if(typeof window !== "undefined") {
-        //     require('tinymce/tinymce');
-        //     require('tinymce/skins/ui/oxide/skin.min.css');
-        //     require('tinymce/icons/default');
-        //     require("tinymce/themes/silver");
-        //     require('tinymce/plugins/emoticons');
-        //     require('tinymce/plugins/emoticons/js/emojis');
-        //     require('tinymce/plugins/table');
-        //     require('tinymce/plugins/help');
-        //     require('tinymce/plugins/lists');
-        //     require('tinymce/plugins/nonbreaking');
-        //     require('tinymce/plugins/quickbars');
-        //     require('tinymce/plugins/preview');
-        //     require('tinymce/plugins/imagetools');
-        //     require('tinymce/plugins/codesample');
-        //     require('tinymce/plugins/code');
-        //     require('tinymce/plugins/hr');
-        //     require('tinymce/plugins/anchor');
-        //     require('tinymce/plugins/image');
-        //     require('tinymce/plugins/link');
-        //     require('tinymce/plugins/wordcount');
-        // }
     }
 
     shouldComponentUpdate = shouldComponentUpdate(this, 'ReplyEditor');
@@ -236,29 +179,6 @@ class ReplyEditor extends Component {
         }
     }
 
-    // getSnapshotBeforeUpdate(prevProps, prevState) {
-    //     // Are we adding new items to the list?
-    //     // Capture the scroll position so we can adjust scroll later.
-    //     if (prevProps.list.length < this.props.list.length) {
-    //       return (
-    //         this.listRef.scrollHeight - this.listRef.scrollTop
-    //       );
-    //     }
-    //     return null;
-    //   }
-
-    //   componentDidUpdate(prevProps, prevState, snapshot) {
-    //     // If we have a snapshot value, we've just added new items.
-    //     // Adjust scroll so these new items don't push the old ones out of view.
-    //     // (snapshot here is the value returned from getSnapshotBeforeUpdate)
-    //     if (snapshot !== null) {
-    //       this.listRef.scrollTop =
-    //         this.listRef.scrollHeight - snapshot;
-    //     }
-    //   }
-
-    commentEditorRef = React.createRef();
-
     onCancel = (e) => {
         if (e) e.preventDefault();
         const { formId, onCancel, defaultPayoutType } = this.props;
@@ -266,6 +186,7 @@ class ReplyEditor extends Component {
         if (
             !body.value
             // eslint-disable-next-line no-alert
+            // eslint-disable-next-line no-restricted-globals
             || confirm(tt('reply_editor.are_you_sure_you_want_to_clear_this_form'))
         ) {
             replyForm.resetForm();
@@ -281,14 +202,6 @@ class ReplyEditor extends Component {
 
     // As rte_editor is updated, keep the (invisible) 'body' field in sync.
     onChange = (rte_value) => {
-        this.setState({ rte_value });
-        const html = stateToHtml(rte_value);
-        const { body } = this.state;
-        if (body.value !== html) body.props.onChange(html);
-    };
-
-    onChange2 = (rte_value) => {
-        console.log('Rte value', rte_value);
         this.setState({ rte_value });
         const html = stateToHtml(rte_value);
         const { body } = this.state;
@@ -324,21 +237,10 @@ class ReplyEditor extends Component {
         this.uploadNextImage();
     };
 
-    // fileDropzone = React.createRef();
-
-    // onOpenClick = () => {
-    //     console.log('Open click called');
-    //     if(this.fileDropzone.current) {
-    //         console.log('Click works');
-    //         this.fileDropzone.current.open();
-    //     }
-    //     // this.dropzone.open();
-    // };
-
     onPasteCapture = (e) => {
         try {
             if (e.clipboardData) {
-                e.clipboardData.items.forEach(item => {
+                e.clipboardData.items.forEach((item) => {
                     if (item.kind === 'file' && /^image\//.test(item.type)) {
                         const blob = item.getAsFile();
                         imagesToUpload.push({
@@ -447,7 +349,7 @@ class ReplyEditor extends Component {
             const imageToUpload = imagesToUpload[ii];
 
             if (imageToUpload.temporaryTag === '') {
-                imagesUploadCount++;
+                imagesUploadCount+= 1;
                 imageToUpload.temporaryTag = `![Uploading image #${imagesUploadCount}...]()`;
                 placeholder += `\n${imageToUpload.temporaryTag}\n`;
             }
@@ -470,8 +372,7 @@ class ReplyEditor extends Component {
 
     showDraftSaved() {
         try {
-            // this.refs = React.createRef();
-            const { draft } = this.refs;
+            const { draft } = this.draftRef.current;
             draft.className = 'ReplyEditor__draft';
             // eslint-disable-next-line no-void
             void draft.offsetWidth; // reset animation
@@ -539,9 +440,7 @@ class ReplyEditor extends Component {
 
         // Insert the temporary tag where the cursor currently is
         body.props.onChange(
-            body.value.substring(0, selectionStart) +
-            nativeEmoji +
-            body.value.substring(selectionStart, body.value.length)
+            body.value.substring(0, selectionStart) + nativeEmoji + body.value.substring(selectionStart, body.value.length)
         );
     };
 
@@ -728,7 +627,7 @@ class ReplyEditor extends Component {
             <div className="ReplyEditor row">
                 <div className="column small-12">
                     <div
-                        ref="draft"
+                        ref={this.draftRef}
                         className="ReplyEditor__draft ReplyEditor__draft-hide"
                     >
                         {tt('reply_editor.draft_saved')}
@@ -761,7 +660,7 @@ class ReplyEditor extends Component {
                                         disabled={loading}
                                         placeholder={tt('reply_editor.title')}
                                         autoComplete="off"
-                                        ref="titleRef"
+                                        ref={this.titleRef}
                                         tabIndex={1}
                                         // eslint-disable-next-line react/jsx-props-no-spreading
                                         {...title.props}
@@ -804,7 +703,7 @@ class ReplyEditor extends Component {
                         >
                             {process.env.BROWSER && rte ? (
                                 <RichTextEditor
-                                    ref="rte"
+                                    ref={this.rteRef}
                                     readOnly={loading}
                                     value={this.state.rte_value}
                                     onChange={this.onChange}
@@ -852,8 +751,8 @@ class ReplyEditor extends Component {
                                                 <div {...getRootProps({ className: 'dropzone' })} className={classnames('dropzone', { 'dropzone--isactive': isDragActive })}>
                                                     <p className="drag-and-drop">
                                                         <input {...getInputProps()} />
-                                                        <a type="button" onClick={this.toggleEmojiPicker}>
-                                                            <Emoji emoji={{ id: 'smiley', skin: 2 }} size={28} />
+                                                        <a role="button" type="button" onClick={this.toggleEmojiPicker}>
+                                                            <Emoji emoji={{ id: 'smiley', skin: 2 }} size={26} />
                                                         </a>
                                                         &nbsp; | &nbsp;
                                                         {tt(
@@ -875,8 +774,6 @@ class ReplyEditor extends Component {
                                             )
                                         }}
                                     </Dropzone>
-                                    {/* </span> */}
-                                    {/* )} */}
                                     {progress.message && (
                                         <div className="info">
                                             {progress.message}
@@ -891,49 +788,7 @@ class ReplyEditor extends Component {
                                             {progress.error}
                                         </div>
                                     )}
-                                    {/* {!isStory && typeof window !== "undefined" && (
-                                        <Editor
-                                            ref={this.commentEditorRef}
-                                            onBlur={body.onBlur}
-                                            onEditorChange={this.onChange2}
-                                            // onChange={this.onChange2}
-                                            apiKey="vd092f869ur5xpeos999x9befq5jxh5nghgomhiwq83etisx"
-                                            value={this.state.rte_value}
-                                            init={{
-                                                branding: false,
-                                                plugins: "emoticons link code image anchor codesample hr imagetools lists table nonbreaking preview quickbars help wordcount",
-                                                toolbar: "emoticons | formatgroup paragraphgroup insertgroup | code codesample anchor | media nonbreaking preview help wordcount",
-                                                toolbar_location: "bottom",
-                                                imagetools_cors_hosts: ['blurt.live', 'blurtblog.tekraze.com', 'blurtlatam.com', 'blurt.blog'],
-                                                menubar: false,
-                                                toolbar_groups: {
-                                                    formatgroup: {
-                                                        icon: 'format',
-                                                        tooltip: 'Formatting',
-                                                        items: 'bold italic underline strikethrough | forecolor backcolor | superscript subscript | removeformat'
-                                                    },
-                                                    paragraphgroup: {
-                                                        icon: 'paragraph',
-                                                        tooltip: 'Paragraph format',
-                                                        items: 'h1 h2 h3 h4 h5 h6 | bullist numlist | alignleft aligncenter alignright | indent outdent'
-                                                    },
-                                                    insertgroup: {
-                                                        icon: 'plus',
-                                                        tooltip: 'Insert',
-                                                        items: 'link image emoticons hr'
-                                                    }
-                                                },
-                                                media_live_embeds: true,
-                                                media_alt_source: false,
-                                                media_poster: false,
-                                                quickbars_insert_toolbar: 'quicktable image media codesample',
-                                                quickbars_selection_toolbar: 'bold italic underline | h1 h2 h3 | formatselect | bullist numlist | blockquote quicklink',
-                                                contextmenu: 'undo redo | inserttable | cell row column deletetable | help',
-                                                image_advtab: true
-                                            }}
-                                            ref={this.commentEditorRef}
-                                        />
-                                    )} */}
+
                                 </span>
                             )}
                         </div>
@@ -970,7 +825,7 @@ class ReplyEditor extends Component {
                                         disabled={loading}
                                         placeholder={tt('reply_editor.summary')}
                                         autoComplete="off"
-                                        ref="summaryRef"
+                                        ref={this.summaryRef}
                                         tabIndex={0}
                                     />
                                 </span>
@@ -1077,10 +932,7 @@ class ReplyEditor extends Component {
                                                     </span>
                                                 )}
                                         </div>
-                                        <a
-                                            href="#"
-                                            onClick={this.showAdvancedSettings}
-                                        >
+                                        <a href="#" onClick={this.showAdvancedSettings}>
                                             {tt(
                                                 'reply_editor.advanced_settings'
                                             )}
@@ -1130,6 +982,7 @@ class ReplyEditor extends Component {
                             )}
                             {!loading && !this.props.onCancel && (
                                 <button
+                                    type="button"
                                     className="button hollow no-border"
                                     tabIndex={5}
                                     disabled={submitting}
@@ -1229,7 +1082,7 @@ const richTextEditor = process.env.BROWSER
     ? require('react-rte-image').default
     : null;
 
-export default (formId) => connect(
+export default (formIdVal) => connect(
     // mapStateToProps
     (state, ownProps) => {
         const username = state.user.getIn(['current', 'username']);
@@ -1264,7 +1117,7 @@ export default (formId) => connect(
         let payoutType = state.user.getIn([
             'current',
             'post',
-            formId,
+            formIdVal,
             'payoutType',
         ]);
         if (!payoutType) {
@@ -1273,7 +1126,7 @@ export default (formId) => connect(
         let beneficiaries = state.user.getIn([
             'current',
             'post',
-            formId,
+            formIdVal,
             'beneficiaries',
         ]);
         beneficiaries = beneficiaries ? beneficiaries.toJS() : [];
@@ -1292,7 +1145,7 @@ export default (formId) => connect(
                 summary,
             },
             state,
-            formId,
+            formIdVal,
             richTextEditor,
             beneficiaries,
             tags,
@@ -1353,9 +1206,8 @@ export default (formId) => connect(
                     parent_permlink: permlink,
                     author: username,
                     // permlink,  assigned in TransactionSaga
-                }
-                : // edit existing
-                isEdit
+                }// edit existing
+                : isEdit
                     ? {
                         author, permlink, parent_author, parent_permlink
                     }
@@ -1373,7 +1225,7 @@ export default (formId) => connect(
 
             // For footer message
             if (!isEdit) {
-                const messageMarkdown = "<br /> <hr /> <center><sub>Posted from [https://blurtlatam.com](https://blurtlatam.com/" + parent_permlink + "/@" + author + "/" + permlink + ")</sub></center>";
+                // const messageMarkdown = "<br /> <hr /> <center><sub>Posted from [https://blurtlatam.com](https://blurtlatam.com/" + parent_permlink + "/@" + author + "/" + permlink + ")</sub></center>";
                 const messageHTML = '<br /> <hr /> <center><sub>Posted from <a href="https://blurtlatam.com/' + parent_permlink + '/@' + author + '/' + permlink + '">https://blurtlatam.com</a></sub></center>';
                 // if (!isStory) {
                 //     body += ` ` + messageHTML;
@@ -1487,27 +1339,27 @@ export default (formId) => connect(
             startLoadingIndicator();
 
             const originalBody = isEdit ? originalPost.body : null;
-            const __config = { originalBody };
-            console.log('config', __config);
+            const config = { originalBody };
+            console.log('config', config);
             // Avoid changing payout option during edits #735
             if (!isEdit && isStory) {
-                if (!__config.comment_options) {
-                    __config.comment_options = {
+                if (!config.comment_options) {
+                    config.comment_options = {
                         author: username,
                         permlink,
                     };
                 }
-                if (!__config.comment_options.extensions) {
-                    __config.comment_options.extensions = [];
+                if (!config.comment_options.extensions) {
+                    config.comment_options.extensions = [];
                 }
                 switch (payoutType) {
                     case '0%': // decline payout
-                        __config.comment_options = {
+                        config.comment_options = {
                             max_accepted_payout: '0.000 BLURT',
                         };
                         break;
                     case '100%':
-                        __config.comment_options.extensions.push([
+                        config.comment_options.extensions.push([
                             1,
                             {
                                 percent_blurt: 0,
@@ -1519,8 +1371,8 @@ export default (formId) => connect(
                     default: // dd//
                 }
                 if (beneficiaries && beneficiaries.length > 0) {
-                    if (!__config.comment_options.extensions) {
-                        __config.comment_options.extensions = [];
+                    if (!config.comment_options.extensions) {
+                        config.comment_options.extensions = [];
                     }
 
                     const beneficiariesList = [
@@ -1539,15 +1391,15 @@ export default (formId) => connect(
                         },
                     ];
 
-                    __config.comment_options.extensions.splice(
+                    config.comment_options.extensions.splice(
                         0,
                         0,
                         beneficiariesList
                     );
-                    __config.comment_options.extensions.join();
+                    config.comment_options.extensions.join();
                 } else {
-                    if (!__config.comment_options) {
-                        __config.comment_options = {};
+                    if (!config.comment_options) {
+                        config.comment_options = {};
                     }
                     const account = state.global.getIn([
                         'accounts',
@@ -1573,7 +1425,7 @@ export default (formId) => connect(
                         }
                     }
                     if (referrer) {
-                        __config.comment_options.extensions.push([
+                        config.comment_options.extensions.push([
                             0,
                             {
                                 beneficiaries: [
@@ -1594,7 +1446,7 @@ export default (formId) => connect(
                 title,
                 body,
                 json_metadata: meta,
-                __config,
+                config,
             };
             const operationFlatFee = state.global.getIn([
                 'props',
