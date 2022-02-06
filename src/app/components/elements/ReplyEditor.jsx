@@ -69,23 +69,18 @@ class ReplyEditor extends Component {
         parent_permlink: '',
         type: 'submit_comment',
     };
-
     constructor(props) {
         super();
         this.state = { progress: {} };
         this.initForm(props);
         this.postRef = React.createRef();
-        this.rteRef = React.createRef();
-        this.titleRef = React.createRef();
-        this.draftRef = React.createRef();
-        this.summaryRef = React.createRef;
     }
 
     componentDidMount() {
         setTimeout(() => {
-            if (this.props.isStory) this.titleRef.current.focus();
+            if (this.props.isStory) this.refs.titleRef.focus();
             else if (this.postRef.current) this.postRef.current.focus();
-            else if (this.rteRef.current) this.rteRef.current.focus();
+            else if (this.refs.rte) this.refs.rte._focus();
         }, 300);
 
         const { formId } = this.props;
@@ -186,7 +181,6 @@ class ReplyEditor extends Component {
         if (
             !body.value
             // eslint-disable-next-line no-alert
-            // eslint-disable-next-line no-restricted-globals
             || confirm(tt('reply_editor.are_you_sure_you_want_to_clear_this_form'))
         ) {
             replyForm.resetForm();
@@ -349,7 +343,7 @@ class ReplyEditor extends Component {
             const imageToUpload = imagesToUpload[ii];
 
             if (imageToUpload.temporaryTag === '') {
-                imagesUploadCount+= 1;
+                imagesUploadCount++;
                 imageToUpload.temporaryTag = `![Uploading image #${imagesUploadCount}...]()`;
                 placeholder += `\n${imageToUpload.temporaryTag}\n`;
             }
@@ -372,7 +366,7 @@ class ReplyEditor extends Component {
 
     showDraftSaved() {
         try {
-            const { draft } = this.draftRef.current;
+            const { draft } = this.refs;
             draft.className = 'ReplyEditor__draft';
             // eslint-disable-next-line no-void
             void draft.offsetWidth; // reset animation
@@ -440,7 +434,9 @@ class ReplyEditor extends Component {
 
         // Insert the temporary tag where the cursor currently is
         body.props.onChange(
-            body.value.substring(0, selectionStart) + nativeEmoji + body.value.substring(selectionStart, body.value.length)
+            body.value.substring(0, selectionStart) +
+            nativeEmoji +
+            body.value.substring(selectionStart, body.value.length)
         );
     };
 
@@ -627,7 +623,7 @@ class ReplyEditor extends Component {
             <div className="ReplyEditor row">
                 <div className="column small-12">
                     <div
-                        ref={this.draftRef}
+                        ref="draft"
                         className="ReplyEditor__draft ReplyEditor__draft-hide"
                     >
                         {tt('reply_editor.draft_saved')}
@@ -660,7 +656,7 @@ class ReplyEditor extends Component {
                                         disabled={loading}
                                         placeholder={tt('reply_editor.title')}
                                         autoComplete="off"
-                                        ref={this.titleRef}
+                                        ref="titleRef"
                                         tabIndex={1}
                                         // eslint-disable-next-line react/jsx-props-no-spreading
                                         {...title.props}
@@ -703,7 +699,7 @@ class ReplyEditor extends Component {
                         >
                             {process.env.BROWSER && rte ? (
                                 <RichTextEditor
-                                    ref={this.rteRef}
+                                    ref="rte"
                                     readOnly={loading}
                                     value={this.state.rte_value}
                                     onChange={this.onChange}
@@ -751,8 +747,8 @@ class ReplyEditor extends Component {
                                                 <div {...getRootProps({ className: 'dropzone' })} className={classnames('dropzone', { 'dropzone--isactive': isDragActive })}>
                                                     <p className="drag-and-drop">
                                                         <input {...getInputProps()} />
-                                                        <a role="button" type="button" onClick={this.toggleEmojiPicker}>
-                                                            <Emoji emoji={{ id: 'smiley', skin: 2 }} size={26} />
+                                                        <a type="button" onClick={this.toggleEmojiPicker}>
+                                                            <Emoji emoji={{ id: 'smiley', skin: 2 }} size={28} />
                                                         </a>
                                                         &nbsp; | &nbsp;
                                                         {tt(
@@ -825,7 +821,7 @@ class ReplyEditor extends Component {
                                         disabled={loading}
                                         placeholder={tt('reply_editor.summary')}
                                         autoComplete="off"
-                                        ref={this.summaryRef}
+                                        ref="summaryRef"
                                         tabIndex={0}
                                     />
                                 </span>
@@ -932,7 +928,10 @@ class ReplyEditor extends Component {
                                                     </span>
                                                 )}
                                         </div>
-                                        <a href="#" onClick={this.showAdvancedSettings}>
+                                        <a
+                                            href="#"
+                                            onClick={this.showAdvancedSettings}
+                                        >
                                             {tt(
                                                 'reply_editor.advanced_settings'
                                             )}
@@ -982,7 +981,6 @@ class ReplyEditor extends Component {
                             )}
                             {!loading && !this.props.onCancel && (
                                 <button
-                                    type="button"
                                     className="button hollow no-border"
                                     tabIndex={5}
                                     disabled={submitting}
@@ -1082,7 +1080,7 @@ const richTextEditor = process.env.BROWSER
     ? require('react-rte-image').default
     : null;
 
-export default (formIdVal) => connect(
+export default (formId) => connect(
     // mapStateToProps
     (state, ownProps) => {
         const username = state.user.getIn(['current', 'username']);
@@ -1117,7 +1115,7 @@ export default (formIdVal) => connect(
         let payoutType = state.user.getIn([
             'current',
             'post',
-            formIdVal,
+            formId,
             'payoutType',
         ]);
         if (!payoutType) {
@@ -1126,7 +1124,7 @@ export default (formIdVal) => connect(
         let beneficiaries = state.user.getIn([
             'current',
             'post',
-            formIdVal,
+            formId,
             'beneficiaries',
         ]);
         beneficiaries = beneficiaries ? beneficiaries.toJS() : [];
@@ -1145,7 +1143,7 @@ export default (formIdVal) => connect(
                 summary,
             },
             state,
-            formIdVal,
+            formId,
             richTextEditor,
             beneficiaries,
             tags,
@@ -1206,8 +1204,9 @@ export default (formIdVal) => connect(
                     parent_permlink: permlink,
                     author: username,
                     // permlink,  assigned in TransactionSaga
-                }// edit existing
-                : isEdit
+                }
+                : // edit existing
+                isEdit
                     ? {
                         author, permlink, parent_author, parent_permlink
                     }
@@ -1225,14 +1224,14 @@ export default (formIdVal) => connect(
 
             // For footer message
             if (!isEdit) {
-                // const messageMarkdown = "<br /> <hr /> <center><sub>Posted from [https://blurtlatam.com](https://blurtlatam.com/" + parent_permlink + "/@" + author + "/" + permlink + ")</sub></center>";
+                // const messageMarkdown = "<br /> <hr /> <center><sub>Posted from [https://blurtblog.tekraze.com](https://blurtblog.tekraze.com/" + parent_permlink + "/@" + author + "/" + permlink + ")</sub></center>";
                 const messageHTML = '<br /> <hr /> <center><sub>Posted from <a href="https://blurtlatam.com/' + parent_permlink + '/@' + author + '/' + permlink + '">https://blurtlatam.com</a></sub></center>';
-                // if (!isStory) {
-                //     body += ` ` + messageHTML;
-                //     isHtml = true;
-                // } else
-                if (!isHtmlTest(body)) {
+                if (!isStory) {
                     body += ` ` + messageHTML;
+                    isHtml = false;
+                } else if (!isHtmlTest(body)) {
+                    body += ` ` + messageHTML;
+                    isHtml = false;
                 } else if (isHtmlTest(body)) {
                     let htmlFromBody = body;
                     if (htmlFromBody) htmlFromBody = stripHtmlWrapper(htmlFromBody);
@@ -1339,27 +1338,27 @@ export default (formIdVal) => connect(
             startLoadingIndicator();
 
             const originalBody = isEdit ? originalPost.body : null;
-            const config = { originalBody };
-            console.log('config', config);
+            const __config = { originalBody };
+            console.log('config', __config);
             // Avoid changing payout option during edits #735
             if (!isEdit && isStory) {
-                if (!config.comment_options) {
-                    config.comment_options = {
+                if (!__config.comment_options) {
+                    __config.comment_options = {
                         author: username,
                         permlink,
                     };
                 }
-                if (!config.comment_options.extensions) {
-                    config.comment_options.extensions = [];
+                if (!__config.comment_options.extensions) {
+                    __config.comment_options.extensions = [];
                 }
                 switch (payoutType) {
                     case '0%': // decline payout
-                        config.comment_options = {
+                        __config.comment_options = {
                             max_accepted_payout: '0.000 BLURT',
                         };
                         break;
                     case '100%':
-                        config.comment_options.extensions.push([
+                        __config.comment_options.extensions.push([
                             1,
                             {
                                 percent_blurt: 0,
@@ -1371,8 +1370,8 @@ export default (formIdVal) => connect(
                     default: // dd//
                 }
                 if (beneficiaries && beneficiaries.length > 0) {
-                    if (!config.comment_options.extensions) {
-                        config.comment_options.extensions = [];
+                    if (!__config.comment_options.extensions) {
+                        __config.comment_options.extensions = [];
                     }
 
                     const beneficiariesList = [
@@ -1391,15 +1390,15 @@ export default (formIdVal) => connect(
                         },
                     ];
 
-                    config.comment_options.extensions.splice(
+                    __config.comment_options.extensions.splice(
                         0,
                         0,
                         beneficiariesList
                     );
-                    config.comment_options.extensions.join();
+                    __config.comment_options.extensions.join();
                 } else {
-                    if (!config.comment_options) {
-                        config.comment_options = {};
+                    if (!__config.comment_options) {
+                        __config.comment_options = {};
                     }
                     const account = state.global.getIn([
                         'accounts',
@@ -1425,7 +1424,7 @@ export default (formIdVal) => connect(
                         }
                     }
                     if (referrer) {
-                        config.comment_options.extensions.push([
+                        __config.comment_options.extensions.push([
                             0,
                             {
                                 beneficiaries: [
@@ -1446,7 +1445,7 @@ export default (formIdVal) => connect(
                 title,
                 body,
                 json_metadata: meta,
-                config,
+                __config,
             };
             const operationFlatFee = state.global.getIn([
                 'props',
