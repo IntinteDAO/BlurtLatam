@@ -60,7 +60,11 @@ class Header extends Component {
     }
 
     componentDidMount() {
-        if(this.props.gptEnabled && process.env.BROWSER) {
+        // if(this.props.gptEnabled && process.env.BROWSER) {
+        //     window.addEventListener('gptadshown', (e) => this.gptAdRendered(e));
+        // }
+        const { gptEnabled } = this.props;
+        if(gptEnabled) {
             window.addEventListener('gptadshown', (e) => this.gptAdRendered(e));
         }
     }

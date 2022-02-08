@@ -4,7 +4,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Slider from 'react-rangeslider';
+import Slider from '@appigram/react-rangeslider';
 import tt from 'counterpart';
 import CloseButton from 'app/components/elements/CloseButton';
 import * as transactionActions from 'app/redux/TransactionReducer';
@@ -130,32 +130,41 @@ class Voting extends Component {
         };
 
         this.handleWeightChange = (up) => (weight) => {
+            const { sliderWeight } = this.state;
             let w;
             if (up) {
                 w = {
                     up: weight,
-                    down: this.state.sliderWeight.down,
+                    down: sliderWeight.down,
                 };
             } else {
                 w = {
-                    up: this.state.sliderWeight.up,
+                    up: sliderWeight.up,
                     down: weight,
                 };
             }
+            const { username, is_comment } = this.props;
+            localStorage.setItem(
+                'voteWeight'
+                + (up ? '' : 'Down')
+                + '-' + username
+                + (is_comment ? '-comment' : ''),
+                weight
+            );
             this.setState({ sliderWeight: w });
         };
 
         this.storeSliderWeight = (up) => () => {
             const { username, is_comment } = this.props;
+            const { sliderWeight } = this.state;
             const weight = up
-                ? this.state.sliderWeight.up
-                : this.state.sliderWeight.down;
+                ? sliderWeight.up
+                : sliderWeight.down;
             localStorage.setItem(
-                'voteWeight' +
-                (up ? '' : 'Down') +
-                '-' +
-                username +
-                (is_comment ? '-comment' : ''),
+                'voteWeight'
+                + (up ? '' : 'Down')
+                + '-' + username
+                + (is_comment ? '-comment' : ''),
                 weight
             );
         };

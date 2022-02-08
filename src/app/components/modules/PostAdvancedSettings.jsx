@@ -9,6 +9,8 @@ import BeneficiarySelector from 'app/components/cards/BeneficiarySelector';
 import PropTypes from 'prop-types';
 import * as userActions from 'app/redux/UserReducer';
 import { connect } from 'react-redux';
+import PostTemplateSelector from 'app/components/cards/PostTemplateSelector';
+import { loadUserTemplates, saveUserTemplates } from 'app/utils/UserTemplates';
 
 class PostAdvancedSettings extends Component {
     static propTypes = {
@@ -17,7 +19,7 @@ class PostAdvancedSettings extends Component {
 
     constructor(props) {
         super();
-        this.state = { payoutType: props.initialPayoutType };
+        this.state = { payoutType: props.initialPayoutType, postTemplateName: null, };
         this.initForm(props);
     }
 
@@ -44,14 +46,64 @@ class PostAdvancedSettings extends Component {
         this.setState({ payoutType: event.target.value });
     };
 
+    handleTemplateSelected = (postTemplateName) => {
+        const { username } = this.props;
+        const userTemplates = loadUserTemplates(username);
+        this.setState({ postTemplateName });
+
+        if (postTemplateName !== null) {
+            for (let ti = 0; ti < userTemplates.length; ti += 1) {
+                const template = userTemplates[ti];
+                const { beneficiaries } = this.state;
+                const newBeneficiaries = {
+                    ...beneficiaries,
+                };
+
+                if (template.name === postTemplateName) {
+                    if (Object.prototype.hasOwnProperty.call(template, 'payoutType')) {
+                        this.setState({ payoutType: template.payoutType });
+                    }
+
+                    if (Object.prototype.hasOwnProperty.call(template, 'beneficiaries')) {
+                        newBeneficiaries.props.value = template.beneficiaries;
+                        this.setState({ beneficiaries: newBeneficiaries });
+                    }
+
+                    break;
+                }
+            }
+        }
+    };
+
+    handleDeleteTemplate = (event, postTemplateName) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const { username } = this.props;
+        const userTemplates = loadUserTemplates(username);
+        let ui = userTemplates.length;
+        // eslint-disable-next-line no-plusplus
+        while (ui--) {
+            if (userTemplates[ui].name === postTemplateName) {
+                userTemplates.splice(ui, 1);
+            }
+        }
+
+        saveUserTemplates(username, [...userTemplates]);
+        this.setState({ postTemplateName: null });
+    };
+
     render() {
         const {
             formId, username, defaultPayoutType, initialPayoutType
         } = this.props;
-        const { beneficiaries, payoutType } = this.state;
+        const { beneficiaries, payoutType, postTemplateName } = this.state;
         // eslint-disable-next-line react/destructuring-assignment
         const { submitting, valid, handleSubmit } = this.state.advancedSettings;
-        const disabled = submitting || !(valid || payoutType !== initialPayoutType);
+        const disabled = submitting || !(valid || payoutType !== initialPayoutType || postTemplateName !== null);
+
+        const loadingTemplate = postTemplateName && postTemplateName.indexOf('create_') === -1;
+        const userTemplates = loadUserTemplates(username);
 
         const form = (
             <form
@@ -65,6 +117,7 @@ class PostAdvancedSettings extends Component {
                         this.props.setPayoutType(formId, payoutType);
                         this.props.setBeneficiaries(formId, data.beneficiaries);
                         this.props.hideAdvancedSettings();
+                        this.props.setPostTemplateName(formId, postTemplateName);
                     }
                 })}
             >
@@ -125,6 +178,11 @@ class PostAdvancedSettings extends Component {
                     </h4>
                 </div>
                 <BeneficiarySelector {...beneficiaries.props} tabIndex={1} />
+                <PostTemplateSelector
+                    username={username}
+                    onChange={this.handleTemplateSelected}
+                    templates={userTemplates}
+                />
                 <div className="error">
                     {(beneficiaries.touched || beneficiaries.value)
                         && beneficiaries.error}
@@ -139,8 +197,23 @@ class PostAdvancedSettings extends Component {
                                 disabled={disabled}
                                 tabIndex={2}
                             >
-                                {tt('g.save')}
+                                {loadingTemplate && tt('post_advanced_settings_jsx.load_template')}
+                                {!loadingTemplate && tt('g.save')}
                             </button>
+                            {loadingTemplate && (
+                                <button
+                                    type="button"
+                                    className="button"
+                                    tabIndex={0}
+                                    onClick={(event) => {
+                                        this.handleDeleteTemplate(event, postTemplateName);
+                                    }}
+                                >
+                                    {postTemplateName
+                                        && postTemplateName.indexOf('create_') === -1
+                                        && tt('post_advanced_settings_jsx.delete_template')}
+                                </button>
+                            )}
                         </span>
                     </div>
                 </div>
@@ -204,6 +277,12 @@ export default connect(
             userActions.set({
                 key: ['current', 'post', formId, 'payoutType'],
                 value: payoutType,
+            })
+        ),
+        setPostTemplateName: (formId, postTemplateName, create = false) => dispatch(
+            userActions.set({
+                key: ['current', 'post', formId, 'postTemplateName'],
+                value: create ? `create_${postTemplateName}` : postTemplateName,
             })
         ),
         setBeneficiaries: (formId, beneficiaries) => dispatch(
