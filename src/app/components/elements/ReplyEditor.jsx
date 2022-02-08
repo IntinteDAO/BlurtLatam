@@ -60,7 +60,7 @@ class ReplyEditor extends Component {
         defaultPayoutType: PropTypes.string,
         payoutType: PropTypes.string,
         summary: PropTypes.string,
-        postTemplateName: string,
+        postTemplateName: PropTypes.string,
     };
 
     static defaultProps = {
