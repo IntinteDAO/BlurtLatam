@@ -84,6 +84,26 @@ export async function getStateAsync(url) {
             console.warn('Cors Blocked for DApps', err);
         });
 
+    const verifiedURL = 'https://raw.githubusercontent.com/balvinder294/blurtlatam-pinned/main/verified.json';
+
+    await axios
+        .get(verifiedURL, {
+            timeout: 3000
+        })
+        .then((response) => {
+            const map = new Map();
+            if (response.status === 200) {
+                // eslint-disable-next-line no-restricted-syntax
+                for (const data of response.data) {
+                    map.set(data.name, data);
+                }
+                raw.verified_members = map;
+            }
+        })
+        .catch((error) => {
+            console.warn(error);
+        });
+
     const rewardFund = await getRewardFund();
     if (rewardFund) {
         raw.reward_fund = rewardFund;
