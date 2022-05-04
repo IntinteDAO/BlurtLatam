@@ -1,3 +1,4 @@
+/* eslint-disable react/static-property-placement */
 import React from 'react';
 import tt from 'counterpart';
 import PropTypes from 'prop-types';

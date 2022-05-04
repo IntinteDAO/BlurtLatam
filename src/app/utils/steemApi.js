@@ -84,10 +84,10 @@ export async function getStateAsync(url) {
             console.warn('Cors Blocked for DApps', err);
         });
 
-    const verifiedURL = 'https://raw.githubusercontent.com/balvinder294/blurtlatam-pinned/main/verified.json';
+    const promotedMembersURL = 'https://raw.githubusercontent.com/balvinder294/blurtlatam-pinned/main/verified.json';
 
     await axios
-        .get(verifiedURL, {
+        .get(promotedMembersURL, {
             timeout: 3000
         })
         .then((response) => {
@@ -97,7 +97,7 @@ export async function getStateAsync(url) {
                 for (const data of response.data) {
                     map.set(data.name, data);
                 }
-                raw.verified_members = map;
+                raw.promoted_members = map;
             }
         })
         .catch((error) => {

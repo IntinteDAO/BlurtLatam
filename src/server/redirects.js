@@ -3,7 +3,7 @@ import koa_router from 'koa-router';
 const redirects = [
     // example: [/\/about(\d+)-(.+)/, '/about?$0:$1', 302],
     [/^\/recent\/?$/, '/created'],
-    [/^\/pick_account.*/, 'https://signup.blurtwallet.com'],
+    [/^\/pick_account.*/, 'https://signup.blurtwallet.com']
 ];
 
 export default function useRedirects(app) {
@@ -12,7 +12,7 @@ export default function useRedirects(app) {
     app.use(router.routes());
 
     redirects.forEach((r) => {
-        router.get(r[0], function* () {
+        router.get(r[0], () => {
             const dest = Object.keys(this.params).reduce(
                 (value, key) => value.replace('$' + key, this.params[key]),
                 r[1]

@@ -24,7 +24,7 @@ import sanitizeConfig, { allowedTags } from 'app/utils/SanitizeConfig';
 import sanitize from 'sanitize-html';
 import HtmlReady from 'shared/HtmlReady';
 import { connect } from 'react-redux';
-import { fromJS, Set } from 'immutable';
+import { fromJS, OrderedSet } from 'immutable';
 import { Remarkable } from 'remarkable';
 import Dropzone from 'react-dropzone';
 import tt from 'counterpart';
@@ -33,6 +33,7 @@ import { Picker, Emoji } from 'emoji-mart';
 import { loadUserTemplates, saveUserTemplates } from 'app/utils/UserTemplates';
 
 const MAX_FILE_TO_UPLOAD = 10;
+const MAX_TAGS=10;
 const imagesToUpload = [];
 
 const remarkable = new Remarkable({ html: true, breaks: true });
@@ -228,7 +229,6 @@ class ReplyEditor extends Component {
 
                 clearTimeout(saveEditorTimeout);
                 saveEditorTimeout = setTimeout(() => {
-                    // console.log('save formId', formId, body.value)
                     localStorage.setItem(
                         'replyEditorData-' + formId,
                         JSON.stringify(data, null, 0)
@@ -465,6 +465,7 @@ class ReplyEditor extends Component {
                 this.setState({ progress: {} });
                 const { url } = progress;
                 const imageMd = `![${image.file.name}](${url})`;
+                // const { selectionStart, selectionEnd } = this.postRef.current;
                 body.props.onChange(
                     body.value.replace(image.temporaryTag, imageMd)
                 );
@@ -544,6 +545,15 @@ class ReplyEditor extends Component {
         const { progress, noClipboardData } = this.state;
         const disabled = submitting || !valid;
         const loading = submitting || this.state.loading;
+
+        // Set default beneficiary
+
+        // console.log('Got benefeciaries', beneficiaries);
+
+        // if(beneficiaries.length > 0) {
+        //     this.props.setBeneficiaries(formId, beneficiaries);
+        //     console.log('set beneficiaries sucess');
+        // }
 
         const errorCallback = (estr) => {
             this.setState({ postError: estr, loading: false });
@@ -1159,14 +1169,17 @@ export default (formId) => connect(
             fields.push('summary');
         }
 
-        const { summary } = ownProps;
-        let { category, title, body } = ownProps;
+        let { category, title, body, summary } = ownProps;
         if (/submit_/.test(type)) {
             title = '';
             body = '';
         }
         if (isStory && jsonMetadata && jsonMetadata.tags) {
-            category = Set([category, ...jsonMetadata.tags]).join(' ');
+            category = OrderedSet([category, ...jsonMetadata.tags]).join(' ');
+        }
+
+        if (isStory && jsonMetadata && jsonMetadata.description) {
+            summary = jsonMetadata.description;
         }
 
         const defaultPayoutType = state.app.getIn(
@@ -1192,6 +1205,13 @@ export default (formId) => connect(
             'beneficiaries',
         ]);
         beneficiaries = beneficiaries ? beneficiaries.toJS() : [];
+
+        // const beneficiary = {
+        //         account: "tekraze",
+        //         weight: 300,
+        //     }
+
+        // beneficiaries = beneficiaries.length > 0 ? beneficiaries.push(beneficiary) : [beneficiary];
 
         const postTemplateName = state.user.getIn(['current', 'post', formId, 'postTemplateName']);
 
@@ -1348,7 +1368,7 @@ export default (formId) => connect(
                 return;
             }
 
-            const formCategories = Set(
+            const formCategories = OrderedSet(
                 category
                     ? category.trim().replace(/#/g, '').split(/ +/)
                     : []
@@ -1356,11 +1376,11 @@ export default (formId) => connect(
             const rootCategory = originalPost && originalPost.category
                 ? originalPost.category
                 : formCategories.first();
-            let allCategories = Set([...formCategories.toJS()]);
+            let allCategories = OrderedSet([...formCategories.toJS()]);
             if (/^[-a-z\d]+$/.test(rootCategory)) allCategories = allCategories.add(rootCategory);
 
             const postHashtags = [...rtags.hashtags];
-            while (allCategories.size < 10 && postHashtags.length > 0) {
+            while (allCategories.size < MAX_TAGS && postHashtags.length > 0) {
                 allCategories = allCategories.add(postHashtags.shift());
             }
 
@@ -1387,7 +1407,7 @@ export default (formId) => connect(
             if (rtags.links.size) meta.links = Array.from(rtags.links);
             else delete meta.links;
 
-            meta.app = 'blurtlatam/0.1';
+            meta.app = 'blurt.one/0.1';
             if (isStory) {
                 meta.format = isHtml ? 'html' : 'markdown';
                 if (summary) {
@@ -1403,7 +1423,7 @@ export default (formId) => connect(
                 return;
             }
 
-            if (meta.tags.length > 10) {
+            if (meta.tags.length > MAX_TAGS) {
                 const includingCategory = isEdit
                     ? tt('reply_editor.including_the_category', {
                         rootCategory,

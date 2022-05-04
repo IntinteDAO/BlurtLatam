@@ -7,8 +7,8 @@ export const APP_NAME_UPPERCASE = 'BLURT';
 export const APP_ICON = 'blurt';
 // FIXME figure out best way to do this on both client and server from env
 // vars. client should read $STM_Config, server should read config package.
-export const APP_URL = 'https://blurt.world/';
-export const APP_DOMAIN = 'blurt.world';
+export const APP_URL = 'https://blurtlatam.com/';
+export const APP_DOMAIN = 'blurtlatam.com';
 export const LIQUID_TOKEN = 'Blurt';
 // sometimes it's impossible to use html tags to style coin name, hence usage of _UPPERCASE modifier
 export const LIQUID_TOKEN_UPPERCASE = 'BLURT';
@@ -19,7 +19,7 @@ export const DEBT_TOKEN = 'BLURT DOLLAR';
 export const DEBT_TOKENS = 'BLURT DOLLARS';
 export const CURRENCY_SIGN = '$';
 export const WIKI_URL = ''; // https://wiki.blurt.world/
-export const LANDING_PAGE_URL = 'https://blurt.world/';
+export const LANDING_PAGE_URL = 'https://blurtlatam.com/';
 export const TERMS_OF_SERVICE_URL = 'https://' + APP_DOMAIN + '/tos.html';
 export const PRIVACY_POLICY_URL = 'https://' + APP_DOMAIN + '/privacy.html';
 export const WHITEPAPER_URL = 'https://blurt.world/WhitePaper.pdf';
@@ -37,15 +37,12 @@ export const ALLOWED_CURRENCIES = ['USD'];
 
 // meta info
 export const TWITTER_HANDLE = '@blurt';
-export const SHARE_IMAGE =
-    'https://' + APP_DOMAIN + '/images/steemit-share.png';
-export const TWITTER_SHARE_IMAGE =
-    'https://' + APP_DOMAIN + '/images/steemit-twshare.png';
-export const SITE_DESCRIPTION =
-    'Blurt is a social media platform where everyone gets paid for ' +
-    'creating and curating content. It leverages a robust digital points system, called Blurt, that ' +
-    'supports real value for digital rewards through market price discovery and liquidity';
+export const SHARE_IMAGE = 'https://' + APP_DOMAIN + '/images/steemit-share.png';
+export const TWITTER_SHARE_IMAGE = 'https://' + APP_DOMAIN + '/images/steemit-twshare.png';
+export const SITE_DESCRIPTION = 'Blurt is a social media platform where everyone gets paid for '
+    + 'creating and curating content. It leverages a robust digital points system, called Blurt, that '
+    + 'supports real value for digital rewards through market price discovery and liquidity';
 
 // various
 export const SUPPORT_EMAIL = 'info@blurt.foundation';
-export const RECOMMENDED_FOLLOW_ACCOUNT = 'blurt.world';
+export const RECOMMENDED_FOLLOW_ACCOUNT = 'blurtlatam';

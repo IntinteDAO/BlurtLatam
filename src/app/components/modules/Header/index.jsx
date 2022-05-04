@@ -60,11 +60,17 @@ class Header extends Component {
     }
 
     componentDidMount() {
-        // if(this.props.gptEnabled && process.env.BROWSER) {
-        //     window.addEventListener('gptadshown', (e) => this.gptAdRendered(e));
+        // if (
+        //     !this.props.gptEnabled ||
+        //     !process.env.BROWSER ||
+        //     !window.googletag ||
+        //     !window.googletag.pubads
+        // ) {
+        //     return null;
         // }
+
         const { gptEnabled } = this.props;
-        if(gptEnabled) {
+        if (gptEnabled) {
             window.addEventListener('gptadshown', (e) => this.gptAdRendered(e));
         }
     }
@@ -76,24 +82,26 @@ class Header extends Component {
         if (nextProps.pathname !== this.props.pathname) {
             const route = resolveRoute(nextProps.pathname);
             if (
-                route
-                && route.page === 'PostsIndex'
-                && route.params
-                && route.params.length > 0
+                route &&
+                route.page === 'PostsIndex' &&
+                route.params &&
+                route.params.length > 0
             ) {
-                const sort_order = route.params[0] !== 'home' ? route.params[0] : null;
-                if (sort_order) window.last_sort_order = this.last_sort_order = sort_order;
+                const sort_order =
+                    route.params[0] !== 'home' ? route.params[0] : null;
+                if (sort_order)
+                    window.last_sort_order = this.last_sort_order = sort_order;
             }
         }
     }
 
     componentWillUnmount() {
-        if(this.props.gptEnabled && process.env.BROWSER) {
-            window.addEventListener('gptadshown', (e) => this.gptAdRendered(e));
-        }
-
-        if(window && this.props.gptEnabled && process.env.BROWSER) {
-            window.removeEventListener('gptadshown');
+        if (!this.props.gptEnabled ||
+            !process.env.BROWSER ||
+            !window.googletag ||
+            !window.googletag.pubads
+        ) {
+            return null;
         }
     }
 

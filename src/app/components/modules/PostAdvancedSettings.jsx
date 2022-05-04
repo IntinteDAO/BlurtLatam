@@ -188,6 +188,7 @@ class PostAdvancedSettings extends Component {
                         && beneficiaries.error}
                     &nbsp;
                 </div>
+                <br />
                 <div className="row">
                     <div className="column">
                         <span>
@@ -258,7 +259,6 @@ export default connect(
             formId,
             'beneficiaries',
         ]);
-        console.log(beneficiaries);
         beneficiaries = beneficiaries ? beneficiaries.toJS() : [];
         return {
             ...ownProps,
