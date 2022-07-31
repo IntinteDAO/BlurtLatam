@@ -12,7 +12,7 @@ import { serverApiRecordEvent } from 'app/utils/ServerApiClient';
 import * as blurtjs from '@blurtfoundation/blurtjs';
 import { determineViewMode } from 'app/utils/Links';
 import frontendLogger from 'app/utils/FrontendLogger';
-import ReactGA from 'react-ga';
+import ReactGA from 'react-ga4';
 
 window.addEventListener('error', frontendLogger);
 
@@ -30,15 +30,19 @@ try {
     console.error(e);
 }
 
-// UA-125809453-3 Tekraze
-// UA-179023138-1
-ReactGA.initialize('UA-125809453-3', {
-    titleCase: false,
-    gaOptions: {
-        siteSpeedSampleRate: 100
-    }
+ReactGA.initialize(
+    [{
+        trackingId: 'UA-125809453-3',
+        gaOptions: {
+            anonymizeIp: true
+        }
+    }]
+);
+
+ReactGA.send({
+    hitType: 'pageview',
+    page: window.location.pathname + window.location.search
 });
-ReactGA.pageview(window.location.pathname + window.location.search);
 
 function runApp(initial_state) {
     const konami = {

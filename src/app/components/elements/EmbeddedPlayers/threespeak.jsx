@@ -1,54 +1,103 @@
+import React from 'react';
+
+/**
+ * Regular expressions for detecting and validating provider URLs
+ * @type {{htmlReplacement: RegExp, main: RegExp, sanitize: RegExp}}
+ */
 const regex = {
     // eslint-disable-next-line no-useless-escape
-    sanitize: /^https:\/\/3speak\.tv\/embed\?v=([A-Za-z0-9_\-\/]+)(&.*)?$/,
+    sanitize: /^https:\/\/3speak\.(?:online|co|tv)\/(embed|watch)\?v=([A-Za-z0-9_\-\/.]+)(&.*)?$/,
     // eslint-disable-next-line no-useless-escape
-    main: /(?:https?:\/\/(?:(?:3speak\.tv\/watch\?v=)|(?:3speak\.tv\/embed\?v=)))([A-Za-z0-9_\-\/]+)(&.*)?/i,
+    main: /(?:https?:\/\/(?:(?:3speak\.(?:online|co|tv)\/watch\?v=)|(?:3speak\.(?:online|co|tv)\/embed\?v=)))([A-Za-z0-9_\-\/.]+)(&.*)?/i,
     // eslint-disable-next-line no-useless-escape
-    htmlReplacement: /<a href="(https?:\/\/3speak\.tv\/watch\?v=([A-Za-z0-9_\-\/]+))".*<img.*?><\/a>/i,
+    htmlReplacement: /<a href="(https?:\/\/3speak\.(?:online|co|tv)\/watch\?v=([A-Za-z0-9_\-\/.]+))".*<img.*?><\/a>/i,
     embedShorthand: /~~~ embed:(.*?)\/(.*?) threespeak ~~~/,
 };
 
 export default regex;
+
+/**
+ * Configuration for HTML iframe's `sandbox` attribute
+ * @type {useSandbox: boolean, sandboxAttributes: string[]}
+ */
 export const sandboxConfig = {
     useSandbox: true,
     sandboxAttributes: ['allow-scripts', 'allow-same-origin', 'allow-popups'],
 };
 
-export function genIframeMd(idx, threespeakId, w, h) {
+/**
+ * Generates the Markdown/HTML code to override the detected URL with an iFrame
+ *
+ * @param idx
+ * @param threespeakId
+ * @param width
+ * @param height
+ * @returns {*}
+ */
+export function genIframeMd(idx, threespeakId, width, height) {
     const url = `https://3speak.tv/embed?v=${threespeakId}`;
+
+    let sandbox = sandboxConfig.useSandbox;
+    if (sandbox) {
+        if (Object.prototype.hasOwnProperty.call(sandboxConfig, 'sandboxAttributes')) {
+            sandbox = sandboxConfig.sandboxAttributes.join(' ');
+        }
+    }
+    const aspectRatioPercent = (height / width) * 100;
+    const iframeProps = {
+        key: idx,
+        src: url,
+        width,
+        height,
+        frameBorder: '0',
+        allowFullScreen: 'allowFullScreen',
+    };
+    if (sandbox) {
+        iframeProps.sandbox = sandbox;
+    }
+
     return (
-        <div key={`threespeak-${threespeakId}-${idx}`} className="videoWrapper">
+        <div key={`threespeak-${threespeakId}-${idx}`} className="videoWrapper"
+            style={{
+              position: 'relative',
+              width: '100%',
+              height: 0,
+              paddingBottom: `${aspectRatioPercent}%`,
+            }}
+        >
             <iframe
                 title="3Speak embedded player"
-                key={idx}
-                src={url}
-                width={w}
-                height={h}
-                frameBorder="0"
-                allowFullScreen
-                allow="fullscreen"
-                sandbox={
-                    sandboxConfig.useSandbox
-                        ? sandboxConfig.sandboxAttributes
-                            ? sandboxConfig.sandboxAttributes.join(' ')
-                            : true
-                        : ''
-                }
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                {...iframeProps}
             />
         </div>
     );
 }
 
+/**
+ * Check if the iframe code in the post editor is to an allowed URL
+ * <iframe src="https://3speak.tv/embed?v=threespeak/iaarkpvf"></iframe>
+ * @param url
+ * @returns {boolean|*}
+ */
 export function validateIframeUrl(url) {
     const match = url.match(regex.sanitize);
 
     if (match) {
+        if(url.includes('watch')) {
+            url = url.replace('watch', 'embed');
+        }
         return url;
     }
 
     return false;
 }
 
+/**
+ * Rewrites the embedded URL to a normalized format
+ * @param url
+ * @returns {string|boolean}
+ */
 export function normalizeEmbedUrl(url) {
     const match = url.match(regex.contentId);
 
@@ -59,6 +108,11 @@ export function normalizeEmbedUrl(url) {
     return false;
 }
 
+/**
+ * Extract the content ID and other metadata from the URL
+ * @param data
+ * @returns {null|{id: *, canonical: string, url: *}}
+ */
 export function extractMetadata(data) {
     if (!data) return null;
 
@@ -68,14 +122,24 @@ export function extractMetadata(data) {
     const fullId = match[1];
     const id = fullId.split('/').pop();
 
+    console.log('full id', fullId);
+    console.log('id', id);
+
     return {
         id,
         fullId,
         url,
-        thumbnail: `https://img.3speakcontent.co/${id}/poster.png`,
+        canonical: url,
+        thumbnail: `https://img.3speakcontent.co/${id}/post.png`,
     };
 }
 
+/**
+ * Replaces the URL with a custom Markdown for embedded players
+ * @param child
+ * @param links
+ * @returns {*}
+ */
 export function embedNode(child, links, images) {
     try {
         const { data } = child;
@@ -84,7 +148,7 @@ export function embedNode(child, links, images) {
         if (threespeak) {
             child.data = data.replace(
                 threespeak.url,
-                `~~~ embed:${threespeak.id} threespeak ~~~`
+                `~~~ embed:${threespeak.fullId} threespeak ~~~`
             );
 
             if (links) {
@@ -100,7 +164,7 @@ export function embedNode(child, links, images) {
             // So we are handling thumbnail URL extraction differently.
             const match = data.match(regex.embedShorthand);
             if (match && images) {
-                const imageUrl = `https://img.3speakcontent.co/${match[2]}/poster.png`;
+                const imageUrl = `https://img.3speakcontent.co/${match[2]}/post.png`;
                 images.add(imageUrl);
             }
         }
@@ -111,6 +175,11 @@ export function embedNode(child, links, images) {
     return child;
 }
 
+/**
+ * Pre-process HTML codes from the Markdown before it gets transformed
+ * @param child
+ * @returns {string}
+ */
 export function preprocessHtml(child) {
     try {
         if (typeof child === 'string') {

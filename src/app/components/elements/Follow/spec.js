@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import Follow from './index';
 import rootReducer from 'app/redux/RootReducer';
-import Adapter from 'enzyme-adapter-react-15';
+import Adapter from 'enzyme-adapter-react-16';
 
 const store = createStore(rootReducer);
 

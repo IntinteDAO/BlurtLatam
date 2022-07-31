@@ -29,7 +29,7 @@ global.$STM_Config = {
     img_proxy_prefix: config.get('img_proxy_prefix'),
     ipfs_prefix: config.get('ipfs_prefix'),
     price_info_url: config.get('price_info_url'),
-    // coal_url: config.get('coal_url'),
+    coal_url: config.get('coal_url'),
     read_only_mode: config.get('read_only_mode'),
     upload_image: config.get('upload_image'),
     site_domain: config.get('site_domain'),

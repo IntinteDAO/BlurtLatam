@@ -18,11 +18,8 @@ class DappsList extends Component {
                         <div className="row">
                             {categoryValue.map((item, index2) => {
                                 return (
-                                    <div className="small-12 large-4 column">
-                                        <div
-                                            className="single-category"
-                                            key={index2 + item.title}
-                                        >
+                                    <div key={index2 + item.title} className="small-12 large-4 column">
+                                        <div className="single-category">
                                             <Icon name="blurt" size="5x" />
                                             <h4>{item.title}</h4>
                                             <br />
@@ -59,10 +56,7 @@ class DappsList extends Component {
 }
 
 export default connect((state) => {
-    const dapps =
-        state.global.getIn(['dapps']) == undefined
-            ? undefined
-            : state.global.getIn(['dapps']);
+    const dapps = state.offchain.get('dapps');
     return {
         dapps,
     };

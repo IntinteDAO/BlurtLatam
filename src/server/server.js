@@ -30,6 +30,7 @@ import { getSupportedLocales } from './utils/misc';
 import { specialPosts } from './utils/SpecialPosts';
 import fs from 'fs';
 
+import { Dapps } from './utils/Dapps';
 // const session = require('koa-session');
 
 if (cluster.isMaster) console.log('application server starting, please wait.');
@@ -290,6 +291,9 @@ if (env !== 'test') {
     // we're inside a generator, we can't `await` here, so we pass a promise
     // so `src/server/app_render.jsx` can `await` on it.
     app.specialPostsPromise = specialPosts();
+
+    app.dappsPromise = Dapps();
+
     // refresh special posts every five minutes
     setInterval(function () {
         return new Promise(function (resolve, reject) {

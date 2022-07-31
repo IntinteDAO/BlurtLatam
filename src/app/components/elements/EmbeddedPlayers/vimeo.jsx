@@ -1,3 +1,5 @@
+import React from 'react';
+
 const regex = {
     sanitize: /^(https?:)?\/\/player.vimeo.com\/video\/([0-9]*)/i,
     main: /https?:\/\/(?:vimeo.com\/|player.vimeo.com\/video\/)([0-9]+)\/?(#t=((\d+)s?))?\/?/,

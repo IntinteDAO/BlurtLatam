@@ -6,7 +6,6 @@ import { connect } from 'react-redux';
 import { immutableAccessor } from 'app/utils/Accessors';
 import extractContent from 'app/utils/ExtractContent';
 import Headroom from 'react-headroom';
-import Icon from 'app/components/elements/Icon';
 import resolveRoute from 'app/ResolveRoute';
 import tt from 'counterpart';
 import { APP_NAME } from 'app/client_config';
@@ -20,11 +19,9 @@ import Userpic from 'app/components/elements/Userpic';
 import { SIGNUP_URL } from 'shared/constants';
 import BlurtLogo from 'app/components/elements/BlurtLogo';
 import normalizeProfile from 'app/utils/NormalizeProfile';
-import Announcement from 'app/components/elements/Announcement';
-import GptAd from 'app/components/elements/GptAd';
 import { actions as fetchDataSagaActions } from 'app/redux/FetchDataSaga';
 import { startPolling } from 'app/redux/PollingSaga';
-import { List } from 'immutable';
+import { api } from '@blurtfoundation/blurtjs';
 
 class Header extends Component {
     static propTypes = {
@@ -45,6 +42,7 @@ class Header extends Component {
             gptAdRendered: false,
             showAd: false,
             showAnnouncement: this.props.showAnnouncement,
+            currentVotingPower: 100
         };
     }
 
@@ -56,6 +54,12 @@ class Header extends Component {
         } = this.props;
         if (loggedIn) {
             getAccountNotifications(current_account_name);
+            if(!this.powerUpdateInterval) this.setCurrentPower();
+            // Update power every 30 sec
+            this.powerUpdateInterval = setInterval(() => {
+                this.setCurrentPower();
+            }, 30000);
+
         }
     }
 
@@ -70,7 +74,7 @@ class Header extends Component {
         // }
 
         const { gptEnabled } = this.props;
-        if (gptEnabled) {
+        if(gptEnabled) {
             window.addEventListener('gptadshown', (e) => this.gptAdRendered(e));
         }
     }
@@ -96,13 +100,15 @@ class Header extends Component {
     }
 
     componentWillUnmount() {
-        if (!this.props.gptEnabled ||
+        if (
+            !this.props.gptEnabled ||
             !process.env.BROWSER ||
             !window.googletag ||
             !window.googletag.pubads
         ) {
             return null;
         }
+        clearInterval(this.powerUpdateInterval);
     }
 
     gptAdRendered() {
@@ -120,6 +126,86 @@ class Header extends Component {
     hideAnnouncement() {
         this.setState({ showAnnouncement: false });
         this.props.hideAnnouncement();
+    }
+
+    setCurrentPower = () => {
+        const { username } = this.props;
+        if (username) {
+            api.getAccounts([username], (err, response) => {
+                const accountUpdated = response[0];
+                localStorage.setItem('updated-account', JSON.stringify(accountUpdated));
+
+                if (accountUpdated) {
+                    const updatedVotingPower = this.calculateVotingPower(accountUpdated).toFixed();
+                    localStorage.setItem('current-voting-power', updatedVotingPower);
+                    this.setState({ currentVotingPower: updatedVotingPower })
+                }
+            });
+        }
+    }
+
+    calculateVotingPower = (current_account) => {
+        const { BLURT_VOTING_MANA_REGENERATION_SECONDS } = this.props;
+        let voting_manabar = null;
+        if (!voting_manabar) {
+            voting_manabar = current_account
+                ? current_account.voting_manabar
+                : 0;
+        }
+
+        const current_mana = parseInt(
+            voting_manabar ? voting_manabar.current_mana : 0
+        );
+
+        const last_update_time = voting_manabar
+            ? voting_manabar.last_update_time
+            : 0;
+
+        let vesting_shares = 0.0;
+        if (!vesting_shares) {
+            vesting_shares = current_account
+                ? Number(current_account.vesting_shares.split(' ')[0])
+                : 0.0;
+        }
+
+        let delegated_vesting_shares = 0.0;
+        if (!delegated_vesting_shares) {
+            delegated_vesting_shares = current_account
+                ? Number(current_account.delegated_vesting_shares.split(' ')[0])
+                : 0.0;
+        }
+
+        let vesting_withdraw_rate = 0.0;
+        if (!vesting_withdraw_rate) {
+            vesting_withdraw_rate = current_account
+                ? current_account.vesting_withdraw_rate
+                    ? current_account.vesting_withdraw_rate.split(' ')[0]
+                    : 0.0
+                : 0.0;
+        }
+
+        let received_vesting_shares = 0.0;
+        if (!received_vesting_shares) {
+            received_vesting_shares = current_account
+                ? Number(current_account.received_vesting_shares.split(' ')[0])
+                : 0.0;
+        }
+
+        const net_vesting_shares =
+            vesting_shares - delegated_vesting_shares + received_vesting_shares;
+
+        const maxMana =
+            (net_vesting_shares - Number(vesting_withdraw_rate)) * 1000000;
+
+        const now = Math.round(Date.now() / 1000);
+        const elapsed = now - last_update_time;
+        const regenerated_mana = (elapsed * maxMana) / BLURT_VOTING_MANA_REGENERATION_SECONDS;
+        let currentMana = current_mana;
+        currentMana += regenerated_mana;
+        if (currentMana >= maxMana) {
+            currentMana = maxMana;
+        }
+        return ((currentMana * 100) / maxMana);
     }
 
     render() {
@@ -144,13 +230,13 @@ class Header extends Component {
             notifications,
         } = this.props;
 
-        let { showAd, showAnnouncement } = this.state;
+        let { showAd, showAnnouncement, currentVotingPower } = this.state;
         let lastSeenTimestamp = 0;
         let unreadNotificationCount = 0;
         if (
-            loggedIn
-            && notifications !== undefined
-            && typeof localStorage !== 'undefined'
+            loggedIn &&
+            notifications !== undefined &&
+            typeof localStorage !== 'undefined'
         ) {
             if (localStorage.getItem('last_timestamp') !== null) {
                 lastSeenTimestamp = localStorage.getItem('last_timestamp');
@@ -158,7 +244,7 @@ class Header extends Component {
                 localStorage.setItem('last_timestamp', 0);
             }
             notifications.get('unread_notifications').map((notification) => {
-                const {timestamp} = notification.toJS();
+                const { timestamp } = notification.toJS();
                 if (lastSeenTimestamp < timestamp) {
                     unreadNotificationCount++;
                 }
@@ -178,13 +264,14 @@ class Header extends Component {
                 page_title = tt('header_jsx.home');
                 const account_name = route.params[1];
                 if (
-                    current_account_name
-                    && account_name.indexOf(current_account_name) === 1
+                    current_account_name &&
+                    account_name.indexOf(current_account_name) === 1
                 ) home_account = true;
             } else {
                 topic = route.params.length > 1 ? route.params[1] : '';
                 tags = [topic];
-                const type = route.params[0] == 'payout_comments' ? 'comments' : 'posts';
+                const type =
+                    route.params[0] == 'payout_comments' ? 'comments' : 'posts';
                 let prefix = route.params[0];
                 if (prefix == 'created') prefix = 'New';
                 if (prefix == 'payout') prefix = 'Pending payout';
@@ -250,18 +337,21 @@ class Header extends Component {
 
         // Format first letter of all titles and lowercase user name
         if (route.page !== 'UserProfile') {
-            page_title = page_title.charAt(0).toUpperCase() + page_title.slice(1);
+            page_title =
+                page_title.charAt(0).toUpperCase() + page_title.slice(1);
         }
 
         if (
-            process.env.BROWSER
-            && route.page !== 'Post'
-            && route.page !== 'PostNoCategory'
-        ) document.title = page_title + ' — ' + APP_NAME;
+            process.env.BROWSER &&
+            route.page !== 'Post' &&
+            route.page !== 'PostNoCategory'
+        )
+            document.title = page_title + ' — ' + APP_NAME;
 
-        const logo_link = resolveRoute(pathname).params
-                && resolveRoute(pathname).params.length > 1
-                && this.last_sort_order
+        const logo_link =
+            resolveRoute(pathname).params &&
+                resolveRoute(pathname).params.length > 1 &&
+                this.last_sort_order
                 ? '/' + this.last_sort_order
                 : current_account_name
                     ? `/@${current_account_name}/feed`
@@ -274,7 +364,8 @@ class Header extends Component {
             } else {
                 e.preventDefault();
             }
-            const a = e.target.nodeName.toLowerCase() === 'a'
+            const a =
+                e.target.nodeName.toLowerCase() === 'a'
                     ? e.target
                     : e.target.parentNode;
             browserHistory.push(a.pathname + a.search + a.hash);
@@ -297,11 +388,16 @@ class Header extends Component {
         const settings_link = `/@${username}/settings`;
         const pathCheck = userPath === '/submit.html' ? true : null;
         const notifications_link = `/@${username}/notifications`;
-        const notif_label = tt('g.notifications')
-            + (unreadNotificationCount > 0
+        const notif_label =
+            tt('g.notifications') +
+            (unreadNotificationCount > 0
                 ? ` (${unreadNotificationCount})`
                 : '');
         const user_menu = [
+            {
+                icon: 'chevron-up-circle',
+                value: `Voting Power : ${currentVotingPower}%`
+            },
             {
                 link: feed_link,
                 icon: 'home',
@@ -412,14 +508,14 @@ class Header extends Component {
                             {/*USER AVATAR */}
                             {loggedIn && (
                                 <DropdownMenu
-                                    className="Header__usermenu"
+                                    className={'Header__usermenu'}
                                     items={user_menu}
                                     title={username}
                                     el="span"
                                     selected={tt('g.rewards')}
                                     position="left"
                                 >
-                                    <li className="Header__userpic ">
+                                    <li className={'Header__userpic '}>
                                         <span title={username}>
                                             <Userpic account={username} />
                                         </span>
@@ -471,6 +567,10 @@ const mapStateToProps = (state, ownProps) => {
 
     const userPath = state.routing.locationBeforeTransitions.pathname;
     const username = state.user.getIn(['current', 'username']);
+    const BLURT_VOTING_MANA_REGENERATION_SECONDS = state.global.getIn([
+        'blurt_config',
+        'BLURT_VOTING_MANA_REGENERATION_SECONDS',
+    ]);
 
     const notifications = state.global.getIn([
         'unread_notifications',
@@ -496,6 +596,7 @@ const mapStateToProps = (state, ownProps) => {
         walletUrl,
         content,
         notifications,
+        BLURT_VOTING_MANA_REGENERATION_SECONDS,
         ...ownProps,
     };
 };
@@ -543,4 +644,4 @@ const mapDispatchToProps = (dispatch) => ({
 
 const connectedHeader = connect(mapStateToProps, mapDispatchToProps)(Header);
 
-export default connectedHeader;
+export default connectedHeaders;

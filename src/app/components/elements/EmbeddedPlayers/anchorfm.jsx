@@ -3,12 +3,13 @@ import React from 'react'
 
 /**
  * Regular expressions for detecting and validating provider URLs
- * @type {{htmlReplacement: RegExp, main: RegExp, sanitize: RegExp}}
+ * @type {{htmlReplacement: RegExp, contentId: RegExp, contentIdEmbed: RegExp}}
  */
 const regex = {
-  sanitize:
-        /^(https?:)?\/\/player\.twitch\.tv\/\?(channel|video)=([A-Za-z0-9]+)/i,
-  main: /https?:\/\/(?:www.)?twitch\.tv\/(?:(videos)\/)?([a-zA-Z0-9]+$)/i
+  contentId:
+        /^https:\/\/anchor\.fm\/?([a-zA-Z-0-9]+)\/episodes\/?([a-zA-Z-0-9\/]+)/i,
+  contentIdEmbed:
+        /^https:\/\/anchor\.fm\/?([a-zA-Z-0-9]+)\/embed\/episodes\/?([a-zA-Z-0-9\/]+)/i
 }
 export default regex
 
@@ -21,29 +22,18 @@ export const sandboxConfig = {
   sandboxAttributes: []
 }
 
-function getParentDomain () {
-  let parentDomain = $STM_Config.site_domain
-  if (typeof window !== 'undefined') {
-    parentDomain = window.location.hostname
-  }
-
-  return parentDomain
-}
-
 /**
  * Check if the iframe code in the post editor is to an allowed URL
  * <iframe src="https://player.twitch.tv/?channel=tfue" frameborder="0" allowfullscreen="true" scrolling="no" height="378" width="620"></iframe>
- *
+ * <iframe src="https://anchor.fm/the-nerve/embed/episodes/Ep-48-Poet--academic-Emily-Cullen-e1hrfei" height="102px" width="400px" frameborder="0" scrolling="no"></iframe>
  * @param url
  * @returns {boolean|*}
  */
 export function validateIframeUrl (url) {
-  const match = url.match(regex.sanitize)
+  const match = url.match(regex.contentIdEmbed)
 
   if (match) {
-    return `https://player.twitch.tv/?${match[2]}=${
-            match[3]
-        }&parent=${getParentDomain()}`
+    return `https://anchor.fm/${match[1]}/embed/episodes/${match[2]}`
   }
 
   return false
@@ -55,18 +45,10 @@ export function validateIframeUrl (url) {
  * @returns {string|boolean}
  */
 export function normalizeEmbedUrl (url) {
-  const match = url.match(regex.sanitize)
+  const match = url.match(regex.contentIdEmbed)
 
   if (match && match.length >= 3) {
-    if (match[1] === undefined) {
-      return `https://player.twitch.tv/?autoplay=false&channel=${
-                match[2]
-            }&parent=${getParentDomain()}`
-    }
-
-    return `https://player.twitch.tv/?autoplay=false&video=${
-            match[2]
-        }&parent=${getParentDomain()}`
+    return `https://anchor.fm/${match[1]}/embed/episodes/${match[2]}`
   }
 
   return false
@@ -80,36 +62,29 @@ export function normalizeEmbedUrl (url) {
 function extractMetadata (data) {
   if (!data) return null
 
-  const m = data.match(regex.main)
+  const m = data.match(regex.contentId)
 
   if (!m || m.length < 3) return null
 
   return {
-    id: m[1] === 'videos' ? `?video=${m[2]}` : `?channel=${m[2]}`,
+    id: `${m[1]}/embed/episodes/${m[2]}`,
     url: m[0],
-    canonical:
-            m[1] === 'videos'
-              ? `https://player.twitch.tv/?video=${
-                      m[2]
-                  }&parent=${getParentDomain()}`
-              : `https://player.twitch.tv/?channel=${
-                      m[2]
-                  }&parent=${getParentDomain()}`
+    canonical: `https://anchor.fm/${m[1]}/embed/episodes/${m[2]}`
   }
 }
 
 export function embedNode (child, links /* images */) {
   try {
     const { data } = child
-    const twitch = extractMetadata(data)
-    if (!twitch) return child
+    const anchorfm = extractMetadata(data)
+    if (!anchorfm) return child
 
     child.data = data.replace(
-      twitch.url,
-            `~~~ embed:${twitch.id} twitch ~~~`
+      anchorfm.url,
+            `~~~ embed:${anchorfm.id} anchorfm ~~~`
     )
 
-    if (links) links.add(twitch.canonical)
+    if (links) links.add(anchorfm.canonical)
   } catch (error) {
     console.error(error)
   }
@@ -126,7 +101,7 @@ export function embedNode (child, links /* images */) {
  * @returns {*}
  */
 export function genIframeMd (idx, id, width, height) {
-  const url = `https://player.twitch.tv/${id}&parent=${getParentDomain()}`
+  const url = `https://anchor.fm/${id}`
 
   let sandbox = sandboxConfig.useSandbox
   if (sandbox) {
@@ -143,8 +118,9 @@ export function genIframeMd (idx, id, width, height) {
   const iframeProps = {
     src: url,
     width,
-    height,
+    height: '102px',
     frameBorder: '0',
+    scrolling: 'no',
     allowFullScreen: 'allowFullScreen'
   }
   if (sandbox) {
@@ -153,17 +129,16 @@ export function genIframeMd (idx, id, width, height) {
 
   return (
     <div
-      key={`twitch-${id}-${idx}`}
-      className='videoWrapper'
+      key={`anchorfm-${id}-${idx}`}
       style={{
         position: 'relative',
         width: '100%',
-        height: 0,
-        paddingBottom: `${aspectRatioPercent}%`
+        height: '102px',
+        paddingBottom: '2%'
       }}
     >
       <iframe
-        title='Twitch embedded player'
+        title='AnchorFm embedded player'
                 // eslint-disable-next-line react/jsx-props-no-spreading
         {...iframeProps}
       />

@@ -3,12 +3,11 @@ import React from 'react'
 
 /**
  * Regular expressions for detecting and validating provider URLs
- * @type {{htmlReplacement: RegExp, main: RegExp, sanitize: RegExp}}
+ * @type {{htmlReplacement: RegExp, main: RegExp, clip: RegExp}}
  */
 const regex = {
-  sanitize:
-        /^(https?:)?\/\/player\.twitch\.tv\/\?(channel|video)=([A-Za-z0-9]+)/i,
-  main: /https?:\/\/(?:www.)?twitch\.tv\/(?:(videos)\/)?([a-zA-Z0-9]+$)/i
+  main: /https?:\/\/(?:www.)?twitch\.tv\/([a-zA-Z0-9-_]+)\/clip\/([a-zA-Z0-9-_]+)/i,
+  clip: /https:\/\/clips\.twitch\.tv\/embed\?clip=([a-zA-Z0-9-_]+)/i
 }
 export default regex
 
@@ -32,17 +31,17 @@ function getParentDomain () {
 
 /**
  * Check if the iframe code in the post editor is to an allowed URL
- * <iframe src="https://player.twitch.tv/?channel=tfue" frameborder="0" allowfullscreen="true" scrolling="no" height="378" width="620"></iframe>
+ * <iframe src="https://clips.twitch.tv/embed?clip=NastyVictoriousCheeseCoolCat-8LNzeiCE2_C9JlqO&parent=www.example.com" frameborder="0" allowfullscreen="true" scrolling="no" height="378" width="620"></iframe>
  *
  * @param url
  * @returns {boolean|*}
  */
 export function validateIframeUrl (url) {
-  const match = url.match(regex.sanitize)
+  const match = url.match(regex.clip)
 
   if (match) {
-    return `https://player.twitch.tv/?${match[2]}=${
-            match[3]
+    return `https://clips.twitch.tv/embed?clip=${
+            match[1]
         }&parent=${getParentDomain()}`
   }
 
@@ -55,18 +54,10 @@ export function validateIframeUrl (url) {
  * @returns {string|boolean}
  */
 export function normalizeEmbedUrl (url) {
-  const match = url.match(regex.sanitize)
+  const match = url.match(regex.clip)
 
-  if (match && match.length >= 3) {
-    if (match[1] === undefined) {
-      return `https://player.twitch.tv/?autoplay=false&channel=${
-                match[2]
-            }&parent=${getParentDomain()}`
-    }
-
-    return `https://player.twitch.tv/?autoplay=false&video=${
-            match[2]
-        }&parent=${getParentDomain()}`
+  if (match) {
+    return `https://clips.twitch.tv/embed?clip=${match[1]}`
   }
 
   return false
@@ -85,31 +76,26 @@ function extractMetadata (data) {
   if (!m || m.length < 3) return null
 
   return {
-    id: m[1] === 'videos' ? `?video=${m[2]}` : `?channel=${m[2]}`,
+    id: m[2],
     url: m[0],
-    canonical:
-            m[1] === 'videos'
-              ? `https://player.twitch.tv/?video=${
-                      m[2]
-                  }&parent=${getParentDomain()}`
-              : `https://player.twitch.tv/?channel=${
-                      m[2]
-                  }&parent=${getParentDomain()}`
+    canonical: m[0]
+    // canonical: `https://clips.twitch.tv/embed?clip=${m[2]}`
   }
 }
 
 export function embedNode (child, links /* images */) {
   try {
     const { data } = child
-    const twitch = extractMetadata(data)
-    if (!twitch) return child
+    const twitchClip = extractMetadata(data)
+
+    if (!twitchClip) return child
 
     child.data = data.replace(
-      twitch.url,
-            `~~~ embed:${twitch.id} twitch ~~~`
+      twitchClip.url,
+            `~~~ embed:${twitchClip.id} twclips ~~~`
     )
 
-    if (links) links.add(twitch.canonical)
+    if (links) links.add(twitchClip.canonical)
   } catch (error) {
     console.error(error)
   }
@@ -126,7 +112,7 @@ export function embedNode (child, links /* images */) {
  * @returns {*}
  */
 export function genIframeMd (idx, id, width, height) {
-  const url = `https://player.twitch.tv/${id}&parent=${getParentDomain()}`
+  const url = `https://clips.twitch.tv/embed?clip=${id}&parent=${getParentDomain()}`
 
   let sandbox = sandboxConfig.useSandbox
   if (sandbox) {
@@ -153,7 +139,7 @@ export function genIframeMd (idx, id, width, height) {
 
   return (
     <div
-      key={`twitch-${id}-${idx}`}
+      key={`twitch-clip-${id}-${idx}`}
       className='videoWrapper'
       style={{
         position: 'relative',
@@ -163,7 +149,7 @@ export function genIframeMd (idx, id, width, height) {
       }}
     >
       <iframe
-        title='Twitch embedded player'
+        title='Twitch Clip embedded player'
                 // eslint-disable-next-line react/jsx-props-no-spreading
         {...iframeProps}
       />

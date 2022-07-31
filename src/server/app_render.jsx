@@ -53,6 +53,7 @@ async function appRender(ctx, locales = false, resolvedAssets = false) {
             new_visit: ctx.session.new_visit,
             config: $STM_Config,
             special_posts: await ctx.app.specialPostsPromise,
+            dapps: await ctx.app.dappsPromise,
             login_challenge,
         };
 

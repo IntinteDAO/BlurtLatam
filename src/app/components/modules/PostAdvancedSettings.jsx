@@ -19,7 +19,10 @@ class PostAdvancedSettings extends Component {
 
     constructor(props) {
         super();
-        this.state = { payoutType: props.initialPayoutType, postTemplateName: null, };
+        this.state = {
+            payoutType: props.initialPayoutType,
+            postTemplateName: null,
+        };
         this.initForm(props);
     }
 
@@ -100,7 +103,9 @@ class PostAdvancedSettings extends Component {
         const { beneficiaries, payoutType, postTemplateName } = this.state;
         // eslint-disable-next-line react/destructuring-assignment
         const { submitting, valid, handleSubmit } = this.state.advancedSettings;
-        const disabled = submitting || !(valid || payoutType !== initialPayoutType || postTemplateName !== null);
+        const disabled = submitting || !(
+            valid || payoutType !== initialPayoutType || postTemplateName !== null
+        );
 
         const loadingTemplate = postTemplateName && postTemplateName.indexOf('create_') === -1;
         const userTemplates = loadUserTemplates(username);

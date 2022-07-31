@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {
     genIframeMd as genDtubeIframeMd,
     validateIframeUrl as validateDtubeIframeUrl,
@@ -15,9 +17,26 @@ import {
 } from 'app/components/elements/EmbeddedPlayers/twitch';
 
 import {
-    validateIframeUrl as validateSoundcloudIframeUrl,
-    sandboxConfig as sandboxConfigSoundcloud,
-} from 'app/components/elements/EmbeddedPlayers/soundcloud';
+    genIframeMd as genVimmIframeMd,
+    validateIframeUrl as validateVimmIframeUrl,
+    normalizeEmbedUrl as normalizeVimmEmbedUrl,
+    embedNode as embedVimmNode,
+    sandboxConfig as sandboxConfigVimm,
+} from 'app/components/elements/EmbeddedPlayers/vimm';
+
+// import {
+//   normalizeEmbedUrl as normalizeCodeBlockEmbedUrl,
+//   genIframeMd as genCodeBlockIframeMd,
+//   embedNode as embedCodeBlockNode
+// } from 'app/components/elements/EmbeddedPlayers/codeblock'
+
+import {
+    genIframeMd as genTwitchClipsIframeMd,
+    validateIframeUrl as validateTwitchIClipsframeUrl,
+    normalizeEmbedUrl as normalizeTwitchClipsEmbedUrl,
+    embedNode as embedTwitchClipsNode,
+    sandboxConfig as sandboxConfigTwitchClips,
+} from 'app/components/elements/EmbeddedPlayers/twitch-clips';
 
 import {
     validateIframeUrl as validateLbryIframeUrl,
@@ -64,6 +83,59 @@ import {
     preprocessHtml as preprocessTwitterHtml,
 } from 'app/components/elements/EmbeddedPlayers/twitter';
 
+import {
+    genIframeMd as genAnchorFmIframeMd,
+    validateIframeUrl as validateAnchorFMIframeUrl,
+    normalizeEmbedUrl as normalizeAnchorFmEmbedUrl,
+    embedNode as embedAnchorFmNode,
+    sandboxConfig as sandboxConfigAnchorFm,
+} from 'app/components/elements/EmbeddedPlayers/anchorfm';
+
+import {
+    validateIframeUrl as validateOdyseeIframeUrl,
+    sandboxConfig as sandboxConfigOdysee,
+} from 'app/components/elements/EmbeddedPlayers/odysee';
+
+import {
+    normalizeEmbedUrl as normalizeSoundCloudEmbedUrl,
+    genIframeMd as genSoundcloudIframeMd,
+    validateIframeUrl as validateSoundcloudIframeUrl,
+    sandboxConfig as sandboxConfigSoundcloud,
+    embedNode as embedSoundCloudNode,
+} from 'app/components/elements/EmbeddedPlayers/soundcloud';
+
+import {
+    extractMetadata as validateGistIframeUrl,
+    extractMetadataFromEmbedCode as normalizeGistEmbedUrl,
+    embedNode as embedGistNode,
+    genIframeMd as genGistIframeMd,
+    preprocessHtml as preprocessGistHtml,
+    sandboxConfig as sandboxConfigGist,
+} from 'app/components/elements/EmbeddedPlayers/gist';
+
+import {
+    validateIframeUrl as validateArchiveIframeUrl,
+    normalizeEmbedUrl as normalizeArchiveEmbedUrl,
+    embedNode as embedArchiveNode,
+    genIframeMd as genArchiveIframeMd,
+    sandboxConfig as sandboxConfigArchive,
+} from 'app/components/elements/EmbeddedPlayers/archiveorg';
+
+import {
+    validateIframeUrl as validateMixCloudIframeUrl,
+    normalizeEmbedUrl as normalizeMixCloudEmbedUrl,
+    embedNode as embedMixCloudNode,
+    genIframeMd as genMixCloudIframeMd,
+    sandboxConfig as sandboxConfigMixCloud,
+} from 'app/components/elements/EmbeddedPlayers/mixcloud';
+
+import {
+    validateIframeUrl as validateSpotifyIframeUrl,
+    embedNode as embedSpotifyNode,
+    genIframeMd as genSpotifyIframeMd,
+    sandboxConfig as sandboxConfigSpotify,
+} from 'app/components/elements/EmbeddedPlayers/spotify';
+
 const supportedProviders = [
     {
         id: 'dtube',
@@ -78,16 +150,40 @@ const supportedProviders = [
         validateIframeUrlFn: validateTwitchIframeUrl,
         normalizeEmbedUrlFn: normalizeTwitchEmbedUrl,
         embedNodeFn: embedTwitchNode,
-        genIframeMdFn: embedTwitchNode,
+        genIframeMdFn: genTwitchIframeMd,
         ...sandboxConfigTwitch,
     },
     {
-        id: 'soundcloud',
-        validateIframeUrlFn: validateSoundcloudIframeUrl,
-        normalizeEmbedUrlFn: null,
-        embedNodeFn: null,
-        genIframeMdFn: null,
-        ...sandboxConfigSoundcloud,
+        id: 'vimm',
+        validateIframeUrlFn: validateVimmIframeUrl,
+        normalizeEmbedUrlFn: normalizeVimmEmbedUrl,
+        embedNodeFn: embedVimmNode,
+        genIframeMdFn: genVimmIframeMd,
+        ...sandboxConfigVimm,
+    },
+    // {
+    //   id: 'codeblock',
+    //   // validateIframeUrlFn: validateTwitchIframeUrl,
+    //   normalizeEmbedUrlFn: normalizeCodeBlockEmbedUrl,
+    //   embedNodeFn: embedCodeBlockNode,
+    //   genIframeMdFn: genCodeBlockIframeMd,
+    //   ...sandboxConfigTwitch
+    // },
+    {
+        id: 'twclips',
+        validateIframeUrlFn: validateTwitchIClipsframeUrl,
+        normalizeEmbedUrlFn: normalizeTwitchClipsEmbedUrl,
+        embedNodeFn: embedTwitchClipsNode,
+        genIframeMdFn: genTwitchClipsIframeMd,
+        ...sandboxConfigTwitchClips,
+    },
+    {
+        id: 'anchorfm',
+        validateIframeUrlFn: validateAnchorFMIframeUrl,
+        normalizeEmbedUrlFn: normalizeAnchorFmEmbedUrl,
+        embedNodeFn: embedAnchorFmNode,
+        genIframeMdFn: genAnchorFmIframeMd,
+        ...sandboxConfigAnchorFm,
     },
     {
         id: 'youtube',
@@ -136,6 +232,54 @@ const supportedProviders = [
         genIframeMdFn: genWistiaIframeMd,
         ...sandboxConfigWistia,
     },
+    {
+        id: 'odysee',
+        validateIframeUrlFn: validateOdyseeIframeUrl,
+        normalizeEmbedUrlFn: null,
+        embedNodeFn: null,
+        genIframeMdFn: null,
+        ...sandboxConfigOdysee,
+    },
+    {
+        id: 'spotify',
+        validateIframeUrlFn: validateSpotifyIframeUrl,
+        normalizeEmbedUrlFn: null,
+        embedNodeFn: embedSpotifyNode,
+        genIframeMdFn: genSpotifyIframeMd,
+        ...sandboxConfigSpotify,
+    },
+    {
+        id: 'gist',
+        validateIframeUrlFn: validateGistIframeUrl,
+        normalizeEmbedUrlFn: normalizeGistEmbedUrl,
+        embedNodeFn: embedGistNode,
+        genIframeMdFn: genGistIframeMd,
+        ...sandboxConfigGist,
+    },
+    {
+        id: 'soundcloud',
+        validateIframeUrlFn: validateSoundcloudIframeUrl,
+        normalizeEmbedUrlFn: normalizeSoundCloudEmbedUrl,
+        embedNodeFn: embedSoundCloudNode,
+        genIframeMdFn: genSoundcloudIframeMd,
+        ...sandboxConfigSoundcloud,
+    },
+    {
+        id: 'mixcloud',
+        validateIframeUrlFn: validateMixCloudIframeUrl,
+        normalizeEmbedUrlFn: normalizeMixCloudEmbedUrl,
+        embedNodeFn: embedMixCloudNode,
+        genIframeMdFn: genMixCloudIframeMd,
+        ...sandboxConfigMixCloud,
+    },
+    {
+        id: 'archiveorg',
+        validateIframeUrlFn: validateArchiveIframeUrl,
+        normalizeEmbedUrlFn: normalizeArchiveEmbedUrl,
+        embedNodeFn: embedArchiveNode,
+        genIframeMdFn: genArchiveIframeMd,
+        ...sandboxConfigArchive,
+    },
 ];
 
 export default supportedProviders;
@@ -145,7 +289,7 @@ export function validateIframeUrl(url) {
         const provider = supportedProviders[pi];
         const validUrl = provider.validateIframeUrlFn(url);
 
-        if (validUrl !== false) {
+        if (validUrl === true) {
             console.log(`Found a valid ${provider.id} iframe URL`);
             return {
                 providerId: provider.id,
@@ -256,5 +400,6 @@ export function generateMd(section, idx, large) {
 export function preprocessHtml(html) {
     html = preprocess3SpeakHtml(html);
     html = preprocessTwitterHtml(html);
+    html = preprocessGistHtml(html);
     return html;
 }

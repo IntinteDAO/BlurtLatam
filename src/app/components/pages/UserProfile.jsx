@@ -1,5 +1,6 @@
+/* eslint-disable import/no-import-module-exports */
 /* eslint react/prop-types: 0 */
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -670,7 +671,16 @@ export default class UserProfile extends Component {
                     {top_menu}
                 </div>
                 {section && section === 'blog' && profile.avatarUrl ? (
-                    <div className="avatar">
+                    <div
+                        className="avatar"
+                        style={{
+                            textAlign: "center",
+                            maxWidth: "480px",
+                            width: "320px",
+                            marginLeft: "auto",
+                            marginRight: "auto",
+                            boxShadow: "5px 5px 5px 5px #f24933"
+                        }}>
                         <UserAvatar avatarUrl={profile.avatarUrl} />
                     </div>
                 ) : (

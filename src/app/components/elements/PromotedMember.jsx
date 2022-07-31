@@ -6,11 +6,11 @@ class PromotedMember extends Component {
         const { promoted_member, author } = this.props; // redux
 
         const promoted = promoted_member.get(author);
-        // console.log('Verified', verified);
+
         if (promoted !== undefined) {
             const description = `@${promoted.category}: ${promoted.description}`;
             return (
-                <span className="PromotedMember" title={description}>Promoted - Member</span>
+                <span className="PromotedMember" title={description}>Promoted - { promoted.category}</span>
             );
         }
         return null;

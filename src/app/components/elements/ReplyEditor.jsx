@@ -30,10 +30,11 @@ import Dropzone from 'react-dropzone';
 import tt from 'counterpart';
 import 'emoji-mart/css/emoji-mart.css';
 import { Picker, Emoji } from 'emoji-mart';
+
 import { loadUserTemplates, saveUserTemplates } from 'app/utils/UserTemplates';
 
 const MAX_FILE_TO_UPLOAD = 10;
-const MAX_TAGS=10;
+const MAX_TAGS = 10;
 const imagesToUpload = [];
 
 const remarkable = new Remarkable({ html: true, breaks: true });
@@ -122,6 +123,12 @@ class ReplyEditor extends Component {
                     ? stateFromHtml(this.props.richTextEditor, raw)
                     : null,
             });
+
+            // let beneficiaries = [];
+            // beneficiaries.push({username: 'blurt.one', percent: parseInt(5).toFixed(0)})
+            // beneficiaries = [...new Set(beneficiaries)];
+            // // this.props.setBeneficiaries(formId, []);
+            // this.props.setBeneficiaries(formId, beneficiaries);
         }
     }
 
@@ -545,15 +552,6 @@ class ReplyEditor extends Component {
         const { progress, noClipboardData } = this.state;
         const disabled = submitting || !valid;
         const loading = submitting || this.state.loading;
-
-        // Set default beneficiary
-
-        // console.log('Got benefeciaries', beneficiaries);
-
-        // if(beneficiaries.length > 0) {
-        //     this.props.setBeneficiaries(formId, beneficiaries);
-        //     console.log('set beneficiaries sucess');
-        // }
 
         const errorCallback = (estr) => {
             this.setState({ postError: estr, loading: false });
@@ -1206,13 +1204,6 @@ export default (formId) => connect(
         ]);
         beneficiaries = beneficiaries ? beneficiaries.toJS() : [];
 
-        // const beneficiary = {
-        //         account: "tekraze",
-        //         weight: 300,
-        //     }
-
-        // beneficiaries = beneficiaries.length > 0 ? beneficiaries.push(beneficiary) : [beneficiary];
-
         const postTemplateName = state.user.getIn(['current', 'post', formId, 'postTemplateName']);
 
         const ret = {
@@ -1407,7 +1398,7 @@ export default (formId) => connect(
             if (rtags.links.size) meta.links = Array.from(rtags.links);
             else delete meta.links;
 
-            meta.app = 'blurt.one/0.1';
+            meta.app = 'blurtlatam/0.1';
             if (isStory) {
                 meta.format = isHtml ? 'html' : 'markdown';
                 if (summary) {
@@ -1503,42 +1494,22 @@ export default (formId) => connect(
                     if (!__config.comment_options) {
                         __config.comment_options = {};
                     }
-                    const account = state.global.getIn([
-                        'accounts',
-                        username,
-                    ]);
-                    let referrer = '';
-                    if (
-                        account.get('json_metadata') !== undefined
-                        && account.get('json_metadata') !== ''
-                    ) {
-                        const accountCreatedDaysAgo = (new Date().getTime()
-                            - new Date(
-                                `${account.get('created')}Z`
-                            ).getTime())
-                            / 1000
-                            / 60
-                            / 60
-                            / 24;
-                        if (accountCreatedDaysAgo < 30) {
-                            referrer = JSON.parse(
-                                account.get('json_metadata')
-                            ).referral;
-                        }
-                    }
-                    if (referrer) {
-                        __config.comment_options.extensions.push([
-                            0,
-                            {
-                                beneficiaries: [
-                                    {
-                                        account: referrer,
-                                        weight: 300,
-                                    },
-                                ],
-                            },
-                        ]);
-                    }
+                    // const account = state.global.getIn([
+                    //     'accounts',
+                    //     username,
+                    // ]);
+                    // const referrer = username && username === 'blurt.one' ? 'tekraze' : 'blurt.one';
+                    // __config.comment_options.extensions.push([
+                    //     0,
+                    //     {
+                    //         beneficiaries: [
+                    //             {
+                    //                 account: referrer,
+                    //                 weight: 500,
+                    //             },
+                    //         ],
+                    //     },
+                    // ]);
                 }
             }
 
