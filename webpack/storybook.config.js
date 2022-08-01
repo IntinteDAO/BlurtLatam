@@ -16,7 +16,9 @@ module.exports = (baseConfig, env) => {
         extensions: ['.js', '.json', '.jsx'],
         modules: [path.resolve(__dirname, '../src'), 'node_modules']
     };
-    config.plugins.push(new MiniCssExtractPlugin('[name]-[chunkhash].css'));
+    config.plugins.push(
+        new MiniCssExtractPlugin({ filename: '[name]-[chunkhash].css' })
+    );
     config.plugins.push(
         new webpack.DefinePlugin({
             'process.env': {

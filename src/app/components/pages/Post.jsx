@@ -299,8 +299,8 @@ class Post extends Component {
                     <div className="column">
                         <iframe
                             title="Acceptable Adapative ads"
-                            data-aa="2052246"
-                            src="//acceptable.a-ads.com/2052246"
+                            data-aa="2054919"
+                            src="//acceptable.a-ads.com/2054919"
                             style={{
                                 border: "0px", padding: "0", width: "100%", overflow: "hidden", backgroundColor: "transparent"
                             }} />

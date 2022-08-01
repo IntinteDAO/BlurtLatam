@@ -644,4 +644,4 @@ const mapDispatchToProps = (dispatch) => ({
 
 const connectedHeader = connect(mapStateToProps, mapDispatchToProps)(Header);
 
-export default connectedHeaders;
+export default connectedHeader;
