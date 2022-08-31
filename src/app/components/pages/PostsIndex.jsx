@@ -216,21 +216,6 @@ class PostsIndex extends Component {
                 }
             >
                 <article className="articles">
-                    <div className="row">
-                        <div className="column">
-                            <iframe
-                                title="Acceptable Adapative ads"
-                                data-aa="2054919"
-                                src="//acceptable.a-ads.com/2054919"
-                                style={{
-                                    border: "0px", padding: "0", width: "100%", overflow: "hidden", backgroundColor: "transparent"
-                                }} />
-                            <br />
-                            <div className="text-center">
-                                <small><a href="/blurt/@blurt.one/unofficial-development-updates-7-or-27-july-2022-or-ads-on-blurt-one-or-updates-sync-blurt-live">Why Ads ?</a></small>
-                            </div>
-                        </div>
-                    </div>
                     <div className="articles__header row">
                         <div className="small-6 medium-6 large-6 column">
                             <h1 className="articles__h1 show-for-mq-large articles__h1--no-wrap">
