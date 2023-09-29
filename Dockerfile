@@ -1,5 +1,5 @@
 # FROM node:current-alpine
-FROM node:16.13.2-alpine3.15
+FROM node:16.16-alpine3.16
 
 LABEL maintainer jacob@blurt.foundation
 
@@ -12,7 +12,7 @@ COPY . /condenser
 WORKDIR /condenser
 
 RUN mkdir tmp && \
-    npm install && \
+    npm install --legacy-peer-deps && \
     # export NODE_OPTIONS=--openssl-legacy-provider && \
     npm run build
 

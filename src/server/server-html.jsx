@@ -19,10 +19,11 @@ export default function ServerHTML({
     return (
         <html lang="en">
             <head>
-                <script
+                {/* <script
                     async
                     src="https://www.googletagmanager.com/gtag/js?id=G-63ZBEY1EVG"
-                />
+                /> */}
+
                 <script content="window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-63ZBEY1EVG');" />
                 <meta charSet="utf-8" />
                 <meta

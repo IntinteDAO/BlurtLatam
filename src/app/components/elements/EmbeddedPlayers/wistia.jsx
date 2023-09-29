@@ -1,3 +1,5 @@
+import React from 'react';
+
 const regex = {
     sanitize: /^(https?:)?\/\/fast.wistia.com\/embed\/iframe\/([a-z0-9]*)/i,
     main: /(?:https?:\/\/([a-z0-9\-.\/]*).wistia.com\/medias\/)([a-z0-9]+)/,

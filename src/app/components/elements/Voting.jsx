@@ -1,23 +1,18 @@
+/* eslint-disable react/button-has-type */
 /* eslint-disable react/require-default-props */
 /* eslint-disable react/no-unused-prop-types */
 /* eslint-disable react/static-property-placement */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Slider from 'react-rangeslider';
+import Slider from '@appigram/react-rangeslider';
 import tt from 'counterpart';
 import CloseButton from 'app/components/elements/CloseButton';
 import * as transactionActions from 'app/redux/TransactionReducer';
 import Icon from 'app/components/elements/Icon';
 import { fromJS } from 'immutable';
-
-// import {
-//     DEBT_TOKEN_SHORT,
-//     LIQUID_TOKEN_UPPERCASE,
-//     INVEST_TOKEN_SHORT,
-// } from 'app/client_config';
+import { api } from '@blurtfoundation/blurtjs'
 import FormattedAsset from 'app/components/elements/FormattedAsset';
-// import { pricePerSteem } from 'app/utils/StateFunctions';
 import shouldComponentUpdate from 'app/utils/shouldComponentUpdate';
 import {
     formatDecimal,
@@ -26,26 +21,10 @@ import {
 import DropdownMenu from 'app/components/elements/DropdownMenu';
 import TimeAgoWrapper from 'app/components/elements/TimeAgoWrapper';
 import Dropdown from 'app/components/elements/Dropdown';
-import { api } from '@blurtfoundation/blurtjs';
+import VotersListReveal from './VotersLIstReveal';
 
-// const ABOUT_FLAG = (
-//     <div>
-//         <p>
-//             Downvoting a post can decrease pending rewards and make it less
-//             visible. Common reasons:
-//         </p>
-//         <ul>
-//             <li>Disagreement on rewards</li>
-//             <li>Fraud or plagiarism</li>
-//             <li>Hate speech or trolling</li>
-//             <li>Miscategorized content or spam</li>
-//         </ul>
-//     </div>
-// );
-
-const MAX_VOTES_DISPLAY = 20;
+const MAX_VOTES_DISPLAY = 150;
 const VOTE_WEIGHT_DROPDOWN_THRESHOLD = 50; //if BP is more than 50, enable the slider
-// const SBD_PRINT_RATE_MAX = 10000;
 const MAX_WEIGHT = 10000;
 
 class Voting extends Component {
@@ -66,9 +45,7 @@ class Voting extends Component {
         post_obj: PropTypes.any,
         current_account: PropTypes.any,
         enable_slider: PropTypes.bool,
-        voting: PropTypes.bool,
-        // price_per_blurt: PropTypes.number,
-        // sbd_print_rate: PropTypes.number,
+        voting: PropTypes.bool
     };
 
     static defaultProps = {
@@ -86,6 +63,7 @@ class Voting extends Component {
             },
             voting_bar: null,
             mana_updated: null,
+            showVotersListModal: false
         };
 
         this.voteUp = (e) => {
@@ -130,32 +108,42 @@ class Voting extends Component {
         };
 
         this.handleWeightChange = (up) => (weight) => {
+            const { sliderWeight } = this.state;
             let w;
             if (up) {
                 w = {
                     up: weight,
-                    down: this.state.sliderWeight.down,
+                    down: sliderWeight.down,
                 };
             } else {
                 w = {
-                    up: this.state.sliderWeight.up,
+                    up: sliderWeight.up,
                     down: weight,
                 };
             }
+            const { username, is_comment } = this.props;
+
+            localStorage.setItem(
+                'voteWeight' + (up ? '' : 'Down') + '-'
+                + username + (is_comment ? '-comment' : ''),
+                weight
+            );
+
             this.setState({ sliderWeight: w });
         };
 
         this.storeSliderWeight = (up) => () => {
+            const { sliderWeight } = this.state;
             const { username, is_comment } = this.props;
             const weight = up
-                ? this.state.sliderWeight.up
-                : this.state.sliderWeight.down;
+                ? sliderWeight.up
+                : sliderWeight.down;
             localStorage.setItem(
-                'voteWeight' +
-                (up ? '' : 'Down') +
-                '-' +
-                username +
-                (is_comment ? '-comment' : ''),
+                'voteWeight'
+                + (up ? '' : 'Down')
+                + '-'
+                + username
+                + (is_comment ? '-comment' : ''),
                 weight
             );
         };
@@ -189,6 +177,14 @@ class Voting extends Component {
             }
         };
 
+        this.handleVotersListModalHide = () => {
+            this.setState({ showVotersListModal: false });
+        }
+
+        this.handleVotersListModalShow = () => {
+            this.setState({ showVotersListModal: true });
+        }
+
         this.toggleWeightUp = (e) => {
             e.preventDefault();
             this.toggleWeightUpOrDown(true);
@@ -208,71 +204,152 @@ class Voting extends Component {
         this.shouldComponentUpdate = shouldComponentUpdate(this, 'Voting');
     }
 
+    calculateVotingPower = (current_account) => {
+        const { BLURT_VOTING_MANA_REGENERATION_SECONDS } = this.props;
+
+        let voting_manabar = null
+        if (!voting_manabar) {
+            voting_manabar = current_account
+                ? current_account.voting_manabar
+                : 0
+        }
+
+        const current_mana = parseInt(
+            voting_manabar ? voting_manabar.current_mana : 0
+        )
+
+        const last_update_time = voting_manabar
+            ? voting_manabar.last_update_time
+            : 0
+
+        let vesting_shares = 0.0
+        if (!vesting_shares) {
+            vesting_shares = current_account
+                ? Number(current_account.vesting_shares.split(' ')[0])
+                : 0.0
+        }
+
+        let delegated_vesting_shares = 0.0
+        if (!delegated_vesting_shares) {
+            delegated_vesting_shares = current_account
+                ? Number(current_account.delegated_vesting_shares.split(' ')[0])
+                : 0.0
+        }
+
+        let vesting_withdraw_rate = 0.0
+        if (!vesting_withdraw_rate) {
+            vesting_withdraw_rate = current_account
+                ? current_account.vesting_withdraw_rate
+                    ? current_account.vesting_withdraw_rate.split(' ')[0]
+                    : 0.0
+                : 0.0
+        }
+
+        let received_vesting_shares = 0.0
+        if (!received_vesting_shares) {
+            received_vesting_shares = current_account
+                ? Number(current_account.received_vesting_shares.split(' ')[0])
+                : 0.0
+        }
+
+        const net_vesting_shares =
+            vesting_shares - delegated_vesting_shares + received_vesting_shares
+
+        const maxMana =
+            (net_vesting_shares - Number(vesting_withdraw_rate)) * 1000000
+
+        const now = Math.round(Date.now() / 1000)
+        const elapsed = now - last_update_time
+        const regenerated_mana =
+            (elapsed * maxMana) / BLURT_VOTING_MANA_REGENERATION_SECONDS
+        let currentMana = current_mana
+        currentMana += regenerated_mana
+        if (currentMana >= maxMana) {
+            currentMana = maxMana
+        }
+
+        const updatedPower = (currentMana * 100) / maxMana;
+
+        if (localStorage) {
+            localStorage.setItem('updated-account', JSON.stringify(current_account));
+            localStorage.setItem('current-voting-power', updatedPower);
+        }
+
+        this.setState({
+            voting_manabar_updated: voting_manabar,
+            delegated_vesting_shares_updated: delegated_vesting_shares,
+            vesting_shares_updated: vesting_shares,
+            received_vesting_shares_updated: received_vesting_shares,
+            vesting_withdraw_rate_updated: vesting_withdraw_rate,
+            mana_updated: current_mana,
+            last_update_time_updated: last_update_time
+        });
+    }
+
+
     componentDidMount() {
+        const { username } = this.props;
+        if (username) {
+            const currentAccountfromLocal = JSON.parse(localStorage.getItem('updated-account'));
+            if (currentAccountfromLocal) {
+                this.calculateVotingPower(currentAccountfromLocal);
+                this.powerUpdateInterval = setInterval(() => {
+                    this.calculateVotingPower(currentAccountfromLocal);
+                }, 30000)
+            } else {
+                this.getVotingManabar(username);
+            }
+        }
+
+    }
+
+    componentWillMount() {
         const { username, active_votes } = this.props;
         this.checkMyVote(username, active_votes);
-        this.getVotingManabar(username);
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
         const { username, active_votes } = nextProps;
-        this.checkMyVote(username, active_votes);
-        this.getVotingManabar(username);
+        if (active_votes != this.props.active_votes) {
+            this.checkMyVote(username, active_votes);
+            if (username) {
+                const currentAccountfromLocal = JSON.parse(localStorage.getItem('updated-account'));
+                if (currentAccountfromLocal) {
+                    this.calculateVotingPower(currentAccountfromLocal);
+                } else {
+                    this.getVotingManabar(username);
+                }
+            }
+        }
     }
 
     componentDidUpdate(prevProps) {
         const { username, active_votes } = prevProps;
-        this.checkMyVote(username, active_votes);
-        this.getVotingManabar(username);
+        if (this.props.active_votes != active_votes) {
+            this.checkMyVote(username, active_votes);
+            if (username) {
+                const currentAccountfromLocal = JSON.parse(localStorage.getItem('updated-account'));
+                if (currentAccountfromLocal) {
+                    this.calculateVotingPower(currentAccountfromLocal);
+                } else {
+                    this.getVotingManabar(username);
+                }
+            }
+        }
+
+    }
+
+    componentWillUnmount() {
+        if (this.powerUpdateInterval) clearInterval(this.powerUpdateInterval);
     }
 
     getVotingManabar(username) {
         if (username) {
+            localStorage.setItem('user-api-call-status', 'pending');
             api.getAccounts([username], (err, response) => {
                 const accountUpdated = response[0];
-                const { mana_updated } = this.state;
-
-                const setCurrentState = (account) => {
-                    this.setState({
-                        voting_manabar_updated: account
-                            ? account.voting_manabar
-                            : null,
-                        delegated_vesting_shares_updated: account
-                            ? Number(
-                                account.delegated_vesting_shares.split(' ')[0]
-                            )
-                            : null,
-                        vesting_shares_updated: account
-                            ? Number(account.vesting_shares.split(' ')[0])
-                            : null,
-                        received_vesting_shares_updated: account
-                            ? Number(
-                                account.received_vesting_shares.split(' ')[0]
-                            )
-                            : null,
-                        vesting_withdraw_rate_updated: account
-                            ? Number(
-                                account.vesting_withdraw_rate.split(' ')[0]
-                            )
-                            : null,
-                        mana_updated: account
-                            ? account.voting_manabar.current_mana
-                            : null,
-                        last_update_time_updated: account
-                            ? account.last_update_time
-                            : null,
-                    });
-                };
-
                 if (accountUpdated) {
-                    if (!mana_updated) {
-                        setCurrentState(accountUpdated);
-                    } else if (
-                        mana_updated !==
-                        accountUpdated.voting_manabar.current_mana
-                    ) {
-                        setCurrentState(accountUpdated);
-                    }
+                    this.calculateVotingPower(accountUpdated);
                 }
             });
         }
@@ -533,13 +610,12 @@ class Voting extends Component {
                     />
                     {currentVp ? (
                         <div className="voting-power-display">
-                            {tt('voting_jsx.vote_value')}:{' '}
-                            {voteValue.toFixed(3)} BLURT
-                            <br />
-                            {tt('voting_jsx.voting_power')}:{' '}
-                            {currentVp.toFixed(2)}%
-                            <br />
-                            {tt('g.transaction_fee')}: {fee} BLURT
+                            {/* {tt('voting_jsx.vote_value')}:{' '} */}
+                            <b title="Worth of your Vote">VW</b> : {voteValue.toFixed(3)} BLURT &nbsp;|&nbsp;
+                            {/* {tt('voting_jsx.voting_power')}:{' '} */}
+                            <b title="your Voting power to vote">VP</b>: {currentVp.toFixed(2)}% &nbsp;|&nbsp;
+                            {/* {tt('g.transaction_fee')} */}
+                            <b title="Transaction Fee for casting your vote">Fee</b>: {fee} BLURT
                         </div>
                     ) : (
                         ''
@@ -774,15 +850,45 @@ class Voting extends Component {
                     ),
                 });
             }
+            const { showVotersListModal } = this.state;
             voters_list = (
-                <DropdownMenu
-                    selected={tt('voting_jsx.votes_plural', {
-                        count: total_votes,
-                    })}
-                    className="Voting__voters_list"
-                    items={voters}
-                    el="div"
-                />
+                <span className="DropdownMenu">
+                    <a href="#" onClick={this.handleVotersListModalShow}>
+                        {voters.length}
+                        {' '}
+                        votes
+                        <Icon name="dropdown-arrow" />
+                    </a>
+                    {showVotersListModal === true && (
+                        <VotersListReveal style={{ width: '350px !important' }} show onHide={this.handleVotersListModalHide}>
+                            <CloseButton onClick={this.handleVotersListModalHide} />
+                            <h3 style={{ 'text-align': 'center' }}>
+                                Voters (
+                                {voters.length}
+                                )
+                            </h3>
+                            <hr />
+                            <div className="voters-list">
+                                <ul>
+                                    {voters.map((voter, i) => {
+                                        return (
+                                            <li style={{ listStyleType: 'none' }} key={i}>
+                                                {voter.link ? <a href={voter.link}>{voter.value}</a> : <span>{voter.value}</span>}
+                                            </li>
+                                        )
+                                    })}
+                                </ul>
+                                <div className="text-center">
+                                    <button
+                                        className="secondary button no-border"
+                                        onClick={this.handleVotersListModalHide}>
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </VotersListReveal>
+                    )}
+                </span>
             );
         }
 

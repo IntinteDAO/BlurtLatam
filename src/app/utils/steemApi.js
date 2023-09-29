@@ -53,7 +53,7 @@ export async function getStateAsync(url) {
         });
 
     await axios
-        .get('https://blurt-coal.tekraze.com', {
+        .get($STM_Config.coal_url, {
             timeout: 3000,
             headers: {
                 'Access-Control-Allow-Origin': '*'
@@ -70,18 +70,31 @@ export async function getStateAsync(url) {
             }
         })
         .catch((error) => {
+            const map = new Map();
             console.warn(error);
+            raw.blacklist = map;
         });
 
-    await fetch(
-        'https://gitlab.com/blurt/openblurt/condenser-pinned/-/raw/master/dapps.json'
-    )
-        .then((response) => response.json())
-        .then((data) => {
-            if (data) raw.dapps = data;
+    const promotedMembersListURL = 'https://raw.githubusercontent.com/balvinder294/blurtlatam-pinned/main/verified.json';
+
+    await axios
+        .get(promotedMembersListURL, {
+            timeout: 3000
         })
-        .catch((err) => {
-            console.warn('Cors Blocked for DApps', err);
+        .then((response) => {
+            const map = new Map();
+            if (response.status === 200) {
+                // eslint-disable-next-line no-restricted-syntax
+                for (const data of response.data) {
+                    map.set(data.name, data);
+                }
+                raw.promoted_members = map;
+            }
+        })
+        .catch((error) => {
+            const map = new Map();
+            console.warn(error);
+            raw.promoted_members = map;
         });
 
     const rewardFund = await getRewardFund();

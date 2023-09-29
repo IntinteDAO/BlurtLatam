@@ -58,7 +58,7 @@ export default ({
                 sandboxAttributes,
             } = validateEmbbeddedPlayerIframeUrl(srcAtty);
 
-            if (validUrl !== false) {
+            if (validUrl === true) {
                 const iframe = {
                     tagName: 'iframe',
                     attribs: {

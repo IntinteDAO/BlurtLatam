@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Icon from './Icon';
+import HelpTip from './HelpTip';
 
 class Blacklist extends Component {
     render() {
@@ -9,11 +10,25 @@ class Blacklist extends Component {
         if (coalStatus === 'enabled') {
             const blacklisted = blacklist.get(author);
             if (blacklisted !== undefined) {
-                const description = `@${blacklisted.reason}: ${blacklisted.notes}\nIf you believe this is in error, please contact us in #apeals discord.blurt.world`;
+                const description = (
+                    <p>
+                        <strong>Reason Code: </strong>
+                        {blacklisted.reason}
+                        <br />
+                        <strong>Notes: </strong>
+                        {blacklisted.notes}
+                        <br />
+                        If you believe this to be an error, please contact us in #appeals channel in the
+                        {' '}
+                        <a href="https://discord.blurt.world">Blurt Discord server</a>
+                        .
+                    </p>
+                );
+
                 return (
-                    <span title={description}>
+                    <HelpTip content={description}>
                         <Icon name="alert" />
-                    </span>
+                    </HelpTip>
                 );
             }
         }

@@ -24,14 +24,17 @@ import sanitizeConfig, { allowedTags } from 'app/utils/SanitizeConfig';
 import sanitize from 'sanitize-html';
 import HtmlReady from 'shared/HtmlReady';
 import { connect } from 'react-redux';
-import { fromJS, Set } from 'immutable';
+import { fromJS, OrderedSet } from 'immutable';
 import { Remarkable } from 'remarkable';
 import Dropzone from 'react-dropzone';
 import tt from 'counterpart';
 import 'emoji-mart/css/emoji-mart.css';
 import { Picker, Emoji } from 'emoji-mart';
 
+import { loadUserTemplates, saveUserTemplates } from 'app/utils/UserTemplates';
+
 const MAX_FILE_TO_UPLOAD = 10;
+const MAX_TAGS = 10;
 const imagesToUpload = [];
 
 const remarkable = new Remarkable({ html: true, breaks: true });
@@ -59,6 +62,7 @@ class ReplyEditor extends Component {
         defaultPayoutType: PropTypes.string,
         payoutType: PropTypes.string,
         summary: PropTypes.string,
+        postTemplateName: PropTypes.string,
     };
 
     static defaultProps = {
@@ -74,20 +78,9 @@ class ReplyEditor extends Component {
         super();
         this.state = { progress: {} };
         this.initForm(props);
-        this.postRef = React.createRef();
-        this.rteRef = React.createRef();
-        this.titleRef = React.createRef();
-        this.draftRef = React.createRef();
-        this.summaryRef = React.createRef;
     }
 
-    componentDidMount() {
-        setTimeout(() => {
-            if (this.props.isStory) this.titleRef.current.focus();
-            else if (this.postRef.current) this.postRef.current.focus();
-            else if (this.rteRef.current) this.rteRef.current.focus();
-        }, 300);
-
+    UNSAFE_componentWillMount() {
         const { formId } = this.props;
 
         if (process.env.BROWSER) {
@@ -130,7 +123,21 @@ class ReplyEditor extends Component {
                     ? stateFromHtml(this.props.richTextEditor, raw)
                     : null,
             });
+
+            // let beneficiaries = [];
+            // beneficiaries.push({username: 'blurt.one', percent: parseInt(5).toFixed(0)})
+            // beneficiaries = [...new Set(beneficiaries)];
+            // // this.props.setBeneficiaries(formId, []);
+            // this.props.setBeneficiaries(formId, beneficiaries);
         }
+    }
+
+    componentDidMount() {
+        setTimeout(() => {
+            if (this.props.isStory) this.refs.titleRef.focus();
+            else if (this.refs.postRef) this.refs.postRef.focus();
+            else if (this.refs.rte) this.refs.rte._focus();
+        }, 300);
     }
 
     shouldComponentUpdate = shouldComponentUpdate(this, 'ReplyEditor');
@@ -141,6 +148,67 @@ class ReplyEditor extends Component {
             const ns = nextState;
             const tp = this.props;
             const np = nextProps;
+
+            // User Templates
+
+            if (typeof nextProps.postTemplateName !== 'undefined' && nextProps.postTemplateName !== null) {
+                const { formId } = tp;
+
+                if (nextProps.postTemplateName.indexOf('create_') === 0) {
+                    const { username } = tp;
+                    const {
+                        body, title, summary, category
+                    } = ns;
+
+                    const { payoutType, beneficiaries } = np;
+                    const userTemplates = loadUserTemplates(username);
+                    const newTemplateName = nextProps.postTemplateName.replace('create_', '');
+                    const newTemplate = {
+                        name: nextProps.postTemplateName.replace('create_', ''),
+                        beneficiaries,
+                        payoutType,
+                        markdown: body !== undefined ? body.value : '',
+                        title: title !== undefined ? title.value : '',
+                        summary: summary !== undefined ? summary.value : '',
+                        // altAuthor: altAuthor !== undefined ? altAuthor.value : '',
+                        category: category !== undefined ? category.value : '',
+                    };
+
+                    let updated = false;
+                    for (let ui = 0; ui < userTemplates.length; ui += 1) {
+                        if (userTemplates[ui].name === newTemplateName) {
+                            userTemplates[ui] = newTemplate;
+                            updated = true;
+                        }
+                    }
+
+                    if (updated === false) {
+                        userTemplates.push(newTemplate);
+                    }
+
+                    saveUserTemplates(username, userTemplates);
+
+                    this.props.setPostTemplateName(formId, null);
+                } else {
+                    const userTemplates = loadUserTemplates(nextProps.username);
+
+                    for (let ti = 0; ti < userTemplates.length; ti += 1) {
+                        const template = userTemplates[ti];
+                        if (template.name === nextProps.postTemplateName) {
+                            this.state.body.props.onChange(template.markdown);
+                            this.state.title.props.onChange(template.title);
+                            this.state.summary.props.onChange(template.summary);
+                            // this.state.altAuthor.props.onChange(template.altAuthor);
+                            this.state.category.props.onChange(template.category);
+                            this.props.setPayoutType(formId, template.payoutType);
+                            this.props.setBeneficiaries(formId, template.beneficiaries);
+
+                            this.props.setPostTemplateName(formId, null);
+                            break;
+                        }
+                    }
+                }
+            }
 
             // Save curent draft to localStorage
             if (
@@ -166,15 +234,14 @@ class ReplyEditor extends Component {
                     summary: summary ? summary.value : undefined,
                 };
 
+                clearTimeout(saveEditorTimeout);
                 saveEditorTimeout = setTimeout(() => {
-                    // console.log('save formId', formId, body.value)
                     localStorage.setItem(
                         'replyEditorData-' + formId,
                         JSON.stringify(data, null, 0)
                     );
                     this.showDraftSaved();
                 }, 500);
-                clearTimeout(saveEditorTimeout);
             }
         }
     }
@@ -186,7 +253,6 @@ class ReplyEditor extends Component {
         if (
             !body.value
             // eslint-disable-next-line no-alert
-            // eslint-disable-next-line no-restricted-globals
             || confirm(tt('reply_editor.are_you_sure_you_want_to_clear_this_form'))
         ) {
             replyForm.resetForm();
@@ -342,14 +408,14 @@ class ReplyEditor extends Component {
     insertPlaceHolders = () => {
         let { imagesUploadCount } = this.state;
         const { body } = this.state;
-        const { selectionStart } = this.postRef.current;
+        const { selectionStart } = this.refs.postRef;
         let placeholder = '';
 
         for (let ii = 0; ii < imagesToUpload.length; ii += 1) {
             const imageToUpload = imagesToUpload[ii];
 
             if (imageToUpload.temporaryTag === '') {
-                imagesUploadCount+= 1;
+                imagesUploadCount++;
                 imageToUpload.temporaryTag = `![Uploading image #${imagesUploadCount}...]()`;
                 placeholder += `\n${imageToUpload.temporaryTag}\n`;
             }
@@ -372,7 +438,7 @@ class ReplyEditor extends Component {
 
     showDraftSaved() {
         try {
-            const { draft } = this.draftRef.current;
+            const { draft } = this.refs;
             draft.className = 'ReplyEditor__draft';
             // eslint-disable-next-line no-void
             void draft.offsetWidth; // reset animation
@@ -435,12 +501,14 @@ class ReplyEditor extends Component {
         this.setState({ showEmojiPicker: false });
 
         const { body } = this.state;
-        const { selectionStart } = this.postRef.current;
+        const { selectionStart } = this.refs.postRef;
         const nativeEmoji = data.native;
 
         // Insert the temporary tag where the cursor currently is
         body.props.onChange(
-            body.value.substring(0, selectionStart) + nativeEmoji + body.value.substring(selectionStart, body.value.length)
+            body.value.substring(0, selectionStart) +
+            nativeEmoji +
+            body.value.substring(selectionStart, body.value.length)
         );
     };
 
@@ -627,7 +695,7 @@ class ReplyEditor extends Component {
             <div className="ReplyEditor row">
                 <div className="column small-12">
                     <div
-                        ref={this.draftRef}
+                        ref="draft"
                         className="ReplyEditor__draft ReplyEditor__draft-hide"
                     >
                         {tt('reply_editor.draft_saved')}
@@ -660,7 +728,7 @@ class ReplyEditor extends Component {
                                         disabled={loading}
                                         placeholder={tt('reply_editor.title')}
                                         autoComplete="off"
-                                        ref={this.titleRef}
+                                        ref="titleRef"
                                         tabIndex={1}
                                         // eslint-disable-next-line react/jsx-props-no-spreading
                                         {...title.props}
@@ -703,7 +771,7 @@ class ReplyEditor extends Component {
                         >
                             {process.env.BROWSER && rte ? (
                                 <RichTextEditor
-                                    ref={this.rteRef}
+                                    ref="rte"
                                     readOnly={loading}
                                     value={this.state.rte_value}
                                     onChange={this.onChange}
@@ -716,7 +784,7 @@ class ReplyEditor extends Component {
                                     {/* <span> */}
                                     <textarea
                                         {...body.props}
-                                        ref={this.postRef}
+                                        ref="postRef"
                                         onPasteCapture={this.onPasteCapture}
                                         className={
                                             type === 'submit_story'
@@ -751,8 +819,8 @@ class ReplyEditor extends Component {
                                                 <div {...getRootProps({ className: 'dropzone' })} className={classnames('dropzone', { 'dropzone--isactive': isDragActive })}>
                                                     <p className="drag-and-drop">
                                                         <input {...getInputProps()} />
-                                                        <a role="button" type="button" onClick={this.toggleEmojiPicker}>
-                                                            <Emoji emoji={{ id: 'smiley', skin: 2 }} size={26} />
+                                                        <a type="button" onClick={this.toggleEmojiPicker}>
+                                                            <Emoji emoji={{ id: 'smiley', skin: 2 }} size={28} />
                                                         </a>
                                                         &nbsp; | &nbsp;
                                                         {tt(
@@ -825,7 +893,7 @@ class ReplyEditor extends Component {
                                         disabled={loading}
                                         placeholder={tt('reply_editor.summary')}
                                         autoComplete="off"
-                                        ref={this.summaryRef}
+                                        ref="summaryRef"
                                         tabIndex={0}
                                     />
                                 </span>
@@ -932,7 +1000,10 @@ class ReplyEditor extends Component {
                                                     </span>
                                                 )}
                                         </div>
-                                        <a href="#" onClick={this.showAdvancedSettings}>
+                                        <a
+                                            href="#"
+                                            onClick={this.showAdvancedSettings}
+                                        >
                                             {tt(
                                                 'reply_editor.advanced_settings'
                                             )}
@@ -982,7 +1053,6 @@ class ReplyEditor extends Component {
                             )}
                             {!loading && !this.props.onCancel && (
                                 <button
-                                    type="button"
                                     className="button hollow no-border"
                                     tabIndex={5}
                                     disabled={submitting}
@@ -1082,7 +1152,7 @@ const richTextEditor = process.env.BROWSER
     ? require('react-rte-image').default
     : null;
 
-export default (formIdVal) => connect(
+export default (formId) => connect(
     // mapStateToProps
     (state, ownProps) => {
         const username = state.user.getIn(['current', 'username']);
@@ -1097,14 +1167,17 @@ export default (formIdVal) => connect(
             fields.push('summary');
         }
 
-        const { summary } = ownProps;
-        let { category, title, body } = ownProps;
+        let { category, title, body, summary } = ownProps;
         if (/submit_/.test(type)) {
             title = '';
             body = '';
         }
         if (isStory && jsonMetadata && jsonMetadata.tags) {
-            category = Set([category, ...jsonMetadata.tags]).join(' ');
+            category = OrderedSet([category, ...jsonMetadata.tags]).join(' ');
+        }
+
+        if (isStory && jsonMetadata && jsonMetadata.description) {
+            summary = jsonMetadata.description;
         }
 
         const defaultPayoutType = state.app.getIn(
@@ -1117,7 +1190,7 @@ export default (formIdVal) => connect(
         let payoutType = state.user.getIn([
             'current',
             'post',
-            formIdVal,
+            formId,
             'payoutType',
         ]);
         if (!payoutType) {
@@ -1126,10 +1199,12 @@ export default (formIdVal) => connect(
         let beneficiaries = state.user.getIn([
             'current',
             'post',
-            formIdVal,
+            formId,
             'beneficiaries',
         ]);
         beneficiaries = beneficiaries ? beneficiaries.toJS() : [];
+
+        const postTemplateName = state.user.getIn(['current', 'post', formId, 'postTemplateName']);
 
         const ret = {
             ...ownProps,
@@ -1145,10 +1220,11 @@ export default (formIdVal) => connect(
                 summary,
             },
             state,
-            formIdVal,
+            formId,
             richTextEditor,
             beneficiaries,
             tags,
+            postTemplateName,
         };
         return ret;
     },
@@ -1167,6 +1243,12 @@ export default (formIdVal) => connect(
             userActions.set({
                 key: ['current', 'post', formId, 'beneficiaries'],
                 value: fromJS(beneficiaries),
+            })
+        ),
+        setPostTemplateName: (formId, postTemplateName) => dispatch(
+            userActions.set({
+                key: ['current', 'post', formId, 'postTemplateName'],
+                value: postTemplateName,
             })
         ),
         reply: ({
@@ -1206,8 +1288,9 @@ export default (formIdVal) => connect(
                     parent_permlink: permlink,
                     author: username,
                     // permlink,  assigned in TransactionSaga
-                }// edit existing
-                : isEdit
+                }
+                : // edit existing
+                isEdit
                     ? {
                         author, permlink, parent_author, parent_permlink
                     }
@@ -1225,14 +1308,24 @@ export default (formIdVal) => connect(
 
             // For footer message
             if (!isEdit) {
-                // const messageMarkdown = "<br /> <hr /> <center><sub>Posted from [https://blurtlatam.com](https://blurtlatam.com/" + parent_permlink + "/@" + author + "/" + permlink + ")</sub></center>";
-                const messageHTML = '<br /> <hr /> <center><sub>Posted from <a href="https://blurtlatam.com/' + parent_permlink + '/@' + author + '/' + permlink + '">https://blurtlatam.com</a></sub></center>';
-                // if (!isStory) {
-                //     body += ` ` + messageHTML;
-                //     isHtml = true;
-                // } else
-                if (!isHtmlTest(body)) {
+                let messageHTML = '';
+                if(linkProps.parent_author && linkProps.parent_author.length > 0) {
+                    messageHTML = '<br /> <hr /> <center><sub>Posted from <a href="https://blurtlatam.com'
+                    + '/' + parent_permlink
+                    + '/@' + linkProps.parent_author + '/' + permlink + '">https://blurtlatam.com</a></sub></center>';
+                } else {
+                    messageHTML = '<br /> <hr /> <center><sub>Posted from <a href="https://blurtlatam.com'
+                    // + '/' + parent_permlink
+                    + '/@' + linkProps.author
+                    // + '/' + permlink
+                    + '">https://blurtlatam.com</a></sub></center>';
+                }
+                if (!isStory) {
                     body += ` ` + messageHTML;
+                    isHtml = false;
+                } else if (!isHtmlTest(body)) {
+                    body += ` ` + messageHTML;
+                    isHtml = false;
                 } else if (isHtmlTest(body)) {
                     let htmlFromBody = body;
                     if (htmlFromBody) htmlFromBody = stripHtmlWrapper(htmlFromBody);
@@ -1266,7 +1359,7 @@ export default (formIdVal) => connect(
                 return;
             }
 
-            const formCategories = Set(
+            const formCategories = OrderedSet(
                 category
                     ? category.trim().replace(/#/g, '').split(/ +/)
                     : []
@@ -1274,11 +1367,11 @@ export default (formIdVal) => connect(
             const rootCategory = originalPost && originalPost.category
                 ? originalPost.category
                 : formCategories.first();
-            let allCategories = Set([...formCategories.toJS()]);
+            let allCategories = OrderedSet([...formCategories.toJS()]);
             if (/^[-a-z\d]+$/.test(rootCategory)) allCategories = allCategories.add(rootCategory);
 
             const postHashtags = [...rtags.hashtags];
-            while (allCategories.size < 10 && postHashtags.length > 0) {
+            while (allCategories.size < MAX_TAGS && postHashtags.length > 0) {
                 allCategories = allCategories.add(postHashtags.shift());
             }
 
@@ -1321,7 +1414,7 @@ export default (formIdVal) => connect(
                 return;
             }
 
-            if (meta.tags.length > 10) {
+            if (meta.tags.length > MAX_TAGS) {
                 const includingCategory = isEdit
                     ? tt('reply_editor.including_the_category', {
                         rootCategory,
@@ -1339,27 +1432,27 @@ export default (formIdVal) => connect(
             startLoadingIndicator();
 
             const originalBody = isEdit ? originalPost.body : null;
-            const config = { originalBody };
-            console.log('config', config);
+            const __config = { originalBody };
+            console.log('config', __config);
             // Avoid changing payout option during edits #735
             if (!isEdit && isStory) {
-                if (!config.comment_options) {
-                    config.comment_options = {
+                if (!__config.comment_options) {
+                    __config.comment_options = {
                         author: username,
                         permlink,
                     };
                 }
-                if (!config.comment_options.extensions) {
-                    config.comment_options.extensions = [];
+                if (!__config.comment_options.extensions) {
+                    __config.comment_options.extensions = [];
                 }
                 switch (payoutType) {
                     case '0%': // decline payout
-                        config.comment_options = {
+                        __config.comment_options = {
                             max_accepted_payout: '0.000 BLURT',
                         };
                         break;
                     case '100%':
-                        config.comment_options.extensions.push([
+                        __config.comment_options.extensions.push([
                             1,
                             {
                                 percent_blurt: 0,
@@ -1371,8 +1464,8 @@ export default (formIdVal) => connect(
                     default: // dd//
                 }
                 if (beneficiaries && beneficiaries.length > 0) {
-                    if (!config.comment_options.extensions) {
-                        config.comment_options.extensions = [];
+                    if (!__config.comment_options.extensions) {
+                        __config.comment_options.extensions = [];
                     }
 
                     const beneficiariesList = [
@@ -1391,52 +1484,32 @@ export default (formIdVal) => connect(
                         },
                     ];
 
-                    config.comment_options.extensions.splice(
+                    __config.comment_options.extensions.splice(
                         0,
                         0,
                         beneficiariesList
                     );
-                    config.comment_options.extensions.join();
+                    __config.comment_options.extensions.join();
                 } else {
-                    if (!config.comment_options) {
-                        config.comment_options = {};
+                    if (!__config.comment_options) {
+                        __config.comment_options = {};
                     }
-                    const account = state.global.getIn([
-                        'accounts',
-                        username,
-                    ]);
-                    let referrer = '';
-                    if (
-                        account.get('json_metadata') !== undefined
-                        && account.get('json_metadata') !== ''
-                    ) {
-                        const accountCreatedDaysAgo = (new Date().getTime()
-                            - new Date(
-                                `${account.get('created')}Z`
-                            ).getTime())
-                            / 1000
-                            / 60
-                            / 60
-                            / 24;
-                        if (accountCreatedDaysAgo < 30) {
-                            referrer = JSON.parse(
-                                account.get('json_metadata')
-                            ).referral;
-                        }
-                    }
-                    if (referrer) {
-                        config.comment_options.extensions.push([
-                            0,
-                            {
-                                beneficiaries: [
-                                    {
-                                        account: referrer,
-                                        weight: 300,
-                                    },
-                                ],
-                            },
-                        ]);
-                    }
+                    // const account = state.global.getIn([
+                    //     'accounts',
+                    //     username,
+                    // ]);
+                    // const referrer = username && username === 'blurt.one' ? 'tekraze' : 'blurt.one';
+                    // __config.comment_options.extensions.push([
+                    //     0,
+                    //     {
+                    //         beneficiaries: [
+                    //             {
+                    //                 account: referrer,
+                    //                 weight: 500,
+                    //             },
+                    //         ],
+                    //     },
+                    // ]);
                 }
             }
 
@@ -1446,7 +1519,7 @@ export default (formIdVal) => connect(
                 title,
                 body,
                 json_metadata: meta,
-                config,
+                __config,
             };
             const operationFlatFee = state.global.getIn([
                 'props',

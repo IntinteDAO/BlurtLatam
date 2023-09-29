@@ -89,7 +89,7 @@
         }
     }
     .close-button {
-        position: relative;
+        position: fixed;
         margin-left: 1em;
     }
     > .dropdown-comp > .dropdown__content {
@@ -468,4 +468,78 @@ a.confirm_weight:hover {
 
 #btn_group button:focus {
     outline: none;
+}
+
+.votersListModal .reveal {
+    // box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.1), 7px 7px 0 0 $color-orange;
+    border-radius: 0;
+    width: 350px;
+    height: 300px;
+    border: transparent;
+    transition: 0.2s all ease-in-out;
+    @include themify($themes) {
+        background-color: themed('modalBackgroundColor');
+        color: themed('modalTextColorPrimary');
+    }
+    .button {
+        @extend .e-btn;
+        @extend .e-btn--black;
+        min-width: 100px;
+    }
+    h4 {
+        font-weight: bold;
+    }
+}
+
+
+
+.votersListModal .reveal > .close-button {
+    margin-top: 1rem;
+    font-size: 2rem;
+}
+
+@media screen and (max-height: 768px) {
+    // .votersListModal .reveal 
+    .voters-list > ul {
+        overflow-y: auto;
+        height: 120px;
+    }
+
+    .votersListModal .reveal {
+        min-height: 220px;
+        height: 250px;
+    }
+}
+
+@media screen and (min-height: 769px) {
+    // .votersListModal .reveal 
+    .voters-list > ul {
+        overflow-y: auto;
+        height: 140px;
+    }
+
+    .votersListModal .reveal {
+        min-height: 290px;
+        height: 320px;
+    }
+}
+
+@media screen and (max-width: 39.9375em) {
+    .votersListModal.reveal {
+        min-height: 220px;
+        height: 290px;
+        width: 350px !important;
+        margin-right: auto;
+        margin-left: auto;
+        top: 25%;
+    }
+}
+
+@media screen and (min-width: 39.9376em) {
+    .votersListModal.reveal {
+        width: 350px !important;
+        margin-right: auto;
+        margin-left: auto;
+        top: 30%;
+    }
 }

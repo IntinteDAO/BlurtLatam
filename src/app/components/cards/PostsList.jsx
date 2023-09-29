@@ -1,16 +1,12 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import tt from 'counterpart';
 import * as userActions from 'app/redux/UserReducer';
 import { actions as fetchDataSagaActions } from 'app/redux/FetchDataSaga';
 import PostSummary from 'app/components/cards/PostSummary';
-import Post from 'app/components/pages/Post';
 import LoadingIndicator from 'app/components/elements/LoadingIndicator';
 import debounce from 'lodash.debounce';
 import { findParent } from 'app/utils/DomUtils';
-import Icon from 'app/components/elements/Icon';
-import GptAd from 'app/components/elements/GptAd';
 
 import shouldComponentUpdate from 'app/utils/shouldComponentUpdate';
 
@@ -304,14 +300,6 @@ class PostsList extends Component {
                                     />
                                 )}
                             </li>
-
-                            <div className="articles__content-block--ad">
-                                <GptAd
-                                    tags={[category]}
-                                    type="Freestar"
-                                    id="bsa-zone_1566495089502-1_123456"
-                                />
-                            </div>
                         </div>
                     );
                 }

@@ -14,6 +14,7 @@ import { connect } from 'react-redux';
 import Overlay from 'react-overlays/lib/Overlay';
 import AuthorDropdown from '../AuthorDropdown';
 import Blacklist from '../Blacklist';
+import PromotedMember from '../PromotedMember';
 
 const { string, bool, number } = PropTypes;
 
@@ -118,6 +119,7 @@ class Author extends Component {
                     </strong>{' '}
                     {/* <Reputation value={authorRepLog10} /> */}
                     <Blacklist author={author} />
+                    <PromotedMember author={author} />
                     {showAffiliation && AffiliationMap[author] ? (
                         <span className="affiliation">
                             {tt('g.affiliation_' + AffiliationMap[author])}

@@ -3,7 +3,7 @@ import CloseButton from 'app/components/elements/CloseButton';
 import { Link } from 'react-router';
 import tt from 'counterpart';
 import { SIGNUP_URL } from 'shared/constants';
-import imgSrc from 'app/assets/images/blurt-girl-splash.png';
+import imgSrc from 'app/assets/images/ready-player-hero-1.png';
 
 export default class WelcomePanel extends Component {
     constructor(props) {
