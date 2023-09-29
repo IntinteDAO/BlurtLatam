@@ -240,7 +240,7 @@ class Settings extends Component {
                                 <select
                                     defaultValue={
                                         user_preferences.defaultCommentsSortOrder ||
-                                        'new'
+                                        'trending'
                                     }
                                     onChange={
                                         this

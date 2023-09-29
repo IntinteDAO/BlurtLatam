@@ -578,7 +578,7 @@ const Comment = connect(
             ignore_list,
             comments_sort_order: state.app.getIn(
                 ['user_preferences', 'defaultCommentsSortOrder'],
-                'new'
+                'trending'
             ),
             operation_flat_fee: state.global.getIn([
                 'props',

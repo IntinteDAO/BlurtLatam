@@ -1310,15 +1310,15 @@ export default (formId) => connect(
             if (!isEdit) {
                 let messageHTML = '';
                 if(linkProps.parent_author && linkProps.parent_author.length > 0) {
-                    messageHTML = '<br /> <hr /> <center><sub>Posted from <a href="https://blurtlatam.com'
+                    messageHTML = '<br /> <hr /> <center><sub>Posted from <a href="https://blurtlatam.intinte.org'
                     + '/' + parent_permlink
-                    + '/@' + linkProps.parent_author + '/' + permlink + '">https://blurtlatam.com</a></sub></center>';
+                    + '/@' + linkProps.parent_author + '/' + permlink + '">https://blurtlatam.intinte.org</a></sub></center>';
                 } else {
-                    messageHTML = '<br /> <hr /> <center><sub>Posted from <a href="https://blurtlatam.com'
+                    messageHTML = '<br /> <hr /> <center><sub>Posted from <a href="https://blurtlatam.intinte.org'
                     // + '/' + parent_permlink
                     + '/@' + linkProps.author
                     // + '/' + permlink
-                    + '">https://blurtlatam.com</a></sub></center>';
+                    + '">https://blurtlatam.intinte.org</a></sub></center>';
                 }
                 if (!isStory) {
                     body += ` ` + messageHTML;

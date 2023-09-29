@@ -372,7 +372,7 @@ export default connect((state, ownProps) => {
             ownProps.router.getCurrentLocation().query.sort
             || state.app.getIn(
                 ['user_preferences', 'defaultCommentsSortOrder'],
-                'new'
+                'trending'
             ),
         gptEnabled: state.app.getIn(['googleAds', 'gptEnabled']),
         enabled: state.app.getIn(['googleAds', 'enabled']),
